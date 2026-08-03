@@ -1,12 +1,13 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { Menu, Zap, Github, ArrowRight } from "lucide-react";
+import { Menu, Zap, Github, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { GITHUB_REPO } from "@/lib/site";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -43,14 +44,25 @@ const LEGAL_KEYS = [
 export function Navbar() {
   const t = useTranslations();
   const locale = useLocale();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(href + "/");
+  };
 
   return (
     <header
@@ -61,6 +73,11 @@ export function Navbar() {
           : "bg-transparent border-transparent"
       )}
     >
+      <div className="absolute inset-x-0 top-0 h-px bg-border/40" />
+      <div
+        className="absolute top-0 left-0 h-px bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500 transition-[width] duration-150"
+        style={{ width: `${progress}%` }}
+      />
       <div className="container flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="Lead Machine Home">
           <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:-translate-y-0.5">
@@ -76,7 +93,12 @@ export function Navbar() {
             <Link
               key={it.key}
               href={it.href}
-              className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-accent/40"
+              className={cn(
+                "px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                isActive(it.href)
+                  ? "text-foreground bg-accent/60"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/40"
+              )}
             >
               {t(it.key)}
             </Link>
@@ -85,7 +107,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <a
-            href="https://github.com/lead-machine/lead-machine"
+            href="${GITHUB_REPO}"
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("nav.starOnGithub")}
@@ -93,10 +115,16 @@ export function Navbar() {
           >
             <Github className="h-4 w-4" />
             <span className="hidden md:inline">GitHub</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold">★</span>
+            <span className="text-indigo-600 dark:text-indigo-400 font-bold">â˜…</span>
           </a>
           <LocaleSwitcher compact />
           <ThemeToggle />
+          <Button asChild variant="glass" size="sm" className="hidden md:inline-flex">
+            <Link href="/demo">
+              <Sparkles className="h-4 w-4 text-fuchsia-500" />
+              {t("nav.liveDemo")}
+            </Link>
+          </Button>
           <Button asChild variant="gradient" size="sm" className="hidden md:inline-flex">
             <Link href="/deploy">
               {t("nav.getStarted")}
@@ -157,6 +185,12 @@ export function Navbar() {
                   </Link>
                 ))}
                 <Separator className="my-3" />
+                <Button asChild variant="glass" size="lg" className="mt-1">
+                  <Link href="/demo">
+                    <Sparkles className="h-4 w-4 text-fuchsia-500" />
+                    {t("nav.liveDemo")}
+                  </Link>
+                </Button>
                 <Button asChild variant="gradient" size="lg" className="mt-1">
                   <Link href="/deploy">
                     {t("nav.getStarted")}

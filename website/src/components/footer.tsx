@@ -1,8 +1,9 @@
-import { Link } from "@/i18n/navigation";
+﻿import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Zap, Github, Twitter, Linkedin, Mail, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { locales, localeLabels, type Locale } from "@/i18n/config";
+import { GITHUB_REPO } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const LEGAL_KEYS = [
@@ -22,6 +23,10 @@ const PRODUCT_KEYS = [
   "deploy",
   "docs",
 ] as const;
+
+const PRODUCT_EXTRA: Array<[string, string]> = [
+  ["demo", "nav.liveDemo"],
+] as any;
 
 const RESOURCE_KEYS = [
   "blog",
@@ -63,7 +68,7 @@ export function Footer() {
             </p>
             <div className="mt-5 flex items-center gap-2">
               <a
-                href="https://github.com/lead-machine/lead-machine"
+                href="${GITHUB_REPO}"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
@@ -134,6 +139,16 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              {PRODUCT_EXTRA.map(([href, k]) => (
+                <li key={href}>
+                  <Link
+                    href={`/${href}`}
+                    className="text-muted-foreground hover:text-foreground link-underline"
+                  >
+                    {typeof k === "string" && k.startsWith("nav.") ? t(k) : k}
+                  </Link>
+                </li>
+              ))}
               {FORM_KEYS.map(([href, k]) => (
                 <li key={href}>
                   <Link
@@ -184,14 +199,14 @@ export function Footer() {
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-muted-foreground">
           <p className="flex items-center gap-1.5">
-            © {year} Lead Machine Contributors.{" "}
+            Â© {year} Lead Machine Contributors.{" "}
             {t("meta.license") || "Released under MIT License."}
             <span className="inline-flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-rose-500 fill-rose-500" /> &nbsp;for freelancers worldwide.
             </span>
           </p>
           <p>
-            OpenStreetMap®, OpenStreetMap Foundation. Leaflet © Volodymyr Agafonkin. Next.js © Vercel.
+            OpenStreetMapÂ®, OpenStreetMap Foundation. Leaflet Â© Volodymyr Agafonkin. Next.js Â© Vercel.
           </p>
         </div>
       </div>

@@ -4,7 +4,8 @@
     "description": "Free, open-source, self-hosted lead generation platform for freelancers & small agencies. Find nearby businesses, score them, contact them, build quotes. €0 in subscriptions.",
     "ogTitle": "Lead Machine — Free Forever CRM for Freelancers",
     "ogDescription": "100% open-source. Your data. Your DB. BYOK encryption or no keys at all. Zero subscriptions, zero tracking.",
-    "keywords": "lead generation, crm, open source, self hosted, freelancer tools, small business, openstreetmap, quotes, invoicing"
+    "keywords": "lead generation, crm, open source, self hosted, freelancer tools, small business, openstreetmap, quotes, invoicing",
+    "license": "Released under MIT License."
   },
   "nav": {
     "home": "Home",
@@ -31,7 +32,10 @@
       "imprint": "Imprint",
       "dpa": "Data Processing",
       "security": "Security"
-    }
+    },
+    "language": "Language",
+    "partnership": "Partnerships",
+    "liveDemo": "Live Demo"
   },
   "byokBanner": {
     "title": "🔒 Your API keys · Your data · Your DB.",
@@ -185,7 +189,8 @@
       "a4": "Yes — see the Deploy docs. For Vercel, attach a persistent volume for SQLite (or switch to Postgres — single DATABASE_URL change).",
       "q5": "Is there a hosted managed version?",
       "a5": "Not currently, but the community is working on one. Star & watch the repo for updates."
-    }
+    },
+    "included": "Included"
   },
   "byok": {
     "title": "BYOK & Zero-Knowledge Architecture",
@@ -244,7 +249,7 @@
         "title": "Laptop (Recommended)",
         "badge": "Best for individuals",
         "steps": [
-          "git clone https://github.com/lead-machine/lead-machine.git",
+          "git clone https://github.com/AxsenXzc/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → open http://localhost:3000"
         ],
@@ -270,7 +275,8 @@
         ],
         "notes": "⚠️ Vercel ephemeral FS — you MUST mount a volume or use Postgres for durable storage."
       }
-    }
+    },
+    "copied": "Copied to clipboard"
   },
   "legal": {
     "lastUpdated": "Last updated",
@@ -372,11 +378,31 @@
         "body": "Under the aforementioned EU/Italian regulatory framework, strictly necessary cookies — those required for the basic functioning of the site — can be set without prior consent, and users have a right to delete them via browser settings at any time. These are the only cookies set by this website:"
       },
       "table": {
-        "cols": ["Cookie name", "Purpose", "Duration", "Controller"],
+        "cols": [
+          "Cookie name",
+          "Purpose",
+          "Duration",
+          "Controller"
+        ],
         "rows": [
-          ["next-intl-locale", "Remembers your interface language preference so you don't get re-prompted on every pageload", "1 year (365 days)", "First-party — Lead Machine (functional)"],
-          ["lm_license", "Reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.", "10 years", "First-party — Lead Machine (functional)"],
-          ["lm_consent", "Remembers that you have seen and acknowledged the cookie banner on this site. Stores no personal information.", "90 days", "First-party — Lead Machine (functional)"]
+          [
+            "next-intl-locale",
+            "Remembers your interface language preference so you don't get re-prompted on every pageload",
+            "1 year (365 days)",
+            "First-party — Lead Machine (functional)"
+          ],
+          [
+            "lm_license",
+            "Reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.",
+            "10 years",
+            "First-party — Lead Machine (functional)"
+          ],
+          [
+            "lm_consent",
+            "Remembers that you have seen and acknowledged the cookie banner on this site. Stores no personal information.",
+            "90 days",
+            "First-party — Lead Machine (functional)"
+          ]
         ]
       },
       "notUsedTitle": "Cookies explicitly NOT used on this site",
@@ -398,5 +424,140 @@
       "subtitle": "Full policy at SECURITY.md in the repo. Short version here.",
       "intro": "The Lead Machine security policy lives in SECURITY.md in the main repository and is maintained alongside the code. This page is a human-readable summary for website visitors. The canonical version is the Markdown file on GitHub."
     }
+  },
+  "cta": {
+    "title": "Ready to own your pipeline?",
+    "subtitle": "Deploy Lead Machine on your laptop in 3 commands — or self-host it anywhere. Free forever, no sign-up, no credit card.",
+    "primary": "Deploy Now — Free",
+    "secondary": "Star on GitHub",
+    "demo": "Try the live demo"
+  },
+  "forms": {
+    "name": "Name",
+    "email": "Email",
+    "company": "Company (optional)",
+    "message": "Message",
+    "send": "Send",
+    "sending": "Sending…",
+    "successTitle": "Message sent",
+    "successDesc": "Thanks — we usually reply within 24 hours.",
+    "errorTitle": "Could not send",
+    "errorDesc": "Please check the fields and try again.",
+    "demo-request": {
+      "title": "Request a Demo",
+      "subtitle": "See Lead Machine live: search, score, contact — in under 3 minutes.",
+      "cta": "Request Demo"
+    },
+    "partnership": {
+      "title": "Partnerships",
+      "subtitle": "Let's grow the ecosystem together. Agencies, integrators, resellers — write to us.",
+      "cta": "Send proposal"
+    },
+    "report-issue": {
+      "title": "Report an Issue",
+      "subtitle": "Found a bug? Describe it and we'll fix it fast. Include your OS & browser.",
+      "cta": "Send report"
+    },
+    "waitlist": {
+      "title": "Join the Waitlist",
+      "subtitle": "Be first in line for the hosted managed version, custom builds & early features.",
+      "cta": "Join Waitlist"
+    }
+  },
+  "resources": {
+    "docs": {
+      "title": "Documentation",
+      "subtitle": "Everything you need to install, configure and master Lead Machine.",
+      "body": "Step-by-step guides for local setup, VPS deployment, BYOK keys, AI providers (Gemini & Groq), SMTP and the quote pipeline. The full documentation lives in the repository's /docs folder and the README."
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Stories, guides and field notes from the Lead Machine team.",
+      "body": "Articles about lead generation for freelancers, CRM workflows, self-hosting tips and open-source philosophy. New posts are announced on GitHub Discussions."
+    },
+    "changelog": {
+      "title": "Changelog",
+      "subtitle": "Every release, every fix, every new feature — in chronological order.",
+      "body": "We follow semantic versioning. Releases are published on GitHub Releases with detailed notes, migration steps and breaking-change warnings when applicable."
+    },
+    "roadmap": {
+      "title": "Roadmap",
+      "subtitle": "Where Lead Machine is going next.",
+      "body": "The roadmap is public and community-driven. Upvote ideas and suggest features in GitHub Discussions — we build what users actually need."
+    },
+    "contributors": {
+      "title": "Contributors",
+      "subtitle": "The people who make Lead Machine possible.",
+      "body": "Lead Machine is built by volunteers: developers, designers, translators and users who share their feedback. Every contribution is welcome — from docs fixes to new features."
+    },
+    "status": {
+      "title": "Status",
+      "subtitle": "Real-time status of all Lead Machine services.",
+      "body": "Lead Machine is an open-source project: there are no cloud servers to go down. The website, the code repository and community channels are maintained by volunteers. Report outages on GitHub."
+    },
+    "about": {
+      "title": "About",
+      "subtitle": "Why Lead Machine exists.",
+      "body": "We are freelancers who got tired of paying for tools that lock our data in the cloud. Lead Machine is our answer: a professional lead-generation stack that is free, private and open. It is developed in the open, used daily by its own maintainers."
+    }
+  },
+  "demo": {
+    "title": "Live Demo — Try Lead Machine in Your Browser",
+    "subtitle": "Search real businesses on OpenStreetMap, score leads and generate AI outreach — right here, with your own API keys. Nothing is stored on any server.",
+    "search": {
+      "title": "1 · Find leads",
+      "categoryLabel": "Business category",
+      "categoryPlaceholder": "e.g. plumber, bakery, dentist…",
+      "cityLabel": "City",
+      "cityPlaceholder": "e.g. Milan",
+      "radiusLabel": "Radius",
+      "search": "Search",
+      "searching": "Searching…",
+      "results": "leads found",
+      "noResults": "No businesses found. Try another category or city.",
+      "error": "Search failed. Check your connection and try again.",
+      "score": "Score",
+      "distance": "away"
+    },
+    "lead": {
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "hours": "Open hours",
+      "address": "Address"
+    },
+    "ai": {
+      "title": "2 · AI outreach (optional)",
+      "desc": "Generate a cold email or call script for any lead. Use your own Gemini or Groq key — encrypted in YOUR browser, never sent to us. Or use your free credits.",
+      "geminiKey": "Gemini API key",
+      "groqKey": "Groq API key",
+      "saveKeys": "Save keys (encrypted)",
+      "keysSaved": "Keys saved encrypted in your browser",
+      "eraseKeys": "Erase keys",
+      "keysErased": "Keys erased",
+      "keysNeverLeave": "Your keys never leave this browser — AES-256-GCM + PBKDF2.",
+      "genEmail": "Generate email draft",
+      "genScript": "Generate call script",
+      "generating": "Generating…",
+      "selectLead": "Select a lead first",
+      "copy": "Copy",
+      "creditError": "No key configured and free credits are unavailable."
+    },
+    "credits": {
+      "left": "{count} free AI credits left",
+      "byokPrompt": "Credits used up. Add your own Gemini or Groq key above — unlimited, free forever."
+    },
+    "trust": {
+      "title": "Your trust, our architecture",
+      "body": "This demo runs entirely in your browser. Keys are encrypted client-side with AES-256-GCM (PBKDF2, 100k iterations) and stored only in your localStorage. Don't trust us? Download the full app and run it on your machine.",
+      "selfHost": "Self-host from GitHub",
+      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+    }
+  },
+  "showcase": {
+    "title": "See it in action — right now",
+    "subtitle": "Real businesses from OpenStreetMap. Real lead scores. Real AI outreach with your own keys. No sign-up, no installation.",
+    "cta": "Open the live demo",
+    "credits": "10 free AI credits"
   }
 }

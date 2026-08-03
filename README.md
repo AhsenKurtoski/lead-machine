@@ -112,6 +112,20 @@ See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure
 
 ---
 
+## 🌐 Marketing website
+
+This repo also contains the **public marketing website** for Lead Machine in the [`website/`](./website/) folder:
+
+- Landing, Features, Pricing, BYOK & Privacy, Transparency, Deploy pages — fully translated in **7 languages** (next-intl).
+- A **live in-browser demo** (`/demo`) that searches **real businesses on OpenStreetMap** (Nominatim + Overpass), scores leads 0–100, and generates cold emails / call scripts with the visitor's **own Gemini/Groq keys** (AES-256-GCM + PBKDF2 encrypted in `localStorage`, never sent to any server).
+- **10 free AI credits per visitor** powered by the serverless route `/api/demo-ai` (set `DEMO_AI_KEY` to enable; without it the demo falls back to BYOK automatically).
+- **SEO ready**: per-locale `sitemap.xml`, `robots.txt`, Open Graph image, canonical + hreflang alternates — 174 statically pre-rendered pages.
+- One-command deploy to **Vercel** (root directory: `website`).
+
+📖 Full documentation, architecture, env vars and demo internals → **[`website/README.md`](./website/README.md)**
+
+---
+
 ## 🚀 Quick start
 
 ### 1. Prerequisites
@@ -235,6 +249,7 @@ lead-machine/
 │   ├── app/              # App Router: pages + /api/* routes
 │   ├── components/       # UI: app-shell, charts, forms, cards, locale-switcher, theme-toggle…
 │   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, quotes, security, i18n)
+├── website/              # 🌐 Marketing website + live demo (see website/README.md)
 ├── .env.example
 ├── CONTRIBUTING.md
 ├── SECURITY.md

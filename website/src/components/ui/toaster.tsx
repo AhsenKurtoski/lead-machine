@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { ToastProvider as RadixToastProvider, ToastViewport } from "@/components/ui/toast";
 import { ToastStateContext, type ToastData, type ToastState } from "@/components/ui/use-toast";
@@ -20,7 +22,7 @@ function genId() {
 
 const nextId = genId();
 
-export function Toaster() {
+export function Toaster({ children }: { children?: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastData[]>([]);
 
   const addToast = React.useCallback((toast: Omit<ToastData, "id">) => {
@@ -47,6 +49,7 @@ export function Toaster() {
   return (
     <ToastStateContext.Provider value={state}>
       <RadixToastProvider>
+        {children}
         {toasts.map((toast) => (
           <Toast key={toast.id} variant={toast.variant}>
             {toast.title && <ToastTitle>{toast.title}</ToastTitle>}

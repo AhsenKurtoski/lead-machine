@@ -4,7 +4,8 @@
     "description": "Kostenlose, quelloffene, selbst gehostete Lead-Generierungsplattform für Freelancer & kleine Agenturen. Finde lokale Unternehmen, bewerte sie, kontaktiere sie, erstelle Angebote. €0 an Abonnements.",
     "ogTitle": "Lead Machine — Für immer kostenloses CRM für Freelancer",
     "ogDescription": "100% quelloffen. Deine Daten. Deine DB. BYOK-Verschlüsselung oder gar keine Schlüssel. Null Abonnements, null Tracking.",
-    "keywords": "lead-generierung, crm, open source, selbst gehostet, freelancer-tools, kleines unternehmen, openstreetmap, angebote, rechnungsstellung"
+    "keywords": "lead-generierung, crm, open source, selbst gehostet, freelancer-tools, kleines unternehmen, openstreetmap, angebote, rechnungsstellung",
+    "license": "Unter der MIT-Lizenz veröffentlicht."
   },
   "nav": {
     "home": "Startseite",
@@ -31,7 +32,10 @@
       "imprint": "Impressum",
       "dpa": "Datenverarbeitung",
       "security": "Sicherheit"
-    }
+    },
+    "language": "Sprache",
+    "partnership": "Partnerschaften",
+    "liveDemo": "Live-Demo"
   },
   "byokBanner": {
     "title": "🔒 Deine API-Schlüssel · Deine Daten · Deine DB.",
@@ -185,7 +189,8 @@
       "a4": "Ja — siehe Deploy-Dokumentation. Für Vercel hänge ein persistentes Volume für SQLite an (oder wechsle zu Postgres — nur DATABASE_URL Änderung).",
       "q5": "Gibt es eine gehostete verwaltete Version?",
       "a5": "Derzeit nicht, aber die Community arbeitet daran. Gib einen Stern und verfolge das Repo für Updates."
-    }
+    },
+    "included": "Enthalten"
   },
   "byok": {
     "title": "BYOK & Zero-Knowledge-Architektur",
@@ -244,7 +249,7 @@
         "title": "Laptop (Empfohlen)",
         "badge": "Am besten für Einzelpersonen",
         "steps": [
-          "git clone https://github.com/lead-machine/lead-machine.git",
+          "git clone https://github.com/AxsenXzc/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → öffne http://localhost:3000"
         ],
@@ -270,7 +275,8 @@
         ],
         "notes": "⚠️ Vercel flüchtiges FS — du MUSST ein Volume mounten oder Postgres für dauerhaften Speicher verwenden."
       }
-    }
+    },
+    "copied": "In die Zwischenablage kopiert"
   },
   "legal": {
     "lastUpdated": "Zuletzt aktualisiert",
@@ -372,11 +378,31 @@
         "body": "Gemäß dem oben genannten EU-/italienischen Rechtsrahmen können unbedingt erforderliche Cookies — solche, die für die grundlegende Funktionalität der Website erforderlich sind — ohne vorherige Einwilligung gesetzt werden, und Nutzer haben das Recht, sie jederzeit über die Browsereinstellungen zu löschen. Dies sind die einzigen Cookies, die von dieser Website gesetzt werden:"
       },
       "table": {
-        "cols": ["Cookie-Name", "Zweck", "Dauer", "Verantwortlicher"],
+        "cols": [
+          "Cookie-Name",
+          "Zweck",
+          "Dauer",
+          "Verantwortlicher"
+        ],
         "rows": [
-          ["next-intl-locale", "Merkt sich Ihre Oberflächenspracheinstellung, sodass Sie nicht bei jedem Seitenaufruf erneut gefragt werden", "1 Jahr (365 Tage)", "First-party — Lead Machine (funktional)"],
-          ["lm_license", "Reservierter Cookie-Name für zukünftige optionale Open-Source-Enterprise-Funktionen. 100% NICHT GESETZT in der aktuellen Open-Source-Version. Wird heute in keinem Benutzerbrowser jemals geschrieben.", "10 Jahre", "First-party — Lead Machine (funktional)"],
-          ["lm_consent", "Merkt sich, dass Sie das Cookie-Banner auf dieser Website gesehen und bestätigt haben. Speichert keine personenbezogenen Informationen.", "90 Tage", "First-party — Lead Machine (funktional)"]
+          [
+            "next-intl-locale",
+            "Merkt sich Ihre Oberflächenspracheinstellung, sodass Sie nicht bei jedem Seitenaufruf erneut gefragt werden",
+            "1 Jahr (365 Tage)",
+            "First-party — Lead Machine (funktional)"
+          ],
+          [
+            "lm_license",
+            "Reservierter Cookie-Name für zukünftige optionale Open-Source-Enterprise-Funktionen. 100% NICHT GESETZT in der aktuellen Open-Source-Version. Wird heute in keinem Benutzerbrowser jemals geschrieben.",
+            "10 Jahre",
+            "First-party — Lead Machine (funktional)"
+          ],
+          [
+            "lm_consent",
+            "Merkt sich, dass Sie das Cookie-Banner auf dieser Website gesehen und bestätigt haben. Speichert keine personenbezogenen Informationen.",
+            "90 Tage",
+            "First-party — Lead Machine (funktional)"
+          ]
         ]
       },
       "notUsedTitle": "Cookies, die auf dieser Website ausdrücklich NICHT verwendet werden",
@@ -398,5 +424,140 @@
       "subtitle": "Vollständige Richtlinie in SECURITY.md im Repo. Kurzversion hier.",
       "intro": "Die Sicherheitsrichtlinie von Lead Machine befindet sich in SECURITY.md im Hauptrepository und wird gemeinsam mit dem Code gewartet. Diese Seite ist eine lesbare Zusammenfassung für Website-Besucher. Die kanonische Version ist die Markdown-Datei auf GitHub."
     }
+  },
+  "cta": {
+    "title": "Bereit, deine Pipeline zu besitzen?",
+    "subtitle": "Installiere Lead Machine in 3 Befehlen auf deinem Laptop – oder hoste sie selbst überall. Für immer kostenlos, ohne Anmeldung, ohne Kreditkarte.",
+    "primary": "Jetzt installieren – Kostenlos",
+    "secondary": "Auf GitHub markieren",
+    "demo": "Live-Demo testen"
+  },
+  "forms": {
+    "name": "Name",
+    "email": "E-Mail",
+    "company": "Firma (optional)",
+    "message": "Nachricht",
+    "send": "Senden",
+    "sending": "Senden…",
+    "successTitle": "Nachricht gesendet",
+    "successDesc": "Danke – wir antworten in der Regel innerhalb von 24 Stunden.",
+    "errorTitle": "Senden fehlgeschlagen",
+    "errorDesc": "Bitte prüfe die Felder und versuche es erneut.",
+    "demo-request": {
+      "title": "Demo anfragen",
+      "subtitle": "Sehen Sie Lead Machine live: suchen, bewerten, kontaktieren – in unter 3 Minuten.",
+      "cta": "Demo anfragen"
+    },
+    "partnership": {
+      "title": "Partnerschaften",
+      "subtitle": "Lassen Sie uns das Ökosystem gemeinsam ausbauen. Agenturen, Integratoren, Reseller – schreiben Sie uns.",
+      "cta": "Vorschlag senden"
+    },
+    "report-issue": {
+      "title": "Problem melden",
+      "subtitle": "Einen Fehler gefunden? Beschreiben Sie ihn und wir beheben ihn schnell. Inklusive OS & Browser.",
+      "cta": "Meldung senden"
+    },
+    "waitlist": {
+      "title": "Warteliste beitreten",
+      "subtitle": "Seien Sie Erster für die gehostete Version, Custom Builds & Early Features.",
+      "cta": "Warteliste beitreten"
+    }
+  },
+  "resources": {
+    "docs": {
+      "title": "Dokumentation",
+      "subtitle": "Alles, was Sie brauchen, um Lead Machine zu installieren, zu konfigurieren und zu meistern.",
+      "body": "Schritt-für-Schritt-Anleitungen für lokale Installation, VPS-Bereitstellung, BYOK-Schlüssel, AI-Anbieter (Gemini & Groq), SMTP und die Angebotspipeline. Die vollständige Dokumentation liegt im /docs-Ordner des Repos und in der README."
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Geschichten, Anleitungen und Notizen aus dem Feld vom Lead-Machine-Team.",
+      "body": "Artikel über Lead-Generierung für Freelancer, CRM-Workflows, Self-Hosting-Tipps und Open-Source-Philosophie. Neue Beiträge werden auf GitHub Discussions angekündigt."
+    },
+    "changelog": {
+      "title": "Changelog",
+      "subtitle": "Jedes Release, jeder Fix, jede neue Funktion – in chronologischer Reihenfolge.",
+      "body": "Wir folgen Semantic Versioning. Releases werden auf GitHub Releases mit detaillierten Notizen, Migrationsschritten und Breaking-Change-Hinweisen veröffentlicht."
+    },
+    "roadmap": {
+      "title": "Roadmap",
+      "subtitle": "Wohin sich Lead Machine als Nächstes entwickelt.",
+      "body": "Die Roadmap ist öffentlich und community-getrieben. Bewerten Sie Ideen und schlagen Sie Funktionen in GitHub Discussions vor – wir bauen, was Nutzer wirklich brauchen."
+    },
+    "contributors": {
+      "title": "Mitwirkende",
+      "subtitle": "Die Menschen, die Lead Machine möglich machen.",
+      "body": "Lead Machine wird von Freiwilligen gebaut: Entwickler, Designer, Übersetzer und Nutzer, die Feedback teilen. Jeder Beitrag ist willkommen – von Docs-Fixes bis zu neuen Funktionen."
+    },
+    "status": {
+      "title": "Status",
+      "subtitle": "Echtzeit-Status aller Lead Machine-Dienste.",
+      "body": "Lead Machine ist ein Open-Source-Projekt: Es gibt keine Cloud-Server, die ausfallen können. Website, Code-Repository und Community-Kanäle werden von Freiwilligen gepflegt. Melden Sie Ausfälle auf GitHub."
+    },
+    "about": {
+      "title": "Über uns",
+      "subtitle": "Warum es Lead Machine gibt.",
+      "body": "Wir sind Freelancer, die es leid waren, für Tools zu zahlen, die unsere Daten in der Cloud einsperren. Lead Machine ist unsere Antwort: ein professioneller Lead-Generierungs-Stack, der kostenlos, privat und offen ist. In der Öffentlichkeit entwickelt, täglich von seinen Maintainern genutzt."
+    }
+  },
+  "demo": {
+    "title": "Live-Demo — Lead Machine im Browser ausprobieren",
+    "subtitle": "Durchsuchen Sie echte Unternehmen auf OpenStreetMap, bewerten Sie Leads und erstellen Sie KI-Kontaktaufnahmen — direkt hier, mit Ihren eigenen API-Keys. Nichts wird auf einem Server gespeichert.",
+    "search": {
+      "title": "1 · Leads finden",
+      "categoryLabel": "Unternehmenskategorie",
+      "categoryPlaceholder": "z. B. Klempner, Bäckerei, Zahnarzt…",
+      "cityLabel": "Stadt",
+      "cityPlaceholder": "z. B. Mailand",
+      "radiusLabel": "Radius",
+      "search": "Suchen",
+      "searching": "Suche…",
+      "results": "Leads gefunden",
+      "noResults": "Keine Unternehmen gefunden. Versuchen Sie eine andere Kategorie oder Stadt.",
+      "error": "Suche fehlgeschlagen. Prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "score": "Score",
+      "distance": "entfernt"
+    },
+    "lead": {
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "website": "Website",
+      "hours": "Öffnungszeiten",
+      "address": "Adresse"
+    },
+    "ai": {
+      "title": "2 · KI-Kontaktaufnahme (optional)",
+      "desc": "Erstellen Sie eine Kaltakquise-E-Mail oder einen Anruf-Skript für jeden Lead. Nutzen Sie Ihren eigenen Gemini- oder Groq-Key — in IHREM Browser verschlüsselt, nie an uns gesendet. Oder nutzen Sie Ihre Gratis-Credits.",
+      "geminiKey": "Gemini-API-Key",
+      "groqKey": "Groq-API-Key",
+      "saveKeys": "Keys speichern (verschlüsselt)",
+      "keysSaved": "Keys verschlüsselt in Ihrem Browser gespeichert",
+      "eraseKeys": "Keys löschen",
+      "keysErased": "Keys gelöscht",
+      "keysNeverLeave": "Ihre Keys verlassen diesen Browser nie — AES-256-GCM + PBKDF2.",
+      "genEmail": "E-Mail-Entwurf erstellen",
+      "genScript": "Anruf-Skript erstellen",
+      "generating": "Generierung…",
+      "selectLead": "Wählen Sie zuerst einen Lead aus",
+      "copy": "Kopieren",
+      "creditError": "Kein Key konfiguriert und Gratis-Credits nicht verfügbar."
+    },
+    "credits": {
+      "left": "{count} Gratis-KI-Credits übrig",
+      "byokPrompt": "Credits aufgebraucht. Fügen Sie oben Ihren eigenen Gemini- oder Groq-Key hinzu — unbegrenzt, für immer kostenlos."
+    },
+    "trust": {
+      "title": "Ihr Vertrauen, unsere Architektur",
+      "body": "Diese Demo läuft vollständig in Ihrem Browser. Keys werden clientseitig mit AES-256-GCM (PBKDF2, 100k Iterationen) verschlüsselt und nur in Ihrem localStorage gespeichert. Vertrauen Sie uns nicht? Laden Sie die vollständige App herunter und führen Sie sie auf Ihrem Rechner aus.",
+      "selfHost": "Self-Hosting von GitHub",
+      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+    }
+  },
+  "showcase": {
+    "title": "Sehen Sie es jetzt in Aktion",
+    "subtitle": "Echte Unternehmen von OpenStreetMap. Echte Lead-Scores. Echte KI-Outreach mit Ihren eigenen Schlüsseln. Keine Anmeldung, keine Installation.",
+    "cta": "Live-Demo öffnen",
+    "credits": "10 kostenlose AI-Credits"
   }
 }

@@ -14,8 +14,11 @@ export const localeLabels: Record<Locale, { native: string; english: string; fla
   pt: { native: "Português", english: "Portuguese", flag: "🇵🇹", currency: "EUR", bcp47: "pt-PT" },
 };
 
-export function isValidLocale(locale: string): locale is Locale {
-  return (locales as readonly string[]).includes(locale);
+export function isValidLocale(locale: string | undefined | null): locale is Locale {
+  return (
+    typeof locale === "string" &&
+    (locales as readonly string[]).includes(locale)
+  );
 }
 
 export function getLocaleFromNavigator(fallback: Locale = defaultLocale): Locale {
