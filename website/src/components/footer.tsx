@@ -1,4 +1,4 @@
-﻿import { Link } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Zap, Github, Twitter, Linkedin, Mail, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -68,7 +68,7 @@ export function Footer() {
             </p>
             <div className="mt-5 flex items-center gap-2">
               <a
-                href="${GITHUB_REPO}"
+                href={GITHUB_REPO}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
@@ -127,7 +127,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold tracking-tight">{t("nav.features")?.slice(0, 1).toUpperCase() + "roduct" || "Product"}</h4>
+            <h3 className="text-sm font-semibold tracking-tight">{t("footer.product")}</h3>
             <ul className="mt-4 space-y-3 text-sm">
               {PRODUCT_KEYS.map((k) => (
                 <li key={k}>
@@ -163,7 +163,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold tracking-tight">Resources</h4>
+            <h3 className="text-sm font-semibold tracking-tight">{t("footer.resources")}</h3>
             <ul className="mt-4 space-y-3 text-sm">
               {RESOURCE_KEYS.map((k) => (
                 <li key={k}>
@@ -179,7 +179,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold tracking-tight">Legal</h4>
+            <h3 className="text-sm font-semibold tracking-tight">{t("footer.legal")}</h3>
             <ul className="mt-4 space-y-3 text-sm">
               {LEGAL_KEYS.map((k) => (
                 <li key={k}>
@@ -199,14 +199,14 @@ export function Footer() {
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-muted-foreground">
           <p className="flex items-center gap-1.5">
-            Â© {year} Lead Machine Contributors.{" "}
+            © {year} Lead Machine Contributors.{" "}
             {t("meta.license") || "Released under MIT License."}
             <span className="inline-flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-rose-500 fill-rose-500" /> &nbsp;for freelancers worldwide.
             </span>
           </p>
           <p>
-            OpenStreetMapÂ®, OpenStreetMap Foundation. Leaflet Â© Volodymyr Agafonkin. Next.js Â© Vercel.
+            OpenStreetMap®, OpenStreetMap Foundation. Leaflet © Volodymyr Agafonkin. Next.js © Vercel.
           </p>
         </div>
       </div>

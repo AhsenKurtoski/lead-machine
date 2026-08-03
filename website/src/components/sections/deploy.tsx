@@ -66,7 +66,7 @@ export function DeploySection() {
           <SectionHeader title={t("title")} subtitle={t("subtitle")} />
         </Reveal>
 
-        <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:mt-16 lg:grid-cols-3">
+        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-6 sm:mt-16 lg:grid-cols-3">
           {OPTIONS.map((opt, idx) => (
             <Reveal key={opt.key} delay={idx * 120}>
               <div className="card-hover flex h-full flex-col rounded-2xl border border-border/60 bg-card/70 p-6 backdrop-blur">

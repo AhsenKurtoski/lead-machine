@@ -130,7 +130,7 @@ export function FeaturesTabs() {
 
             {CATEGORIES.map((cat) => (
               <TabsContent key={cat.key} value={cat.key}>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {cat.items.map((item) => (
                     <div
                       key={item.key}

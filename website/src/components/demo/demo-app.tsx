@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { useLocale } from "next-intl";
@@ -16,6 +16,8 @@ import {
   Check,
   TerminalSquare,
   Github,
+  FileDown,
+  ArrowUpDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,11 @@ export type DemoDict = {
     error: string;
     score: string;
     distance: string;
+    sortLabel: string;
+    bestScore: string;
+    nearest: string;
+    exportCsv: string;
+    exported: string;
   };
   lead: {
     email: string;
@@ -145,7 +152,7 @@ function LeadSearch({
         </datalist>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="demo-city">{s.cityLabel}</Label>
           <Input
@@ -188,7 +195,7 @@ function LeadSearch({
       </Button>
 
       <p className="text-center text-[11px] text-muted-foreground">
-        Powered by OpenStreetMap Â· Nominatim Â· Overpass
+        Powered by OpenStreetMap · Nominatim · Overpass
       </p>
     </form>
   );
@@ -215,6 +222,61 @@ function LeadResults({
 }) {
   const s = dict.search;
   const l = dict.lead;
+  const addToast = useToast();
+  const [sort, setSort] = React.useState<"score" | "distance">("score");
+
+  const sortedLeads = React.useMemo(() => {
+    const copy = [...leads];
+    if (sort === "score") {
+      copy.sort((a, b) => b.score - a.score);
+    } else {
+      copy.sort(
+        (a, b) => (a.distanceKm ?? Number.MAX_VALUE) - (b.distanceKm ?? Number.MAX_VALUE)
+      );
+    }
+    return copy;
+  }, [leads, sort]);
+
+  const exportCsv = () => {
+    const header = [
+      "name",
+      "category",
+      "address",
+      "phone",
+      "website",
+      "email",
+      "hours",
+      "score",
+      "distance_km",
+    ];
+    const esc = (v: string | undefined) => `"${(v ?? "").replace(/"/g, '""')}"`;
+    const rows = leads.map((lead) =>
+      [
+        lead.name,
+        lead.category,
+        lead.address,
+        lead.phone,
+        lead.website,
+        lead.email,
+        lead.hours,
+        String(lead.score),
+        lead.distanceKm !== undefined ? lead.distanceKm.toFixed(2) : "",
+      ]
+        .map(esc)
+        .join(",")
+    );
+    const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lead-machine-demo-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    addToast({ title: s.exported, variant: "success" });
+  };
 
   if (status === "searching") {
     return (
@@ -254,10 +316,30 @@ function LeadResults({
 
   return (
     <div className="space-y-3">
-      <p className="px-1 text-xs font-medium text-muted-foreground">
-        {leads.length} {s.results}
-      </p>
-      {leads.map((lead) => (
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <p className="text-xs font-medium text-muted-foreground">
+          {leads.length} {s.results}
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 rounded-lg border border-border/60 bg-card/70 px-2 py-1.5">
+            <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+            <select
+              aria-label={s.sortLabel}
+              value={sort}
+              onChange={(e) => setSort(e.target.value as "score" | "distance")}
+              className="bg-transparent text-xs font-medium text-foreground outline-none [&>option]:bg-background"
+            >
+              <option value="score">{s.bestScore}</option>
+              <option value="distance">{s.nearest}</option>
+            </select>
+          </div>
+          <Button variant="outline" size="sm" onClick={exportCsv}>
+            <FileDown className="h-3.5 w-3.5" />
+            {s.exportCsv}
+          </Button>
+        </div>
+      </div>
+      {sortedLeads.map((lead) => (
         <button
           key={lead.id}
           type="button"
@@ -273,7 +355,7 @@ function LeadResults({
               <p className="truncate font-semibold tracking-tight">{lead.name}</p>
               <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {lead.category}
-                {lead.address ? ` Â· ${lead.address}` : ""}
+                {lead.address ? ` · ${lead.address}` : ""}
               </p>
             </div>
             <Badge variant={scoreVariant(lead.score)}>{lead.score}</Badge>
@@ -366,7 +448,7 @@ function TrustBar({ dict }: { dict: DemoDict }) {
         asChild
       >
         <a
-          href="${GITHUB_REPO}"
+          href={GITHUB_REPO}
           target="_blank"
           rel="noreferrer"
         >
@@ -557,7 +639,7 @@ function AiPanel({
 
       <p className="text-[11px] text-muted-foreground">{ai.keysNeverLeave}</p>
 
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <Button
           variant="gradient"
           size="sm"
@@ -646,7 +728,7 @@ export function DemoApp({ dict }: { dict: DemoDict }) {
 
       <section className="pb-20 sm:pb-28">
         <div className="container">
-          <div className="grid gap-6 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
             <div className="space-y-6 lg:col-span-3">
               <LeadSearch dict={dict} status={status} onSearch={handleSearch} />
               <LeadResults

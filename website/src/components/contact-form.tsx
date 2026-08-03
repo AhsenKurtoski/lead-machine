@@ -87,7 +87,7 @@ export function ContactForm({ slug }: { slug: string }) {
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <Label htmlFor={`${slug}-name`}>{t("name")}</Label>
           <Input

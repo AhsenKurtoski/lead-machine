@@ -1,4 +1,4 @@
-﻿import { getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
   BookOpen,
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageIntro } from "@/components/sections/section-header";
 import type { Locale } from "@/i18n/config";
+import { GITHUB_REPO } from "@/lib/site";
 
 const ICONS: Record<string, LucideIcon> = {
   docs: BookOpen,
@@ -75,7 +76,7 @@ export async function ResourcePage({
                 </Button>
                 <Button asChild variant="gradient" size="lg">
                   <a
-                    href="${GITHUB_REPO}"
+                    href={GITHUB_REPO}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

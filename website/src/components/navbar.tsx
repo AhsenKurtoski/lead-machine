@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { Menu, Zap, Github, ArrowRight, Sparkles } from "lucide-react";
+import { Menu, Zap, Github, Star, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
@@ -107,7 +107,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <a
-            href="${GITHUB_REPO}"
+            href={GITHUB_REPO}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("nav.starOnGithub")}
@@ -115,7 +115,7 @@ export function Navbar() {
           >
             <Github className="h-4 w-4" />
             <span className="hidden md:inline">GitHub</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold">â˜…</span>
+            <Star className="h-3.5 w-3.5 fill-current text-indigo-600 dark:text-indigo-400" />
           </a>
           <LocaleSwitcher compact />
           <ThemeToggle />

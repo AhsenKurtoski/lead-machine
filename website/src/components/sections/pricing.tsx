@@ -37,7 +37,7 @@ export async function Pricing({ locale }: { locale: Locale }) {
           <SectionHeader title={t("title")} subtitle={t("subtitle")} />
         </Reveal>
 
-        <div className="mx-auto mt-12 grid max-w-4xl gap-6 sm:mt-16 lg:grid-cols-2">
+        <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-6 sm:mt-16 lg:grid-cols-2">
           <Reveal delay={100}>
             <Card className="relative h-full overflow-hidden border-indigo-500/30 bg-gradient-to-b from-indigo-500/[0.07] to-transparent">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />

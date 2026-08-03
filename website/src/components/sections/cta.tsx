@@ -1,4 +1,4 @@
-﻿import { getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, Github, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ export async function CtaSection({ locale }: { locale: Locale }) {
                   className="w-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white sm:w-auto"
                 >
                   <a
-                    href="${GITHUB_REPO}"
+                    href={GITHUB_REPO}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

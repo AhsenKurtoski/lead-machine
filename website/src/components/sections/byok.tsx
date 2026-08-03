@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
@@ -42,7 +42,7 @@ export function ByokTabs() {
 
         <Reveal delay={150} className="mt-10 sm:mt-14">
           <Tabs defaultValue="crypto" className="w-full">
-            <TabsList className="mx-auto flex h-auto w-fit gap-1 rounded-2xl bg-muted/60 p-1.5">
+            <TabsList className="mx-auto flex h-auto w-fit max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl bg-muted/60 p-1.5">
               <TabsTrigger value="crypto" className="gap-1.5 rounded-xl px-3 py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:via-violet-500 data-[state=active]:to-fuchsia-500 data-[state=active]:text-white">
                 <LockKeyhole className="h-4 w-4" />
                 {t("tabs.crypto")}
@@ -97,7 +97,7 @@ export function ByokTabs() {
                 <h3 className="mt-10 text-center text-lg font-semibold tracking-tight">
                   {t("zeroknowledge.promisesTitle")}
                 </h3>
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div
                       key={i}
@@ -136,7 +136,7 @@ export function ByokTabs() {
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild variant="outline" size="lg">
               <a
-                href="${GITHUB_REPO}"
+                href={GITHUB_REPO}
                 target="_blank"
                 rel="noopener noreferrer"
               >

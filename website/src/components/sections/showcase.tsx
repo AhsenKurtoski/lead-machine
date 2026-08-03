@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeader } from "@/components/sections/section-header";
 import { Reveal } from "@/components/sections/reveal";
+import { DemoVideo } from "@/components/sections/demo-video";
 import type { Locale } from "@/i18n/config";
 
 export async function Showcase({ locale }: { locale: Locale }) {
@@ -25,14 +26,37 @@ export async function Showcase({ locale }: { locale: Locale }) {
             <div className="relative">
               <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-fuchsia-500/20 blur-3xl" />
               <div className="mockup-frame">
-                <img
-                  src="/product-screenshots/screenshot-demo.png"
-                  alt="Lead Machine live demo with real OpenStreetMap search results"
-                  className="w-full rounded-lg"
-                  width={1440}
-                  height={900}
-                />
+                <DemoVideo />
               </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={150}>
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <img
+                src="/product-screenshots/screenshot-demo-light.png"
+                alt="Lead Machine live demo results — light mode"
+                className="w-full rounded-2xl border border-border/60 shadow-lg"
+                width={1246}
+                height={656}
+                loading="lazy"
+              />
+              <img
+                src="/product-screenshots/screenshot-demo-dark.png"
+                alt="Lead Machine live demo results — dark mode"
+                className="w-full rounded-2xl border border-border/60 shadow-lg"
+                width={1246}
+                height={656}
+                loading="lazy"
+              />
+              <img
+                src="/product-screenshots/screenshot-mobile.png"
+                alt="Lead Machine landing page on mobile"
+                className="w-full rounded-2xl border border-border/60 shadow-lg"
+                width={688}
+                height={971}
+                loading="lazy"
+              />
             </div>
           </Reveal>
 

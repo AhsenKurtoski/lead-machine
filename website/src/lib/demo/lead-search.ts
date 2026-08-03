@@ -20,7 +20,13 @@ export type SearchParams = {
 };
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+
+const OVERPASS_MIRRORS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.osm.jp/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+] as const;
 
 function sanitizeCategory(category: string): string {
   return category
@@ -112,19 +118,33 @@ export async function searchLeads(
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 30000);
+  let lastError = "overpass_failed";
 
   try {
-    const res = await fetch(OVERPASS_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
-      body: `data=${encodeURIComponent(query)}`,
-      signal: controller.signal,
-    });
-    if (!res.ok) throw new Error("overpass_failed");
-    const data = (await res.json()) as { elements?: OverpassPlace[] };
+    let data: { elements?: OverpassPlace[] } | null = null;
+    for (const mirror of OVERPASS_MIRRORS) {
+      try {
+        const res = await fetch(mirror, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+          },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          lastError = `overpass_failed (${mirror})`;
+          continue;
+        }
+        data = (await res.json()) as { elements?: OverpassPlace[] };
+        break;
+      } catch {
+        lastError = `overpass_failed (${mirror})`;
+        continue;
+      }
+    }
+    if (!data) throw new Error(lastError);
 
     const leads: Lead[] = (data.elements ?? [])
       .filter((p) => p.tags && p.tags.name)

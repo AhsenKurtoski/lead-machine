@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
@@ -21,7 +21,7 @@ const STATS = [
   { key: "businesses", value: "40" },
   { key: "countries", value: "37+" },
   { key: "languages", value: "7" },
-  { key: "price", value: "â‚¬0" },
+  { key: "price", value: "€0" },
 ] as const;
 
 export function Hero() {
@@ -77,7 +77,7 @@ export function Hero() {
                 className="w-full sm:w-auto bg-background/60 backdrop-blur"
               >
                 <a
-                  href="${GITHUB_REPO}"
+                  href={GITHUB_REPO}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
