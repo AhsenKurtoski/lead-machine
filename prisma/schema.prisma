@@ -1,0 +1,238 @@
+// ============================================================
+// LEAD MACHINE - Schema database (SQLite, locale, gratis)
+// Spina dorsale di tutte le funzioni (A->R).
+// SQLite non supporta gli enum: gli stati sono String documentate.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Lead: l'attivita potenziale cliente ---
+model Lead {
+  id            String   @id @default(cuid())
+
+  // Anagrafica
+  name          String
+  category      String?  // es. "ristorante", "parrucchiere"
+  subcategory   String?
+
+  // Contatti
+  phone         String?
+  mobile        String?
+  whatsapp      String?  // numero in formato internazionale per wa.me, es 393331234567
+  email         String?
+
+  // Web presence
+  hasWebsite    Boolean  @default(false)
+  website       String?
+  websiteStatus String?  // "assente" | "vecchio" | "lento" | "non_responsive" | "ok"
+  websiteScreenshot String? // path locale dello screenshot (funzione J)
+
+  // Sito demo generato dall'AI (documento HTML completo, salvato in cache)
+  demoHtml      String?
+  demoHtmlAt    DateTime?
+  demoPrompt    String?  // istruzioni personalizzate per l'AI (cosa deve fare il sito)
+
+  // Social
+  hasSocial     Boolean  @default(false)
+  instagram     String?
+  facebook      String?
+  tiktok        String?
+  lastSocialPost DateTime?
+
+  // Recensioni
+  googleRating  Float?
+  googleReviews Int?
+
+  // Posizione principale
+  addressFull   String?
+  city          String?  @default("Feltre")
+  postalCode    String?
+  lat           Float?
+  lng           Float?
+
+  // Scoring (funzione B)
+  priorityScore Int      @default(0)   // 0-100
+  priorityReason String? // spiegazione del "perche"
+
+  // CRM (funzione C)
+  status        String   @default("NUOVO") // NUOVO | CONTATTATO | IN_TRATTATIVA | CLIENTE | SCARTATO
+  notes         String?
+
+  // Provenienza dato
+  source        String?  // "overpass" | "manuale" | "import_csv"
+  osmId         String?  @unique // per dedup (funzione K)
+
+  // Relazioni
+  locations     Location[]
+  activities    Activity[]
+  followUps     FollowUp[]
+  appointments  Appointment[]
+  messages      GeneratedMessage[]
+  quotes        Quote[]
+  emailLogs     EmailLog[]
+  tags          Tag[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([priorityScore])
+  @@index([category])
+}
+
+// --- Sedi multiple (funzione 4: tutte le sedi) ---
+model Location {
+  id        String  @id @default(cuid())
+  lead      Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  address   String
+  city      String?
+  lat       Float?
+  lng       Float?
+  isPrimary Boolean @default(false)
+}
+
+// --- Tag/etichette (funzione C) ---
+model Tag {
+  id     String @id @default(cuid())
+  name   String @unique
+  color  String @default("#6366f1")
+  leads  Lead[]
+}
+
+// --- Log attivita / cronologia (funzione R) ---
+model Activity {
+  id        String   @id @default(cuid())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  type      String   // "nota" | "stato" | "whatsapp" | "email" | "chiamata" | "sistema"
+  description String
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+// --- Follow-up / promemoria (funzione H) ---
+model FollowUp {
+  id        String   @id @default(cuid())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  dueDate   DateTime
+  note      String?
+  channel   String?  // "whatsapp" | "email" | "chiamata"
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([dueDate])
+  @@index([done])
+}
+
+// --- Appuntamenti / calendario (funzione N) ---
+model Appointment {
+  id        String   @id @default(cuid())
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  leadId    String?
+  title     String
+  startsAt  DateTime
+  endsAt    DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([startsAt])
+}
+
+// --- Template messaggi multi-canale e multi-modello (funzioni D, Q) ---
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  channel   String   // "whatsapp" | "email"
+  subject   String?  // solo email
+  body      String   // con variabili nome, categoria, citta...
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- Messaggi generati per ogni lead (storico testo pronto) ---
+model GeneratedMessage {
+  id        String   @id @default(cuid())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  channel   String   // "whatsapp" | "email"
+  subject   String?
+  body      String
+  waLink    String?  // link wa.me precompilato
+  aiUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+// --- Notifiche (funzione P) ---
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // "nuovo_lead" | "follow_up" | "risposta" | "sistema"
+  title     String
+  message   String?
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([read])
+}
+
+// --- Impostazioni / branding (chiave-valore) ---
+model Setting {
+  key   String @id
+  value String
+}
+
+// --- Preventivi brandizzati (funzione O) ---
+model Quote {
+  id         String   @id @default(cuid())
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId     String
+  number     String   // es. "PREV-2026-001"
+  title      String?
+  items      String   @default("[]") // JSON: [{ description, qty, price }]
+  notes      String?
+  discount   Float    @default(0)   // sconto in euro
+  taxRate    Float    @default(0)   // IVA in %, es. 22 (0 = prestazione occasionale, non soggetta a IVA)
+  depositPercent Float @default(0)  // acconto richiesto in % all'accettazione
+  paymentTerms String?              // condizioni / modalita di pagamento
+  deliveryTime String?              // tempi di consegna stimati
+  status     String   @default("bozza") // bozza | inviato | accettato | rifiutato
+  validUntil DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([leadId])
+}
+
+// --- Log delle email inviate: a chi, con quale stato e chi ha risposto ---
+model EmailLog {
+  id        String   @id @default(cuid())
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  leadId    String?
+  toEmail   String
+  toName    String?
+  subject   String
+  body      String?
+  // INVIATO | RISPOSTO | ACCETTATO | RIFIUTATO | RIMBALZATO
+  status    String   @default("INVIATO")
+  hasReply  Boolean  @default(false)
+  source    String?  // "bulk" | "singola"
+  sentAt    DateTime @default(now())
+  repliedAt DateTime?
+
+  @@index([leadId])
+  @@index([status])
+  @@index([sentAt])
+}

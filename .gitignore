@@ -1,0 +1,63 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor / ide
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# test coverage
+/coverage
+
+# local env files
+.env
+.env*.local
+.env.development
+.env.development.*
+.env.production
+.env.production.*
+.env.test
+.env.test.*
+
+# database
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/dev.db
+/prisma/dev.db-wal
+/prisma/dev.db-shm
+/prisma/migrations/**/migration_lock.toml.bak
+
+# backups, local email fallback, runtime scratch
+/backups
+/tmp
+/logs
+
+# generated user screenshots (keep empty folder placeholder)
+/public/screenshots/*
+!/public/screenshots/.gitkeep
+

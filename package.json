@@ -1,0 +1,95 @@
+{
+  "name": "lead-machine",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Open-source local lead generation platform — find, score and contact nearby businesses for free. 100% self-hosted, SQLite + Next.js.",
+  "license": "MIT",
+  "author": "Lead Machine Contributors",
+  "homepage": "https://github.com/lead-machine/lead-machine#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lead-machine/lead-machine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lead-machine/lead-machine/issues"
+  },
+  "keywords": [
+    "lead-generation",
+    "crm",
+    "openstreetmap",
+    "overpass",
+    "nextjs",
+    "sqlite",
+    "prisma",
+    "tailwindcss",
+    "ai",
+    "groq",
+    "gemini",
+    "whatsapp",
+    "email",
+    "quotes",
+    "invoicing",
+    "self-hosted",
+    "local-first",
+    "small-business",
+    "freelancer",
+    "i18n",
+    "multilingual"
+  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "setup": "prisma db push && tsx prisma/seed.ts",
+    "setup:screenshot": "npm install -D playwright && npx playwright install chromium"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.454.0",
+    "next": "14.2.15",
+    "next-themes": "^0.3.0",
+    "nodemailer": "^6.9.14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.12",
+    "@types/node": "^20",
+    "@types/nodemailer": "^6.4.15",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.15",
+    "postcss": "^8.4.47",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.62.1"
+  }
+}
