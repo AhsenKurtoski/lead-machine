@@ -108,6 +108,15 @@ const CATEGORY_SUGGESTIONS = [
   "beauty salon",
 ];
 
+const CITY_SUGGESTIONS = [
+  "Milan",
+  "Berlin",
+  "Madrid",
+  "Ljubljana",
+  "London",
+  "New York",
+];
+
 function LeadSearch({
   dict,
   status,
@@ -162,6 +171,23 @@ function LeadSearch({
             placeholder={s.cityPlaceholder}
             required
           />
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {CITY_SUGGESTIONS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCity(c)}
+                aria-pressed={city === c}
+                className={`rounded-full border px-2.5 py-0.5 text-[11px] transition-colors ${
+                  city === c
+                    ? "border-indigo-500/70 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300"
+                    : "border-border/60 bg-muted/40 text-muted-foreground hover:border-indigo-500/40 hover:text-foreground"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="space-y-2">
           <Label>{s.radiusLabel}</Label>
