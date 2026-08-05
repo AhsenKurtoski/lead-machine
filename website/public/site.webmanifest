@@ -1,0 +1,13 @@
+{
+  "name": "Lead Machine — Free CRM for Freelancers",
+  "short_name": "Lead Machine",
+  "start_url": "/en",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "description": "Open-source lead generation & CRM. €0 forever.",
+  "icons": [
+    { "src": "/icon-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

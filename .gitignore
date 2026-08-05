@@ -61,9 +61,6 @@ next-env.d.ts
 /public/screenshots/*
 !/public/screenshots/.gitkeep
 
-# marketing website (kept out of the CRM repo — deployed separately on Vercel)
-/website
-
 # IDE/tool specs and accidental path duplications
 /.trae
 /C
