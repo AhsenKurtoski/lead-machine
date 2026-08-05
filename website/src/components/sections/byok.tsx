@@ -75,7 +75,7 @@ export function ByokTabs() {
                       <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 via-violet-500 to-fuchsia-500 text-sm font-bold text-white shadow-md shadow-indigo-500/25">
                         {i + 1}
                       </span>
-                      <p className="pt-1 text-sm leading-relaxed text-foreground/90 sm:text-base">
+                      <p className="min-w-0 break-words pt-1 text-sm leading-relaxed text-foreground/90 sm:text-base">
                         {t(`crypto.step${i + 1}`)}
                       </p>
                     </div>
@@ -104,7 +104,7 @@ export function ByokTabs() {
                       className="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-5"
                     >
                       <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-                      <p className="text-sm leading-relaxed text-foreground/90">
+                      <p className="min-w-0 break-words text-sm leading-relaxed text-foreground/90">
                         {t(`zeroknowledge.prom${i + 1}`)}
                       </p>
                     </div>

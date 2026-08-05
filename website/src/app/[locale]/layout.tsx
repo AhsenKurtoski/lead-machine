@@ -65,7 +65,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Toaster>
-        <div className="relative flex min-h-screen flex-col">
+        <div className="relative flex min-h-screen flex-col overflow-x-clip">
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div className="absolute inset-0 hero-gradient-bg opacity-60" />
             <div className="absolute inset-0 grid-pattern-bg" />
