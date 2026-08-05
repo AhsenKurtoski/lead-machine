@@ -15,6 +15,11 @@
 [![i18n — 7 languages](https://img.shields.io/badge/i18n-7_langs-7c3aed)](#)
 [![License: MIT](https://img.shields.io/github/license/lead-machine/lead-machine?color=0969da)](./LICENSE)
 
+---
+**👨‍💻 A DevDuos Creation**
+*The perfect blend of human vision and AI execution.*
+**Idea & Vision:** Axsen Kurtoski (teenager developer & visionary)
+**AI Execution:** Built flawlessly by Artificial Intelligence
 </div>
 
 ---
@@ -136,10 +141,24 @@ This repo also contains the **public marketing website** for Lead Machine in the
 | **npm** (or pnpm / yarn) | Comes with Node | `npm -v` ≥ 10 works. |
 | That's it. | — | SQLite is file-based — **no Postgres / MySQL install needed**. |
 
-Optional:
-- **Gemini API key** → <https://aistudio.google.com> (free tier for ~15 req/min).
-- **Groq API key** → <https://console.groq.com> (free tier with generous limits).
-- **SMTP server** (Gmail with app password, SendGrid, Brevo, a self-hosted Postfix box…). Without SMTP the app writes `.eml` files to `./tmp/emails` so you can still inspect them locally.
+#### 🔑 How to get your free API Keys (Optional but recommended)
+Lead Machine uses AI to generate outreach scripts and score leads. You can use Gemini, Groq, or both (for automatic failover).
+
+**Google Gemini (Recommended for quality)**
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Sign in with your Google account.
+3. Click **"Get API key"** in the left menu, then **"Create API key"**.
+4. Copy the key (it starts with `AIza...`).
+5. Paste it in your `.env` file as `GEMINI_API_KEY=AIza...`
+
+**Groq (Recommended for blazing speed)**
+1. Go to the [Groq Console](https://console.groq.com/keys).
+2. Sign in or create an account.
+3. Click **"Create API Key"** and copy the string (it starts with `gsk_...`).
+4. Paste it in your `.env` file as `GROQ_API_KEY=gsk_...`
+
+Other optional prerequisites:
+- **SMTP server** (Gmail with app password, SendGrid, Brevo…). Without SMTP the app writes `.eml` files to `./tmp/emails` so you can still inspect them locally.
 - **Playwright / Chromium** (for homepage screenshots) — install via `npm run setup:screenshot`.
 
 ### 2. Install & run
@@ -382,8 +401,14 @@ See [LICENSE](./LICENSE) for the exact legal text.
 
 ---
 
-## ❤️ Acknowledgments
+## ❤️ Acknowledgments & Credits
 
+**A DevDuos Creation**
+- 🧠 **Idea & Vision:** Axsen Kurtoski, a passionate teenager developer.
+- 🤖 **Development & Execution:** Built by Artificial Intelligence (OpenCode / Antigravity).
+- 🤝 **The Mission:** Proving that with the right AI tools and a great human vision, anyone can build enterprise-grade software.
+
+Other huge thanks to:
 - OpenStreetMap & Overpass contributors for the amazing free geographic data. ❤️
 - All the authors of `next.js`, `prisma`, `tailwindcss`, `shadcn/ui`, `recharts`, `leaflet`, `nodemailer`, `react-pdf`, `playwright`.
 - **You**, for reading this far and considering the project. ⭐

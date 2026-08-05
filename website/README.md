@@ -259,4 +259,9 @@ Yes — see [Translations](#-translations).
 
 ---
 
+### 👨‍💻 A DevDuos Creation
+This project is the result of a powerful collaboration:
+- **Vision & Idea by:** Axsen Kurtoski (teenager developer & visionary)
+- **Built by:** Artificial Intelligence (OpenCode / Antigravity)
+
 Made with ❤️ for freelancers worldwide. Open-source under [MIT](../LICENSE).
