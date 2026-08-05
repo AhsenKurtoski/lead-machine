@@ -362,7 +362,7 @@
                                             },
                                 "contacts":  {
                                                  "title":  "10. Kontaktni podatki",
-                                                 "body":  "Za pravne zahteve pošljite registrirano sporočilo na:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italija\nE-pošta: axsen_kurtoski@financier.com\nCertificirana e-pošta (PEC): legal@pec.leadmachine.dev\n\nZa varnostne ranljivosti glejte SECURITY.md in pišite na axsen_kurtoski@financier.com (PGP na zahtevo)."
+                                                 "body":  "Za pravne zahteve pošljite registrirano sporočilo na:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italija\nE-pošta: axsen_kurtoski@financier.com\nCertificirana e-pošta (PEC): axsen_kurtoski@financier.com\n\nZa varnostne ranljivosti glejte SECURITY.md in pišite na axsen_kurtoski@financier.com (PGP na zahtevo)."
                                              }
                             },
                   "cookies":  {
@@ -411,7 +411,7 @@
                   "imprint":  {
                                   "title":  "Natisak / Impressum (Art. 7 Abs. 1 TMG \u0026 D. Lgs. 70/2003)",
                                   "subtitle":  "Zahtevano italijanskim in nemškim zakonom za vsako komercialno spletno stran.",
-                                  "body":  "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nPredstavlja: Lead Machine Maintainers\nNaslov sedeža: Via Privacy 1, 20121 Milano MI, Italija\n\nDavčna številka (USt-IdNr.): IT00000000000\nPoslovni register (REA / Handelsregister): Milano REA n. MI-0000000\nKapital: € 10.000,00 i.v.\n\nE-pošta — Splošno: axsen_kurtoski@financier.com\nE-pošta — Zasebnost: axsen_kurtoski@financier.com\nE-pošta — Pravno / PEC: legal@pec.leadmachine.dev\nE-pošta — Varnost / Ranljivosti: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
+                                  "body":  "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nPredstavlja: Lead Machine Maintainers\nNaslov sedeža: Via Privacy 1, 20121 Milano MI, Italija\n\nDavčna številka (USt-IdNr.): IT00000000000\nPoslovni register (REA / Handelsregister): Milano REA n. MI-0000000\nKapital: € 10.000,00 i.v.\n\nE-pošta — Splošno: axsen_kurtoski@financier.com\nE-pošta — Zasebnost: axsen_kurtoski@financier.com\nE-pošta — Pravno / PEC: axsen_kurtoski@financier.com\nE-pošta — Varnost / Ranljivosti: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
                               },
                   "dpa":  {
                               "title":  "Sporazum o obdelavi osebnih podatkov (DPA / AVV Art. 28 GDPR)",

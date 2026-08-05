@@ -362,7 +362,7 @@
                                             },
                                 "contacts":  {
                                                  "title":  "9. Contact Information",
-                                                 "body":  "For legal inquiries, send registered communication to:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italy\nEmail: axsen_kurtoski@financier.com\nCertified Email (PEC): legal@pec.leadmachine.dev\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
+                                                 "body":  "For legal inquiries, send registered communication to:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italy\nEmail: axsen_kurtoski@financier.com\nCertified Email (PEC): axsen_kurtoski@financier.com\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
                                              }
                             },
                   "cookies":  {
@@ -411,7 +411,7 @@
                   "imprint":  {
                                   "title":  "Imprint / Impressum (Art. 7 Abs. 1 TMG \u0026 D. Lgs. 70/2003)",
                                   "subtitle":  "Required by Italian and German law for every commercial website.",
-                                  "body":  "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nRepresented by: Lead Machine Maintainers\nRegistered Address: Via Privacy 1, 20121 Milano MI, Italy\n\nVAT ID (Partita IVA / USt-IdNr.): IT00000000000\nCompany Register (REA / Handelsregister): Milano REA n. MI-0000000\nShare Capital (Capitale Sociale): € 10.000,00 i.v.\n\nEmail — General: axsen_kurtoski@financier.com\nEmail — Privacy: axsen_kurtoski@financier.com\nEmail — Legal / PEC: legal@pec.leadmachine.dev\nEmail — Security / Vulnerabilities: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
+                                  "body":  "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nRepresented by: Lead Machine Maintainers\nRegistered Address: Via Privacy 1, 20121 Milano MI, Italy\n\nVAT ID (Partita IVA / USt-IdNr.): IT00000000000\nCompany Register (REA / Handelsregister): Milano REA n. MI-0000000\nShare Capital (Capitale Sociale): € 10.000,00 i.v.\n\nEmail — General: axsen_kurtoski@financier.com\nEmail — Privacy: axsen_kurtoski@financier.com\nEmail — Legal / PEC: axsen_kurtoski@financier.com\nEmail — Security / Vulnerabilities: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
                               },
                   "dpa":  {
                               "title":  "Data Processing Agreement (DPA / AVV Art. 28 GDPR)",
