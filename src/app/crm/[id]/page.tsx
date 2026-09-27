@@ -4,6 +4,10 @@ import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/components/ui/use-toast";
+import { useLocale } from "@/components/locale-provider";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,6 +79,7 @@ export default function LeadDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = String(params.id);
+  const { t } = useLocale();
 
   const [lead, setLead] = React.useState<Lead | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -83,6 +88,8 @@ export default function LeadDetailPage() {
   const [newTag, setNewTag] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [savedMsg, setSavedMsg] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
 
   // Contatto / messaggi
   const [templates, setTemplates] = React.useState<Template[]>([]);
@@ -170,10 +177,31 @@ export default function LeadDetailPage() {
     setTags(tags.filter((x) => x !== t));
   }
 
-  async function del() {
-    if (!confirm("Eliminare definitivamente questo lead?")) return;
-    await fetch("/api/leads/" + id, { method: "DELETE" });
-    router.push("/crm");
+  async function confirmDelete() {
+    try {
+      const res = await fetch("/api/leads/" + id, { method: "DELETE" });
+      const data = await res.json();
+      if (data.ok) {
+        toast({
+          title: t("toast.leadDeletedTitle"),
+          description: t("toast.leadDeletedDesc"),
+          variant: "success",
+        });
+        router.push("/crm");
+      } else {
+        toast({
+          title: t("toast.errorTitle"),
+          description: data.error || t("toast.deleteFailedDesc"),
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: t("toast.networkTitle"),
+        description: t("toast.networkDesc"),
+        variant: "destructive",
+      });
+    }
   }
 
   async function personalizeAI() {
@@ -276,10 +304,21 @@ export default function LeadDetailPage() {
         <Link href="/crm" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Torna al CRM
         </Link>
-        <Button variant="destructive" size="sm" onClick={del}>
+        <Button variant="destructive" size="sm" onClick={() => setDeleteDialogOpen(true)}>
           <Trash2 className="h-4 w-4" /> Elimina
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={t("confirm.leadTitle", { name: lead.name })}
+        description={t("confirm.leadDesc")}
+        confirmText={t("confirm.leadAction")}
+        cancelText={t("confirm.cancel")}
+        variant="destructive"
+        onConfirm={confirmDelete}
+      />
 
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">

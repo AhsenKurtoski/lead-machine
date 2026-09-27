@@ -22,8 +22,13 @@ export type AiConfig = {
   order: AiProvider[];
 };
 
-const GEMINI_DEFAULT_MODEL = "gemini-2.0-flash";
-const GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile";
+// Modelli predefiniti. Google e Groq ritirano periodicamente i modelli:
+// per questo, se il modello scelto risponde 404 (model not found / shut down),
+// si riprova automaticamente con i modelli di riserva elencati qui sotto.
+const GEMINI_DEFAULT_MODEL = "gemini-3.8-flash";
+const GEMINI_FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-flash-latest"];
+const GROQ_DEFAULT_MODEL = "openai/gpt-oss-20b";
+const GROQ_FALLBACK_MODELS = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b"];
 
 function clean(v: string | undefined | null): string {
   // Rimuove spazi e eventuali virgolette incollate per errore.
@@ -152,12 +157,10 @@ type CallOpts = {
 
 async function callGemini(cfg: AiConfig, opts: CallOpts): Promise<string> {
   if (!cfg.geminiKey) throw new Error("GEMINI_API_KEY mancante");
-  const model = cfg.geminiModel || GEMINI_DEFAULT_MODEL;
-  const url =
-    "https://generativelanguage.googleapis.com/v1beta/models/" +
-    encodeURIComponent(model) +
-    ":generateContent?key=" +
-    encodeURIComponent(cfg.geminiKey);
+
+  // Se il modello e' stato ritirato (404) riproviamo con i modelli di riserva.
+  const preferred = cfg.geminiModel || GEMINI_DEFAULT_MODEL;
+  const models = [preferred, ...GEMINI_FALLBACK_MODELS.filter((m) => m !== preferred)];
 
   const body: Record<string, unknown> = {
     contents: [{ role: "user", parts: [{ text: opts.prompt }] }],
@@ -171,76 +174,112 @@ async function callGemini(cfg: AiConfig, opts: CallOpts): Promise<string> {
   if (opts.useSearch) body.tools = [{ google_search: {} }];
 
   let lastErr = "";
-  for (let attempt = 0; attempt <= 1; attempt++) {
-    const res = await fetchWithTimeout(
-      url,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      },
-      50000,
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const parts = data?.candidates?.[0]?.content?.parts;
-      const text = Array.isArray(parts)
-        ? parts.map((part: { text?: string }) => part?.text ?? "").join("")
-        : "";
-      return (text || "").trim();
+
+  for (const model of models) {
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/" +
+      encodeURIComponent(model) +
+      ":generateContent?key=" +
+      encodeURIComponent(cfg.geminiKey);
+
+    let modelNotFound = false;
+    for (let attempt = 0; attempt <= 1; attempt++) {
+      const res = await fetchWithTimeout(
+        url,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+        50000,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const parts = data?.candidates?.[0]?.content?.parts;
+        const text = Array.isArray(parts)
+          ? parts.map((part: { text?: string }) => part?.text ?? "").join("")
+          : "";
+        return (text || "").trim();
+      }
+      const detail = await res.text().catch(() => "");
+      lastErr = describeHttpError("Gemini", res.status, detail);
+      // 404 = modello inesistente o ritirato: prova subito il successivo.
+      if (res.status === 404) {
+        modelNotFound = true;
+        break;
+      }
+      // Riprova una sola volta per errori transitori (sovraccarico o burst al minuto).
+      if ((res.status === 429 || res.status === 503 || res.status === 500) && attempt < 1) {
+        await sleep(1500);
+        continue;
+      }
+      throw new Error(lastErr);
     }
-    const detail = await res.text().catch(() => "");
-    lastErr = describeHttpError("Gemini", res.status, detail);
-    // Riprova una sola volta per errori transitori (sovraccarico o burst al minuto).
-    if ((res.status === 429 || res.status === 503 || res.status === 500) && attempt < 1) {
-      await sleep(1500);
-      continue;
-    }
-    throw new Error(lastErr);
+    if (!modelNotFound) throw new Error(lastErr || "Gemini: errore sconosciuto");
   }
-  throw new Error(lastErr || "Gemini: errore sconosciuto");
+  throw new Error(lastErr || "Gemini: nessun modello disponibile");
 }
 
 async function callGroq(cfg: AiConfig, opts: CallOpts): Promise<string> {
   if (!cfg.groqKey) throw new Error("GROQ_API_KEY mancante");
-  const model = cfg.groqModel || GROQ_DEFAULT_MODEL;
+
+  // Alcuni modelli Groq sono riservati a piani a pagamento: se il modello scelto
+  // non e' accessibile con la nostra chiave (404), proviamo i modelli di riserva.
+  const preferred = cfg.groqModel || GROQ_DEFAULT_MODEL;
+  const models = [preferred, ...GROQ_FALLBACK_MODELS.filter((m) => m !== preferred)];
+
   const messages: Array<{ role: string; content: string }> = [];
   if (opts.system) messages.push({ role: "system", content: opts.system });
   messages.push({ role: "user", content: opts.prompt });
 
   let lastErr = "";
-  for (let attempt = 0; attempt <= 1; attempt++) {
-    const res = await fetchWithTimeout(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + cfg.groqKey,
+
+  for (const model of models) {
+    let modelNotFound = false;
+    for (let attempt = 0; attempt <= 1; attempt++) {
+      const res = await fetchWithTimeout(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + cfg.groqKey,
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            temperature: opts.temperature ?? 0.7,
+            max_tokens: opts.maxTokens ?? 1024,
+          }),
         },
-        body: JSON.stringify({
-          model,
-          messages,
-          temperature: opts.temperature ?? 0.7,
-          max_tokens: opts.maxTokens ?? 1024,
-        }),
-      },
-      50000,
-    );
-    if (res.ok) {
-      const data = await res.json();
-      const text = data?.choices?.[0]?.message?.content ?? "";
-      return String(text).trim();
+        50000,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.choices?.[0]?.message?.content ?? "";
+        return String(text).trim();
+      }
+      const detail = await res.text().catch(() => "");
+      lastErr = describeHttpError("Groq", res.status, detail);
+      // 404 = modello inesistente o non accessibile: prova subito il successivo.
+      if (res.status === 404) {
+        modelNotFound = true;
+        break;
+      }
+      if (res.status === 403) {
+        // Chiave senza accesso al modello: non insistere con lo stesso.
+        modelNotFound = true;
+        break;
+      }
+      if ((res.status === 429 || res.status === 503 || res.status === 500) && attempt < 1) {
+        await sleep(1500);
+        continue;
+      }
+      throw new Error(lastErr);
     }
-    const detail = await res.text().catch(() => "");
-    lastErr = describeHttpError("Groq", res.status, detail);
-    if ((res.status === 429 || res.status === 503 || res.status === 500) && attempt < 1) {
-      await sleep(1500);
-      continue;
-    }
-    throw new Error(lastErr);
+    if (!modelNotFound) throw new Error(lastErr || "Groq: errore sconosciuto");
   }
-  throw new Error(lastErr || "Groq: errore sconosciuto");
+  throw new Error(lastErr || "Groq: nessun modello disponibile");
 }
 
 // Genera testo provando i provider in ordine, con failover automatico.

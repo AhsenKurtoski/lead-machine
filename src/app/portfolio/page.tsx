@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PortfolioPage() {
   const s = await getSettings();
-  const brand = s.brand_name || "DevDuos";
+  const brand = s.brand_name || "Axsen-Studio";
   const tagline = s.brand_tagline || "Siti web professionali per le attivita locali";
   const owner = s.brand_owner || "";
   const phone = s.brand_phone || "";

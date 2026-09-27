@@ -33,6 +33,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useLocale } from "@/components/locale-provider";
+import { Toaster } from "@/components/ui/toaster";
+
 
 type NavItem = { href: string; labelKey: string; icon: React.ComponentType<{ className?: string }> };
 
@@ -129,6 +131,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           {children}
         </main>
+          <Toaster />
+
       </div>
     </div>
   );

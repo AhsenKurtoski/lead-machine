@@ -28,7 +28,6 @@ export default async function PreventivoPage({ params }: { params: { id: string 
 
   const brandName = settings.brand_name || "La tua Web Agency";
   const brandOwner = settings.brand_owner || "";
-  const brandHolder = settings.brand_holder || "";
   const brandPhone = settings.brand_phone || "";
   const brandEmail = settings.brand_email || "";
   const brandLogo = settings.brand_logo || "/logo.png";
@@ -135,7 +134,6 @@ export default async function PreventivoPage({ params }: { params: { id: string 
                 <div className="text-xs font-medium uppercase tracking-wider text-zinc-400">{brandTagline}</div>
               ) : null}
               {brandOwner ? <div className="mt-1 text-sm text-zinc-600">Referente: {brandOwner}</div> : null}
-              {brandHolder ? <div className="text-sm text-zinc-600">Intestatario: {brandHolder}</div> : null}
               {brandPhone ? <div className="text-sm text-zinc-600">Tel: {brandPhone}</div> : null}
               {brandEmail ? <div className="text-sm text-zinc-600">{brandEmail}</div> : null}
             </div>
@@ -286,7 +284,7 @@ export default async function PreventivoPage({ params }: { params: { id: string 
             <div>
               <div className="mb-10 text-zinc-500">{brandName}</div>
               <div className="border-t border-zinc-300 pt-1 text-xs text-zinc-400">
-                {brandHolder || brandOwner || brandName}
+                {brandOwner || brandName}
               </div>
             </div>
           </div>

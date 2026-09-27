@@ -1,576 +1,576 @@
-﻿{
-    "meta":  {
-                 "title":  "Lead Machine — Open-Source Lead Generation CRM",
-                 "description":  "Free, open-source, self-hosted lead generation platform for freelancers \u0026 small agencies. Find nearby businesses, score them, contact them, build quotes. €0 in subscriptions.",
-                 "ogTitle":  "Lead Machine — Free Forever CRM for Freelancers",
-                 "ogDescription":  "100% open-source. Your data. Your DB. BYOK encryption or no keys at all. Zero subscriptions, zero tracking.",
-                 "keywords":  "lead generation, crm, open source, self hosted, freelancer tools, small business, openstreetmap, quotes, invoicing",
-                 "license":  "Released under MIT License."
-             },
-    "nav":  {
-                "home":  "Home",
-                "features":  "Features",
-                "pricing":  "Pricing",
-                "byok":  "BYOK \u0026 Privacy",
-                "transparency":  "Transparency",
-                "deploy":  "Deploy",
-                "docs":  "Docs",
-                "blog":  "Blog",
-                "changelog":  "Changelog",
-                "roadmap":  "Roadmap",
-                "about":  "About",
-                "demo":  "Request Demo",
-                "contact":  "Contact",
-                "contributors":  "Contributors",
-                "status":  "Status",
-                "getStarted":  "Get Started",
-                "starOnGithub":  "Star on GitHub",
-                "legal":  {
-                              "privacy":  "Privacy Policy",
-                              "terms":  "Terms of Service",
-                              "cookies":  "Cookie Policy",
-                              "imprint":  "Imprint",
-                              "dpa":  "Data Processing",
-                              "security":  "Security"
-                          },
-                "language":  "Language",
-                "partnership":  "Partnerships",
-                "liveDemo":  "Live Demo"
-            },
-    "byokBanner":  {
-                       "title":  "🔒 Your API keys · Your data · Your DB.",
-                       "subtitle":  "We never see, log or store anything. BYOK: keys encrypted in YOUR browser. Lifetime: zero keys needed.",
-                       "cta":  "Learn more →"
-                   },
-    "cookieBanner":  {
-                         "text":  "🍪 We use only technical cookies for basic site functionality. 0 tracking cookies. 0 marketing cookies.",
-                         "accept":  "Got it",
-                         "more":  "Cookie policy →"
-                     },
-    "hero":  {
-                 "eyebrow":  "Open-source · Free Forever · Self-Hosted",
-                 "title":  "Stop paying €200/mo for lead tools.",
-                 "titleHighlight":  "Own your pipeline. For €0.",
-                 "subtitle":  "Lead Machine is a single, open-source Next.js app that runs on your laptop. Search 40M+ businesses on OpenStreetMap, score prospects, email, WhatsApp, build quotes \u0026 invoices. No subscriptions. Your data stays on your machine.",
-                 "ctas":  {
-                              "primary":  "Get Started — Free",
-                              "secondary":  "Watch Demo (2 min)",
-                              "tertiary":  "View on GitHub ⭐"
-                          },
-                 "stats":  {
-                               "businesses":  "M+ businesses searchable",
-                               "countries":  "Countries supported",
-                               "languages":  "Languages",
-                               "price":  "€/mo forever"
-                           },
-                 "trust":  {
-                               "text":  "Trusted by freelancers \u0026 small agencies in",
-                               "countries":  "37+ countries"
-                           }
-             },
-    "features":  {
-                     "title":  "Everything you need. Nothing you don\u0027t.",
-                     "subtitle":  "Built by freelancers, for freelancers. Every feature is included — no upsells, no \"pro upgrade\" walls.",
-                     "categories":  {
-                                        "research":  "Research \u0026 Prospecting",
-                                        "crm":  "Multi-channel CRM",
-                                        "quotes":  "Quotes \u0026 Invoices",
-                                        "ai":  "AI (Optional BYOK)",
-                                        "privacy":  "Privacy First"
-                                    },
-                     "research":  {
-                                      "geo_title":  "Geographic search on OpenStreetMap",
-                                      "geo_desc":  "Query 40M+ businesses by category, radius and city — for free, via Overpass API. No Google Maps key required.",
-                                      "dedup_title":  "Smart deduplication",
-                                      "dedup_desc":  "3 layers of dedup: OSM ID → name+city → fuzzy. Your CRM stays clean automatically.",
-                                      "crawler_title":  "Website \u0026 contact crawler",
-                                      "crawler_desc":  "Given a lead, auto-find homepage, extract email, phone, social links. One-click homepage screenshot (Playwright).",
-                                      "map_title":  "Interactive map view",
-                                      "map_desc":  "Leaflet map with clustering. Color-coded lead statuses. Click a pin → call, email, WhatsApp instantly."
-                                  },
-                     "crm":  {
-                                 "scoring_title":  "0–100 lead scoring",
-                                 "scoring_desc":  "Category, presence of email/phone/website, social signals, recency, distance. Know who to call first.",
-                                 "timeline_title":  "Unified timeline",
-                                 "timeline_desc":  "Calls, emails, WhatsApp, meetings, notes, follow-ups — one view per lead. Nothing slips through.",
-                                 "email_title":  "Email with SMTP or .eml local",
-                                 "email_desc":  "Send via your SMTP (Gmail app password, SendGrid, Postfix…). No SMTP? Emails saved as .eml locally.",
-                                 "whatsapp_title":  "One-click WhatsApp",
-                                 "whatsapp_desc":  "Deep-link to wa.me with per-lead templates. Includes tags \u0026 custom merge fields.",
-                                 "followups_title":  "Follow-up buckets",
-                                 "followups_desc":  "“Today / This week / Overdue / Done” — automatic. Get reminded via browser notifications."
-                             },
-                     "quotes":  {
-                                    "lineitems_title":  "Line-item quotes with VAT",
-                                    "lineitems_desc":  "Quantity, discounts, VAT rates, payment terms, validity. Italian/German/French/English/Spanish/Portuguese/Slovenian labels.",
-                                    "pdf_title":  "PDF generation",
-                                    "pdf_desc":  "Print-ready PDFs with your brand. Client-ready first impression, every time.",
-                                    "workflow_title":  "Workflow pipeline",
-                                    "workflow_desc":  "Draft → Sent → Accepted → Invoiced → Paid (or Rejected/Cancelled). Reminders auto-sent.",
-                                    "csv_title":  "Export CSV / JSON",
-                                    "csv_desc":  "All data exportable. Your SQLite file is portable \u0026 backup-friendly."
-                                },
-                     "ai":  {
-                                "failover_title":  "Dual-provider AI with failover",
-                                "failover_desc":  "Gemini + Groq. If one errors or hits limits, the other kicks in. Results are deterministic per-input.",
-                                "scripts_title":  "Cold-call scripts \u0026 follow-ups",
-                                "scripts_desc":  "Personalized elevator pitches, email drafts, lead-score justifications, contract terms.",
-                                "byok_title":  "BYOK — keys never leave your browser",
-                                "byok_desc":  "Your Gemini/Groq/SMTP keys are AES-GCM 256-bit encrypted in YOUR localStorage. PBKDF2 100k iters. We never touch them."
-                            },
-                     "privacy":  {
-                                     "local_title":  "Local-first SQLite",
-                                     "local_desc":  "A single prisma/dev.db file. Copy it, back it up, move it. Works offline — except for OSM/AI calls.",
-                                     "zero_title":  "Zero telemetry, zero tracking",
-                                     "zero_desc":  "No Google Analytics, no Meta Pixel, no Sentry-by-default. Your business, your data.",
-                                     "opensource_title":  "100% open-source (MIT)",
-                                     "opensource_desc":  "Audit every line on GitHub. Fork it, modify it, sell custom builds. Attribution optional, warmly appreciated."
-                                 }
-                 },
-    "pricing":  {
-                    "title":  "Two ways to use Lead Machine.",
-                    "subtitle":  "Both are €0 forever. Seriously. No subscriptions, no credit card, no fine print.",
-                    "byok":  {
-                                 "badge":  "🎁 BYOK Free Forever",
-                                 "price":  "€0",
-                                 "period":  "forever",
-                                 "headline":  "Bring Your Own Keys. 100% features. Always free.",
-                                 "desc":  "Perfect for technical users \u0026 privacy purists. You bring Gemini, Groq and SMTP keys. We bring a world-class CRM. Your keys stay in YOUR browser, AES-256-GCM encrypted.",
-                                 "features":  [
-                                                  "All features unlocked — research, CRM, quotes, map, AI",
-                                                  "Your API keys — encrypted AES-GCM 256 in your localStorage",
-                                                  "Keys NEVER sent to our servers. NEVER logged. NEVER stored",
-                                                  "MIT license — fork, modify, resell",
-                                                  "Community support on GitHub Issues",
-                                                  "7 interface languages"
-                                              ],
-                                 "cta":  "Get BYOK Free Forever"
-                             },
-                    "opensource":  {
-                                       "badge":  "💻 Self-Hosted (No Keys Needed)",
-                                       "price":  "€0",
-                                       "period":  "one-time",
-                                       "headline":  "Run it yourself. Use it without AI if you prefer.",
-                                       "desc":  "Clone the repo, npm install, done. The CRM works perfectly without any API keys — search, map, quotes, invoices all work offline. Add AI only when/if you want.",
-                                       "features":  [
-                                                        "Run on your laptop or any VPS",
-                                                        "SQLite DB — single portable file",
-                                                        "Zero API keys required for core CRM",
-                                                        "Works 100% offline (except OSM/AI calls)",
-                                                        "Prisma — switch to Postgres with 1 env var",
-                                                        "Full access to source code"
-                                                    ],
-                                       "cta":  "Deploy Now — Free"
-                                   },
-                    "compareTitle":  "Compare options",
-                    "compare":  {
-                                    "research":  "OSM research \u0026 40M+ businesses",
-                                    "crm":  "Full CRM (statuses, tags, timeline)",
-                                    "map":  "Map view \u0026 clustering",
-                                    "quotes":  "Quotes \u0026 invoices with PDF",
-                                    "aiFeatures":  "AI (cold call scripts, emails)",
-                                    "smtp":  "Email sending",
-                                    "whatsapp":  "WhatsApp deep-links",
-                                    "i18n":  "7 languages",
-                                    "selfHost":  "Self-hostable",
-                                    "offline":  "Offline-capable (core)",
-                                    "privacy":  "Local-first SQLite",
-                                    "license":  "MIT license"
-                                },
-                    "faq":  {
-                                "title":  "Pricing FAQ",
-                                "q1":  "Wait — it\u0027s really free? No hidden catch?",
-                                "a1":  "Yes. Lead Machine is MIT-licensed open source. You can download it, run it, modify it, sell derivatives, all for free, forever. The project is maintained by volunteers who use it daily.",
-                                "q2":  "Why don\u0027t you charge subscriptions like everyone else?",
-                                "a2":  "Because the whole point of Lead Machine is to kill the €200/mo SaaS stack for freelancers. Charging would defeat the mission. We make money by selling custom builds \u0026 consulting, not by nickel-and-diming users.",
-                                "q3":  "What about BYOK — are my keys safe?",
-                                "a3":  "Your keys are encrypted client-side with AES-GCM 256-bit using PBKDF2 with 100,000 iterations, keyed to your browser fingerprint, and stored only in YOUR localStorage. They are NEVER sent to any server in plaintext. You can verify the crypto.ts code on GitHub.",
-                                "q4":  "Can I self-host on Vercel / Fly.io / Coolify?",
-                                "a4":  "Yes — see the Deploy docs. For Vercel, attach a persistent volume for SQLite (or switch to Postgres — single DATABASE_URL change).",
-                                "q5":  "Is there a hosted managed version?",
-                                "a5":  "Not currently, but the community is working on one. Star \u0026 watch the repo for updates."
-                            },
-                    "included":  "Included"
-                },
-    "byok":  {
-                 "title":  "BYOK \u0026 Zero-Knowledge Architecture",
-                 "subtitle":  "We built Lead Machine so we would trust it ourselves. Here is exactly how your secrets stay yours.",
-                 "tabs":  {
-                              "crypto":  "How AES-GCM encryption works",
-                              "zeroknowledge":  "Zero-Knowledge Promise"
-                          },
-                 "crypto":  {
-                                "p1":  "All API keys you paste into Lead Machine (Gemini, Groq, SMTP user/pass) are encrypted in your browser BEFORE anything else happens.",
-                                "p2":  "We use the browser\u0027s native Web Crypto API — zero third-party crypto libraries. The implementation is auditable in lib/crypto.ts.",
-                                "stepsTitle":  "Step-by-step encryption flow",
-                                "step1":  "A 16-byte cryptographically-random salt is generated per payload (crypto.getRandomValues).",
-                                "step2":  "A 12-byte random IV (initialization vector) is generated per encryption — non-repeating, GCM-compliant.",
-                                "step3":  "Your browser fingerprint (UA+lang+platform+resolution+timezone+cores+memory) is used as the passphrase.",
-                                "step4":  "PBKDF2 with SHA-256 stretches that passphrase over 100,000 iterations into a 256-bit AES key.",
-                                "step5":  "AES-GCM 256 encrypts your keys. The auth tag is included in the ciphertext (GCM property).",
-                                "step6":  "Salt + IV + ciphertext + iteration count are base64-encoded and JSON-stringified. Result stored ONLY in your localStorage."
-                            },
-                 "zeroknowledge":  {
-                                       "p1":  "“Zero knowledge” in Lead Machine means: by design, the server infrastructure physically cannot access your keys, your leads, or your business data.",
-                                       "p2":  "There is no middleman. There is no proxy. There is no “our servers call the AI for you”. The browser calls Gemini/Groq/Nodemailer directly — or, if you self-host on your laptop, your Node process calls them from YOUR IP address.",
-                                       "promisesTitle":  "The 5 Ironclad Promises",
-                                       "prom1":  "We NEVER receive or log API keys in plaintext. Never. Impossible.",
-                                       "prom2":  "We NEVER send your leads, contacts or quote data to third-party servers.",
-                                       "prom3":  "We NEVER include tracking scripts (no GA, no Meta, no Pixel, no Segment, no Sentry by default).",
-                                       "prom4":  "We NEVER sell or share data with anyone — we don\u0027t have any to share.",
-                                       "prom5":  "All of the above is verifiable by reading the MIT-licensed source on GitHub. If you find otherwise, it\u0027s a bug — email axsen_kurtoski@financier.com for bounty."
-                                   },
-                 "cta":  {
-                             "verify":  "Verify the crypto on GitHub",
-                             "start":  "Start using BYOK Free Forever"
-                         }
-             },
-    "transparency":  {
-                         "title":  "Full Transparency Report",
-                         "subtitle":  "Lead Machine is an open book. Here is what we do, don\u0027t do, and why.",
-                         "sections":  {
-                                          "dataTitle":  "What data we actually process",
-                                          "dataBody":  "If you run Lead Machine on your laptop (the recommended way for individual users): ZERO. We receive nothing, we store nothing, we process nothing. Every byte lives in your prisma/dev.db SQLite file.\n\nIf you use a public community demo instance (not operated by the Lead Machine project directly) or a custom managed build operated by a third party: that operator\u0027s data policies apply. The Lead Machine open-source codebase itself does not phone home.",
-                                          "cookiesTitle":  "Cookies — only the strictly necessary ones",
-                                          "cookiesBody":  "We set 3 first-party functional cookies and nothing else:\n\nnext-intl-locale — 1 year — remembers your language preference.\nlm_license — 10 years — reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.\nlm_consent — 90 days — remembers that you saw the cookie banner.\n\nThat\u0027s it. No Google Analytics. No Meta Pixel. No LinkedIn Insight. No Hotjar. No third-party cookies. Nada.",
-                                          "opensourceTitle":  "100% Open Source — audit everything",
-                                          "opensourceBody":  "Every line of code that ships in Lead Machine is on GitHub under the MIT license. The build is reproducible. Dependency trees are pinned (package-lock.json). If you can read TypeScript, you can verify every claim on this page.",
-                                          "securityTitle":  "Security posture",
-                                          "securityBody":  "Rate limiting on every write endpoint. Input sanitization on every param. Settings whitelist (mass-injection impossible). Secrets redacted from server responses. Prisma transactions + batch ops (no partial writes). CSP-friendly by default. See SECURITY.md for full policy and vulnerability disclosure process.",
-                                          "financialTitle":  "How the project survives financially",
-                                          "financialBody":  "Lead Machine is a labor of love, not a SaaS business. Revenue comes from three channels: (1) custom development for agencies who need bespoke CRM fields or integrations, (2) deployment \u0026 security consulting for self-hosted teams, (3) optional GitHub Sponsors from users who want to tip. No subscriptions. No VC funding. No growth targets that would force us to compromise on privacy."
-                                      }
-                     },
-    "deploy":  {
-                   "title":  "Deploy Lead Machine anywhere",
-                   "subtitle":  "Run on your laptop in 3 commands, or deploy to any VPS/serverless platform.",
-                   "options":  {
-                                   "local":  {
-                                                 "title":  "Laptop (Recommended)",
-                                                 "badge":  "Best for individuals",
-                                                 "steps":  [
-                                                               "git clone https://github.com/AxsenXzc/lead-machine.git",
-                                                               "cd lead-machine \u0026\u0026 npm install \u0026\u0026 npm run setup",
-                                                               "npm run dev → open http://localhost:3000"
-                                                           ],
-                                                 "notes":  "Zero config. SQLite file at prisma/dev.db. Works offline."
-                                             },
-                                   "vps":  {
-                                               "title":  "VPS / VM (Caddy + Basic Auth)",
-                                               "badge":  "Teams / always-on",
-                                               "steps":  [
-                                                             "Spin up a $5/mo VPS (Ubuntu 22.04, 1GB RAM minimum)",
-                                                             "Install Node 20 LTS. Clone repo, npm ci, npm run setup",
-                                                             "Run behind Caddy with automatic HTTPS + basic_auth"
-                                                         ],
-                                               "notes":  "Daily SQLite backup via cron + rclone to S3-compatible storage."
-                                           },
-                                   "serverless":  {
-                                                      "title":  "Serverless (Vercel / Fly.io)",
-                                                      "badge":  "Managed + zero ops",
-                                                      "steps":  [
-                                                                    "Fork the repo, connect to Vercel / Fly.io",
-                                                                    "Attach persistent volume for SQLite OR swap DATABASE_URL to Postgres",
-                                                                    "Set NEXT_PUBLIC_BASE_URL env var. Done."
-                                                                ],
-                                                      "notes":  "⚠️ Vercel ephemeral FS — you MUST mount a volume or use Postgres for durable storage."
-                                                  }
-                               },
-                   "copied":  "Copied to clipboard"
-               },
-    "legal":  {
-                  "lastUpdated":  "Last updated",
-                  "today":  "July 31, 2026",
-                  "privacy":  {
-                                  "title":  "Privacy Policy",
-                                  "subtitle":  "Full GDPR \u0026 CCPA compliant privacy policy.",
-                                  "controller":  {
-                                                     "title":  "1. Data Controller",
-                                                     "body":  "The data controller for this website is:\nLead Machine Open Source Project\nc/o Lead Machine Contributors\nVia Privacy 1, 20121 Milano MI — Italy\nVAT ID (P.IVA): IT00000000000\nEmail: axsen_kurtoski@financier.com\nFor matters relating to this Privacy Policy, you may contact the Controller at any time at the email above."
-                                                 },
-                                  "collected":  {
-                                                    "title":  "2. Categories of Data Collected",
-                                                    "body":  "Lead Machine collects the absolute minimum of personal data. In practice, only the following:\n\na) Contact form data: if you voluntarily fill in a contact form (demo request, partnership, bug report, waitlist), we collect the name and email address you provide. Processing is based solely on your explicit, opt-in consent.\n\nb) Server logs: our web hosts (Vercel, GitHub Pages) may retain transient IP-based connection logs for up to 7 days for pure security/anti-abuse purposes. We do not have access to these logs unless a legal request compels the host to provide them.\n\nc) We explicitly do NOT collect:\n— Third-party analytics (no Google Analytics, no GA4, no Matomo, no Plausible)\n— Advertising or marketing tracking cookies (no Meta Pixel, no LinkedIn Insight, no Twitter/X Ads)\n— User behavioral profiling of any kind\n— Cross-device tracking\n— Financial data (we don\u0027t process payments)"
-                                                },
-                                  "purposes":  {
-                                                   "title":  "3. Purposes of Processing",
-                                                   "body":  "The Data Controller processes personal data solely for the following purposes:\n\n— Responding to contact requests: when you email us or submit a form, we use your data to reply. Period.\n— Security \u0026 anti-abuse: transient IP logs processed by our hosting providers solely to prevent DDoS, brute-force attacks and spam.\n— Compliance with a legal obligation: where we are compelled by binding EU or national law to produce records."
-                                               },
-                                  "basis":  {
-                                                "title":  "4. Legal Basis for Processing",
-                                                "body":  "Processing is based on one or more of the following, as applicable under Art. 6 GDPR:\n\n(a) Explicit, specific, revocable consent (Art. 6(1)(a)) — for contact form submissions and waitlist signups. You may withdraw consent at any time by emailing axsen_kurtoski@financier.com.\n\n(b) Compliance with a legal obligation (Art. 6(1)(c)) — e.g., tax record retention.\n\n(c) Legitimate interests (Art. 6(1)(f)) — only in the narrow case of server-level anti-abuse/security logs. We balance these interests against your rights and find the impact to be minimal (transient, unprofiled, never used for marketing)."
-                                            },
-                                  "retention":  {
-                                                    "title":  "5. Data Retention",
-                                                    "body":  "Data categories are retained for the following maximum periods:\n\n— Contact form submissions (name + email): 36 months from the last interaction with you. This allows us to recognize returning conversations. After 36 months, we permanently delete.\n\n— Transient host-level security logs: up to 7 days (outside our control).\n\n— Financial/customer records relating to consulting or custom builds: 10 years per Italian civil \u0026 tax law (Art. 2220 c.c., Art. 3 D.P.R. 600/1973)."
-                                                },
-                                  "rights":  {
-                                                 "title":  "6. Your Rights (GDPR Articles 15–22)",
-                                                 "body":  "Under the EU General Data Protection Regulation (and comparable laws like the CCPA), you have the following rights, free of charge:\n\n— Right of access (Art. 15): you may request confirmation of whether we process your data and obtain a copy.\n— Right to rectification (Art. 16): correct inaccurate or incomplete data.\n— Right to erasure (“right to be forgotten”, Art. 17): request deletion, subject to legal retention exceptions.\n— Right to restriction (Art. 18): suspend processing in certain cases.\n— Right to data portability (Art. 20): receive your data in a machine-readable format.\n— Right to object (Art. 21): object to processing based on legitimate interests.\n— Right to withdraw consent at any time, without affecting the lawfulness of processing based on consent before withdrawal.\n— Right to lodge a complaint with a supervisory authority.\n\nHow to exercise: email axsen_kurtoski@financier.com with the subject “GDPR Request”. We respond within 30 calendar days."
-                                             },
-                                  "cookies":  {
-                                                  "title":  "7. Cookies",
-                                                  "body":  "A dedicated Cookie Policy exists at /cookies. We set 3 (three) first-party strictly-necessary cookies only. No tracking cookies, no marketing cookies, no third-party cookies of any kind are set by this website."
-                                              },
-                                  "transfer":  {
-                                                   "title":  "8. International Transfers (Extra-EU)",
-                                                   "body":  "To the extent that any processing involves a transfer of personal data outside the European Economic Area, we rely exclusively on one of the following:\n\n(a) Standard Contractual Clauses (SCCs / Standardvertragsklauseln) as adopted by the European Commission (Decision 2021/914 and subsequent);\n(b) Adequacy decisions (e.g., UK IDTA, Switzerland FAIA, Japan APPI);\n(c) Explicit, informed, opt-in consent (Art. 49(1)(a) GDPR) after you have been specifically informed of the risks.\n\nWe never transfer personal data to the United States without SCCs + documented supplementary technical measures (end-to-end encryption at rest and in transit)."
-                                               },
-                                  "authority":  {
-                                                    "title":  "9. Supervisory Authority",
-                                                    "body":  "The lead supervisory authority for Lead Machine is the Italian Data Protection Authority (Garante per la protezione dei dati personali — www.garanteprivacy.it). You may lodge a complaint at any time, in any EU language, with the Garante or with the DPA of your habitual residence, place of work, or place of the alleged infringement."
-                                                },
-                                  "changes":  {
-                                                  "title":  "10. Changes to this Policy",
-                                                  "body":  "We reserve the right to modify this Privacy Policy at any time. Material changes will be flagged with a banner on the homepage for 30 days after publication, and the “Last updated” date at the top of this page will be incremented. Continued use of the site after changes constitutes acceptance."
-                                              }
-                              },
-                  "terms":  {
-                                "title":  "Terms of Service",
-                                "subtitle":  "The contract between you and the Lead Machine project.",
-                                "definitions":  {
-                                                    "title":  "1. Definitions",
-                                                    "body":  "a) “Service” means the Lead Machine software, this marketing website (leadmachine.dev or any subdomain), documentation, and community resources operated by the Lead Machine open-source project.\n\nb) “User” means any natural or legal person that accesses or uses the Service, whether or not they register an account.\n\nc) “Software” means the Lead Machine Next.js application, released under the MIT License as set out in the LICENSE file in the GitHub repository.\n\nd) “Parties” means the User on one side and Lead Machine Contributors on the other."
-                                                },
-                                "service":  {
-                                                "title":  "2. Description of the Service",
-                                                "body":  "Lead Machine provides a self-hosted, local-first lead-generation and CRM application for freelancers and small web agencies. The Software is offered under the MIT License, which allows use, modification, distribution, sublicensing and sale of copies. This website serves as informational, documentation and community hub."
-                                            },
-                                "account":  {
-                                                "title":  "3. User Account \u0026 Registration",
-                                                "body":  "The core, self-hosted Software has no user accounts or authentication system by design — it is intended for single-user local use. Custom multi-user builds may include accounts. For those, the User agrees to:\n\na) Provide accurate, complete, and current registration data;\nb) Maintain the security of any credentials and immediately notify Lead Machine of unauthorized use;\nc) Be fully responsible for all activities conducted under their account, whether authorized or not."
-                                            },
-                                "license":  {
-                                                "title":  "4. MIT License \u0026 Open Source Rules",
-                                                "body":  "The Lead Machine Software is released under the MIT License, a permissive, OSI-approved open-source license. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-                                            },
-                                "prohibited":  {
-                                                   "title":  "5. Prohibited Conduct",
-                                                   "body":  "Users agree not to:\n\na) Use the Service for any unlawful purpose or in violation of any applicable national, EU, or international law or regulation;\nb) Upload, distribute, or transmit malware, viruses, ransomware, spyware, or any code of a destructive or intrusive nature;\nc) Attempt to gain unauthorized access to other Users\u0027 accounts, systems, or networks;\nd) Perform load testing, DDoS, scraping, or aggressive crawling that disrupts the Service;\ne) Impersonate any person or entity or falsely state or otherwise misrepresent an affiliation with a person or entity;\nf) Remove or modify any copyright, trademark, or other proprietary notices from the Software or documentation."
-                                               },
-                                "liability":  {
-                                                  "title":  "6. Limitation of Liability",
-                                                  "body":  "To the maximum extent permitted by applicable law:\n\na) The Service and Software are provided “AS IS” and “AS AVAILABLE”, WITHOUT WARRANTY OF ANY KIND — express, implied, or statutory — including but not limited to warranties of merchantability, fitness for a particular purpose, non-infringement, title, and quiet enjoyment.\n\nb) In no event shall Lead Machine Contributors, its maintainers, volunteers, or suppliers be liable for any indirect, incidental, special, consequential, or punitive damages, including lost profits, lost revenue, loss of data, loss of goodwill, or procurement costs of substitute goods.\n\nc) Total cumulative aggregate liability, under any legal theory (contract, tort, strict liability, statute, or otherwise), shall not exceed €100 EUR (maximum aggregate liability for any single claim).\n\nd) Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be excluded under applicable mandatory law."
-                                              },
-                                "jurisdiction":  {
-                                                     "title":  "7. Governing Law \u0026 Jurisdiction",
-                                                     "body":  "These Terms are governed by and construed in accordance with the law of the Italian Republic, without regard to its conflict-of-laws rules.\n\nFor any dispute arising out of or relating to these Terms or the Service:\n\n— If the User is a consumer resident in the European Union: the User may also bring proceedings in the courts of the Member State of their habitual residence.\n— Otherwise: the Parties irrevocably submit to the exclusive jurisdiction of the Court of Milano, Italy (Foro di Milano).\n\nThe Parties expressly exclude application of the United Nations Convention on Contracts for the International Sale of Goods (CISG, Vienna 1980)."
-                                                 },
-                                "changes":  {
-                                                "title":  "8. Changes to the Service or Terms",
-                                                "body":  "Lead Machine may, at its sole discretion, modify, suspend, or discontinue — temporarily or permanently — features, subdomains, or community resources, with or without notice.\n\nMaterial changes to these Terms will be announced on the homepage for 30 days. Continued use after the 30-day notice period constitutes acceptance of the updated Terms."
-                                            },
-                                "contacts":  {
-                                                 "title":  "9. Contact Information",
-                                                 "body":  "For legal inquiries, send registered communication to:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italy\nEmail: axsen_kurtoski@financier.com\nCertified Email (PEC): axsen_kurtoski@financier.com\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
-                                             }
-                            },
-                  "cookies":  {
-                                  "title":  "Cookie Policy",
-                                  "subtitle":  "Only strictly necessary cookies. Zero tracking, zero marketing.",
-                                  "intro":  "In accordance with Art. 122 of the Italian Privacy Code (D. Lgs. 196/2003 as amended) and Art. 5(3) of the ePrivacy Directive (2002/58/EC), as well as the Guidelines issued by the Italian Data Protection Authority (Garante Privacy, Provv. 10/06/2021 n. 231), this website uses ONLY first-party strictly-necessary technical cookies. No profiling cookies. No marketing cookies. No third-party cookies of any description.",
-                                  "whatAre":  {
-                                                  "title":  "What are cookies",
-                                                  "body":  "Cookies are small text files that a website can store on your browser when you visit it. They are widely used to make websites work efficiently, remember preferences, and — in the case of tracking cookies — build advertising profiles about you."
-                                              },
-                                  "strictlyNecessary":  {
-                                                            "title":  "Strictly Necessary Cookies (no consent required)",
-                                                            "body":  "Under the aforementioned EU/Italian regulatory framework, strictly necessary cookies — those required for the basic functioning of the site — can be set without prior consent, and users have a right to delete them via browser settings at any time. These are the only cookies set by this website:"
-                                                        },
-                                  "table":  {
-                                                "cols":  [
-                                                             "Cookie name",
-                                                             "Purpose",
-                                                             "Duration",
-                                                             "Controller"
-                                                         ],
-                                                "rows":  [
-                                                             [
-                                                                 "next-intl-locale",
-                                                                 "Remembers your interface language preference so you don\u0027t get re-prompted on every pageload",
-                                                                 "1 year (365 days)",
-                                                                 "First-party — Lead Machine (functional)"
-                                                             ],
-                                                             [
-                                                                 "lm_license",
-                                                                 "Reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.",
-                                                                 "10 years",
-                                                                 "First-party — Lead Machine (functional)"
-                                                             ],
-                                                             [
-                                                                 "lm_consent",
-                                                                 "Remembers that you have seen and acknowledged the cookie banner on this site. Stores no personal information.",
-                                                                 "90 days",
-                                                                 "First-party — Lead Machine (functional)"
-                                                             ]
-                                                         ]
-                                            },
-                                  "notUsedTitle":  "Cookies explicitly NOT used on this site",
-                                  "notUsedBody":  "For absolute clarity and as a matter of policy, the following cookies and tracking mechanisms are actively and permanently disabled on this website:\n\n— Google Analytics / GA4 / Universal Analytics cookies (_ga, _gid, _gat, _ga_*)\n— Meta Pixel / Facebook cookies (_fbp, _fbc, fr, sb, tr, wd)\n— LinkedIn Insight Tag (li_gc, lidc, AnalyticsSyncHistory)\n— Twitter/X advertising conversion pixels\n— Hotjar, Fullstory, Microsoft Clarity session recordings\n— Any AdSense, DoubleClick, AdRoll, Criteo, or remarketing cookies\n— Any third-party social media widget cookies (social widgets are implemented as privacy-friendly static badges, not iframes)\n\nWe do not set any of the above. We never will. If you find such a cookie on this domain, it is a bug — please report it to axsen_kurtoski@financier.com and we will fix it promptly."
-                              },
-                  "imprint":  {
-                                  "title":  "Imprint / Impressum (Art. 7 Abs. 1 TMG \u0026 D. Lgs. 70/2003)",
-                                  "subtitle":  "Required by Italian and German law for every commercial website.",
-                                  "body":  "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nRepresented by: Lead Machine Maintainers\nRegistered Address: Via Privacy 1, 20121 Milano MI, Italy\n\nVAT ID (Partita IVA / USt-IdNr.): IT00000000000\nCompany Register (REA / Handelsregister): Milano REA n. MI-0000000\nShare Capital (Capitale Sociale): € 10.000,00 i.v.\n\nEmail — General: axsen_kurtoski@financier.com\nEmail — Privacy: axsen_kurtoski@financier.com\nEmail — Legal / PEC: axsen_kurtoski@financier.com\nEmail — Security / Vulnerabilities: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
-                              },
-                  "dpa":  {
-                              "title":  "Data Processing Agreement (DPA / AVV Art. 28 GDPR)",
-                              "subtitle":  "Standard EU model clauses. Available on demand.",
-                              "intro":  "Under Article 28 of the EU General Data Protection Regulation (GDPR), where a controller engages a processor to process personal data on its behalf, the parties must sign a written Data Processing Agreement (DPA / AVV — Accordo sul Trattamento dei Dati Personali) that meets the requirements of Art. 28(3) GDPR.",
-                              "body":  "Lead Machine Contributors maintain a template DPA incorporating the European Commission\u0027s Standard Contractual Clauses (Module 2: Controller-to-Processor, Decision 2021/914/EU and subsequent amendments), including the Technical and Organisational Measures (TOMs / Misure Tecniche e Organizzative) Annex.\n\nThis DPA is primarily relevant to Users who run community or self-hosted custom deployments, or who request a signed DPA for internal compliance reasons.\n\nTo obtain a signed copy, please email axsen_kurtoski@financier.com with the subject line “DPA Request” and include:\n— The full legal name, address, VAT ID, and registered email of the Controller;\n— Description of the processing to be carried out (which services, categories of data subjects, categories of data, duration).\n\nWe will return a countersigned DPA PDF within 7 working days."
-                          },
-                  "security":  {
-                                   "title":  "Security Policy",
-                                   "subtitle":  "Full policy at SECURITY.md in the repo. Short version here.",
-                                   "intro":  "The Lead Machine security policy lives in SECURITY.md in the main repository and is maintained alongside the code. This page is a human-readable summary for website visitors. The canonical version is the Markdown file on GitHub."
-                               }
-              },
-    "cta":  {
-                "title":  "Ready to own your pipeline?",
-                "subtitle":  "Deploy Lead Machine on your laptop in 3 commands — or self-host it anywhere. Free forever, no sign-up, no credit card.",
-                "primary":  "Deploy Now — Free",
-                "secondary":  "Star on GitHub",
-                "demo":  "Try the live demo"
-            },
-    "forms":  {
-                  "name":  "Name",
-                  "email":  "Email",
-                  "company":  "Company (optional)",
-                  "message":  "Message",
-                  "send":  "Send",
-                  "sending":  "Sending…",
-                  "successTitle":  "Message sent",
-                  "successDesc":  "Thanks — we usually reply within 24 hours.",
-                  "errorTitle":  "Could not send",
-                  "errorDesc":  "Please check the fields and try again.",
-                  "demo-request":  {
-                                       "title":  "Request a Demo",
-                                       "subtitle":  "See Lead Machine live: search, score, contact — in under 3 minutes.",
-                                       "cta":  "Request Demo"
-                                   },
-                  "partnership":  {
-                                      "title":  "Partnerships",
-                                      "subtitle":  "Let\u0027s grow the ecosystem together. Agencies, integrators, resellers — write to us.",
-                                      "cta":  "Send proposal"
-                                  },
-                  "report-issue":  {
-                                       "title":  "Report an Issue",
-                                       "subtitle":  "Found a bug? Describe it and we\u0027ll fix it fast. Include your OS \u0026 browser.",
-                                       "cta":  "Send report"
-                                   },
-                  "waitlist":  {
-                                   "title":  "Join the Waitlist",
-                                   "subtitle":  "Be first in line for the hosted managed version, custom builds \u0026 early features.",
-                                   "cta":  "Join Waitlist"
-                               }
-              },
-    "resources":  {
-                      "docs":  {
-                                   "title":  "Documentation",
-                                   "subtitle":  "Everything you need to install, configure and master Lead Machine.",
-                                   "body":  "Step-by-step guides for local setup, VPS deployment, BYOK keys, AI providers (Gemini \u0026 Groq), SMTP and the quote pipeline. The full documentation lives in the repository\u0027s /docs folder and the README."
-                               },
-                      "blog":  {
-                                   "title":  "Blog",
-                                   "subtitle":  "Stories, guides and field notes from the Lead Machine team.",
-                                   "body":  "Articles about lead generation for freelancers, CRM workflows, self-hosting tips and open-source philosophy. New posts are announced on GitHub Discussions."
-                               },
-                      "changelog":  {
-                                        "title":  "Changelog",
-                                        "subtitle":  "Every release, every fix, every new feature — in chronological order.",
-                                        "body":  "We follow semantic versioning. Releases are published on GitHub Releases with detailed notes, migration steps and breaking-change warnings when applicable."
-                                    },
-                      "roadmap":  {
-                                      "title":  "Roadmap",
-                                      "subtitle":  "Where Lead Machine is going next.",
-                                      "body":  "The roadmap is public and community-driven. Upvote ideas and suggest features in GitHub Discussions — we build what users actually need."
-                                  },
-                      "contributors":  {
-                                           "title":  "Contributors",
-                                           "subtitle":  "The people who make Lead Machine possible.",
-                                           "body":  "Lead Machine is built by volunteers: developers, designers, translators and users who share their feedback. Every contribution is welcome — from docs fixes to new features."
-                                       },
-                      "status":  {
-                                     "title":  "Status",
-                                     "subtitle":  "Real-time status of all Lead Machine services.",
-                                     "body":  "Lead Machine is an open-source project: there are no cloud servers to go down. The website, the code repository and community channels are maintained by volunteers. Report outages on GitHub."
-                                 },
-                      "about":  {
-                                    "title":  "About",
-                                    "subtitle":  "Why Lead Machine exists.",
-                                    "body":  "We are freelancers who got tired of paying for tools that lock our data in the cloud. Lead Machine is our answer: a professional lead-generation stack that is free, private and open. It is developed in the open, used daily by its own maintainers."
-                                }
-                  },
-    "demo":  {
-                 "title":  "Live Demo — Try Lead Machine in Your Browser",
-                 "subtitle":  "Search real businesses on OpenStreetMap, score leads and generate AI outreach — right here, with your own API keys. Nothing is stored on any server.",
-                 "search":  {
-                                "title":  "1 · Find leads",
-                                "categoryLabel":  "Business category",
-                                "categoryPlaceholder":  "e.g. plumber, bakery, dentist…",
-                                "cityLabel":  "City",
-                                "cityPlaceholder":  "e.g. Milan",
-                                "radiusLabel":  "Radius",
-                                "search":  "Search",
-                                "searching":  "Searching…",
-                                "results":  "leads found",
-                                "noResults":  "No businesses found. Try another category or city.",
-                                "error":  "Search failed. Check your connection and try again.",
-                                "score":  "Score",
-                                "distance":  "away",
-                                "sortLabel":  "Sort by",
-                                "bestScore":  "Best score",
-                                "nearest":  "Nearest",
-                                "exportCsv":  "Export CSV",
-                                "exported":  "Leads exported"
-                            },
-                 "lead":  {
-                              "email":  "Email",
-                              "phone":  "Phone",
-                              "website":  "Website",
-                              "hours":  "Open hours",
-                              "address":  "Address"
-                          },
-                 "ai":  {
-                            "title":  "2 · AI outreach (optional)",
-                            "desc":  "Generate a cold email or call script for any lead. Use your own Gemini or Groq key — encrypted in YOUR browser, never sent to us. Or use your free credits.",
-                            "geminiKey":  "Gemini API key",
-                            "groqKey":  "Groq API key",
-                            "saveKeys":  "Save keys (encrypted)",
-                            "keysSaved":  "Keys saved encrypted in your browser",
-                            "eraseKeys":  "Erase keys",
-                            "keysErased":  "Keys erased",
-                            "keysNeverLeave":  "Your keys never leave this browser — AES-256-GCM + PBKDF2.",
-                            "genEmail":  "Generate email draft",
-                            "genScript":  "Generate call script",
-                            "generating":  "Generating…",
-                            "selectLead":  "Select a lead first",
-                            "copy":  "Copy",
-                            "creditError":  "No key configured and free credits are unavailable."
-                        },
-                 "credits":  {
-                                 "left":  "{count} free AI credits left",
-                                 "byokPrompt":  "Credits used up. Add your own Gemini or Groq key above — unlimited, free forever."
-                             },
-                 "trust":  {
-                               "title":  "Your trust, our architecture",
-                               "body":  "This demo runs entirely in your browser. Keys are encrypted client-side with AES-256-GCM (PBKDF2, 100k iterations) and stored only in your localStorage. Don\u0027t trust us? Download the full app and run it on your machine.",
-                               "selfHost":  "Self-host from GitHub",
-                               "clone":  "git clone https://github.com/AxsenXzc/lead-machine.git"
-                           }
-             },
-    "showcase":  {
-                     "title":  "See it in action — right now",
-                     "subtitle":  "Real businesses from OpenStreetMap. Real lead scores. Real AI outreach with your own keys. No sign-up, no installation.",
-                     "cta":  "Open the live demo",
-                     "credits":  "10 free AI credits",
-                     "playVideo":  "Watch the demo",
-                     "unmuteVideo":  "Unmute",
-                     "muteVideo":  "Mute"
-                 },
-    "footer":  {
-                   "product":  "Product",
-                   "resources":  "Resources",
-                   "legal":  "Legal"
-               }
+{
+  "meta": {
+    "title": "Lead Machine — Open-Source Lead Generation CRM",
+    "description": "Free, open-source, self-hosted lead generation platform for freelancers & small agencies. Find nearby businesses, score them, contact them, build quotes. €0 in subscriptions.",
+    "ogTitle": "Lead Machine — Free Forever CRM for Freelancers",
+    "ogDescription": "100% open-source. Your data. Your DB. BYOK encryption or no keys at all. Zero subscriptions, zero tracking.",
+    "keywords": "lead generation, crm, open source, self hosted, freelancer tools, small business, openstreetmap, quotes, invoicing",
+    "license": "Released under MIT License."
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "byok": "BYOK & Privacy",
+    "transparency": "Transparency",
+    "deploy": "Deploy",
+    "docs": "Docs",
+    "blog": "Blog",
+    "changelog": "Changelog",
+    "roadmap": "Roadmap",
+    "about": "About",
+    "demo": "Request Demo",
+    "contact": "Contact",
+    "contributors": "Contributors",
+    "status": "Status",
+    "getStarted": "Get Started",
+    "starOnGithub": "Star on GitHub",
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy",
+      "imprint": "Imprint",
+      "dpa": "Data Processing",
+      "security": "Security"
+    },
+    "language": "Language",
+    "partnership": "Partnerships",
+    "liveDemo": "Live Demo"
+  },
+  "byokBanner": {
+    "title": "🔒 Your API keys · Your data · Your DB.",
+    "subtitle": "We never see, log or store anything. BYOK: keys encrypted in YOUR browser. Lifetime: zero keys needed.",
+    "cta": "Learn more →"
+  },
+  "cookieBanner": {
+    "text": "🍪 We use only technical cookies for basic site functionality. 0 tracking cookies. 0 marketing cookies.",
+    "accept": "Got it",
+    "more": "Cookie policy →"
+  },
+  "hero": {
+    "eyebrow": "Open-source · Free Forever · Self-Hosted",
+    "title": "Stop paying €200/mo for lead tools.",
+    "titleHighlight": "Own your pipeline. For €0.",
+    "subtitle": "Lead Machine is a single, open-source Next.js app that runs on your laptop. Search 40M+ businesses on OpenStreetMap, score prospects, email, WhatsApp, build quotes & invoices. No subscriptions. Your data stays on your machine.",
+    "ctas": {
+      "primary": "Get Started — Free",
+      "secondary": "Watch Demo (2 min)",
+      "tertiary": "View on GitHub ⭐"
+    },
+    "stats": {
+      "businesses": "M+ businesses searchable",
+      "countries": "Countries supported",
+      "languages": "Languages",
+      "price": "€/mo forever"
+    },
+    "trust": {
+      "text": "Trusted by freelancers & small agencies in",
+      "countries": "37+ countries"
+    }
+  },
+  "features": {
+    "title": "Everything you need. Nothing you don't.",
+    "subtitle": "Built by freelancers, for freelancers. Every feature is included — no upsells, no \"pro upgrade\" walls.",
+    "categories": {
+      "research": "Research & Prospecting",
+      "crm": "Multi-channel CRM",
+      "quotes": "Quotes & Invoices",
+      "ai": "AI (Optional BYOK)",
+      "privacy": "Privacy First"
+    },
+    "research": {
+      "geo_title": "Geographic search on OpenStreetMap",
+      "geo_desc": "Query 40M+ businesses by category, radius and city — for free, via Overpass API. No Google Maps key required.",
+      "dedup_title": "Smart deduplication",
+      "dedup_desc": "3 layers of dedup: OSM ID → name+city → fuzzy. Your CRM stays clean automatically.",
+      "crawler_title": "Website & contact crawler",
+      "crawler_desc": "Given a lead, auto-find homepage, extract email, phone, social links. One-click homepage screenshot (Playwright).",
+      "map_title": "Interactive map view",
+      "map_desc": "Leaflet map with clustering. Color-coded lead statuses. Click a pin → call, email, WhatsApp instantly."
+    },
+    "crm": {
+      "scoring_title": "0–100 lead scoring",
+      "scoring_desc": "Category, presence of email/phone/website, social signals, recency, distance. Know who to call first.",
+      "timeline_title": "Unified timeline",
+      "timeline_desc": "Calls, emails, WhatsApp, meetings, notes, follow-ups — one view per lead. Nothing slips through.",
+      "email_title": "Email with SMTP or .eml local",
+      "email_desc": "Send via your SMTP (Gmail app password, SendGrid, Postfix…). No SMTP? Emails saved as .eml locally.",
+      "whatsapp_title": "One-click WhatsApp",
+      "whatsapp_desc": "Deep-link to wa.me with per-lead templates. Includes tags & custom merge fields.",
+      "followups_title": "Follow-up buckets",
+      "followups_desc": "“Today / This week / Overdue / Done” — automatic. Get reminded via browser notifications."
+    },
+    "quotes": {
+      "lineitems_title": "Line-item quotes with VAT",
+      "lineitems_desc": "Quantity, discounts, VAT rates, payment terms, validity. Italian/German/French/English/Spanish/Portuguese/Slovenian labels.",
+      "pdf_title": "PDF generation",
+      "pdf_desc": "Print-ready PDFs with your brand. Client-ready first impression, every time.",
+      "workflow_title": "Workflow pipeline",
+      "workflow_desc": "Draft → Sent → Accepted → Invoiced → Paid (or Rejected/Cancelled). Reminders auto-sent.",
+      "csv_title": "Export CSV / JSON",
+      "csv_desc": "All data exportable. Your SQLite file is portable & backup-friendly."
+    },
+    "ai": {
+      "failover_title": "Dual-provider AI with failover",
+      "failover_desc": "Gemini + Groq. If one errors or hits limits, the other kicks in. Results are deterministic per-input.",
+      "scripts_title": "Cold-call scripts & follow-ups",
+      "scripts_desc": "Personalized elevator pitches, email drafts, lead-score justifications, contract terms.",
+      "byok_title": "BYOK — keys never leave your browser",
+      "byok_desc": "Your Gemini/Groq/SMTP keys are AES-GCM 256-bit encrypted in YOUR localStorage. PBKDF2 100k iters. We never touch them."
+    },
+    "privacy": {
+      "local_title": "Local-first SQLite",
+      "local_desc": "A single prisma/dev.db file. Copy it, back it up, move it. Works offline — except for OSM/AI calls.",
+      "zero_title": "Zero telemetry, zero tracking",
+      "zero_desc": "No Google Analytics, no Meta Pixel, no Sentry-by-default. Your business, your data.",
+      "opensource_title": "100% open-source (MIT)",
+      "opensource_desc": "Audit every line on GitHub. Fork it, modify it, sell custom builds. Attribution optional, warmly appreciated."
+    }
+  },
+  "pricing": {
+    "title": "Two ways to use Lead Machine.",
+    "subtitle": "Both are €0 forever. Seriously. No subscriptions, no credit card, no fine print.",
+    "byok": {
+      "badge": "🎁 BYOK Free Forever",
+      "price": "€0",
+      "period": "forever",
+      "headline": "Bring Your Own Keys. 100% features. Always free.",
+      "desc": "Perfect for technical users & privacy purists. You bring Gemini, Groq and SMTP keys. We bring a world-class CRM. Your keys stay in YOUR browser, AES-256-GCM encrypted.",
+      "features": [
+        "All features unlocked — research, CRM, quotes, map, AI",
+        "Your API keys — encrypted AES-GCM 256 in your localStorage",
+        "Keys NEVER sent to our servers. NEVER logged. NEVER stored",
+        "MIT license — fork, modify, resell",
+        "Community support on GitHub Issues",
+        "7 interface languages"
+      ],
+      "cta": "Get BYOK Free Forever"
+    },
+    "opensource": {
+      "badge": "💻 Self-Hosted (No Keys Needed)",
+      "price": "€0",
+      "period": "one-time",
+      "headline": "Run it yourself. Use it without AI if you prefer.",
+      "desc": "Clone the repo, npm install, done. The CRM works perfectly without any API keys — search, map, quotes, invoices all work offline. Add AI only when/if you want.",
+      "features": [
+        "Run on your laptop or any VPS",
+        "SQLite DB — single portable file",
+        "Zero API keys required for core CRM",
+        "Works 100% offline (except OSM/AI calls)",
+        "Prisma — switch to Postgres with 1 env var",
+        "Full access to source code"
+      ],
+      "cta": "Deploy Now — Free"
+    },
+    "compareTitle": "Compare options",
+    "compare": {
+      "research": "OSM research & 40M+ businesses",
+      "crm": "Full CRM (statuses, tags, timeline)",
+      "map": "Map view & clustering",
+      "quotes": "Quotes & invoices with PDF",
+      "aiFeatures": "AI (cold call scripts, emails)",
+      "smtp": "Email sending",
+      "whatsapp": "WhatsApp deep-links",
+      "i18n": "7 languages",
+      "selfHost": "Self-hostable",
+      "offline": "Offline-capable (core)",
+      "privacy": "Local-first SQLite",
+      "license": "MIT license"
+    },
+    "faq": {
+      "title": "Pricing FAQ",
+      "q1": "Wait — it's really free? No hidden catch?",
+      "a1": "Yes. Lead Machine is MIT-licensed open source. You can download it, run it, modify it, sell derivatives, all for free, forever. The project is maintained by volunteers who use it daily.",
+      "q2": "Why don't you charge subscriptions like everyone else?",
+      "a2": "Because the whole point of Lead Machine is to kill the €200/mo SaaS stack for freelancers. Charging would defeat the mission. We make money by selling custom builds & consulting, not by nickel-and-diming users.",
+      "q3": "What about BYOK — are my keys safe?",
+      "a3": "Your keys are encrypted client-side with AES-GCM 256-bit using PBKDF2 with 100,000 iterations, keyed to your browser fingerprint, and stored only in YOUR localStorage. They are NEVER sent to any server in plaintext. You can verify the crypto.ts code on GitHub.",
+      "q4": "Can I self-host on Vercel / Fly.io / Coolify?",
+      "a4": "Yes — see the Deploy docs. For Vercel, attach a persistent volume for SQLite (or switch to Postgres — single DATABASE_URL change).",
+      "q5": "Is there a hosted managed version?",
+      "a5": "Not currently, but the community is working on one. Star & watch the repo for updates."
+    },
+    "included": "Included"
+  },
+  "byok": {
+    "title": "BYOK & Zero-Knowledge Architecture",
+    "subtitle": "We built Lead Machine so we would trust it ourselves. Here is exactly how your secrets stay yours.",
+    "tabs": {
+      "crypto": "How AES-GCM encryption works",
+      "zeroknowledge": "Zero-Knowledge Promise"
+    },
+    "crypto": {
+      "p1": "All API keys you paste into Lead Machine (Gemini, Groq, SMTP user/pass) are encrypted in your browser BEFORE anything else happens.",
+      "p2": "We use the browser's native Web Crypto API — zero third-party crypto libraries. The implementation is auditable in lib/crypto.ts.",
+      "stepsTitle": "Step-by-step encryption flow",
+      "step1": "A 16-byte cryptographically-random salt is generated per payload (crypto.getRandomValues).",
+      "step2": "A 12-byte random IV (initialization vector) is generated per encryption — non-repeating, GCM-compliant.",
+      "step3": "Your browser fingerprint (UA+lang+platform+resolution+timezone+cores+memory) is used as the passphrase.",
+      "step4": "PBKDF2 with SHA-256 stretches that passphrase over 100,000 iterations into a 256-bit AES key.",
+      "step5": "AES-GCM 256 encrypts your keys. The auth tag is included in the ciphertext (GCM property).",
+      "step6": "Salt + IV + ciphertext + iteration count are base64-encoded and JSON-stringified. Result stored ONLY in your localStorage."
+    },
+    "zeroknowledge": {
+      "p1": "“Zero knowledge” in Lead Machine means: by design, the server infrastructure physically cannot access your keys, your leads, or your business data.",
+      "p2": "There is no middleman. There is no proxy. There is no “our servers call the AI for you”. The browser calls Gemini/Groq/Nodemailer directly — or, if you self-host on your laptop, your Node process calls them from YOUR IP address.",
+      "promisesTitle": "The 5 Ironclad Promises",
+      "prom1": "We NEVER receive or log API keys in plaintext. Never. Impossible.",
+      "prom2": "We NEVER send your leads, contacts or quote data to third-party servers.",
+      "prom3": "We NEVER include tracking scripts (no GA, no Meta, no Pixel, no Segment, no Sentry by default).",
+      "prom4": "We NEVER sell or share data with anyone — we don't have any to share.",
+      "prom5": "All of the above is verifiable by reading the MIT-licensed source on GitHub. If you find otherwise, it's a bug — email axsen_kurtoski@financier.com for bounty."
+    },
+    "cta": {
+      "verify": "Verify the crypto on GitHub",
+      "start": "Start using BYOK Free Forever"
+    }
+  },
+  "transparency": {
+    "title": "Full Transparency Report",
+    "subtitle": "Lead Machine is an open book. Here is what we do, don't do, and why.",
+    "sections": {
+      "dataTitle": "What data we actually process",
+      "dataBody": "If you run Lead Machine on your laptop (the recommended way for individual users): ZERO. We receive nothing, we store nothing, we process nothing. Every byte lives in your prisma/dev.db SQLite file.\n\nIf you use a public community demo instance (not operated by the Lead Machine project directly) or a custom managed build operated by a third party: that operator's data policies apply. The Lead Machine open-source codebase itself does not phone home.",
+      "cookiesTitle": "Cookies — only the strictly necessary ones",
+      "cookiesBody": "We set 3 first-party functional cookies and nothing else:\n\nnext-intl-locale — 1 year — remembers your language preference.\nlm_license — 10 years — reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.\nlm_consent — 90 days — remembers that you saw the cookie banner.\n\nThat's it. No Google Analytics. No Meta Pixel. No LinkedIn Insight. No Hotjar. No third-party cookies. Nada.",
+      "opensourceTitle": "100% Open Source — audit everything",
+      "opensourceBody": "Every line of code that ships in Lead Machine is on GitHub under the MIT license. The build is reproducible. Dependency trees are pinned (package-lock.json). If you can read TypeScript, you can verify every claim on this page.",
+      "securityTitle": "Security posture",
+      "securityBody": "Rate limiting on every write endpoint. Input sanitization on every param. Settings whitelist (mass-injection impossible). Secrets redacted from server responses. Prisma transactions + batch ops (no partial writes). CSP-friendly by default. See SECURITY.md for full policy and vulnerability disclosure process.",
+      "financialTitle": "How the project survives financially",
+      "financialBody": "Lead Machine is a labor of love, not a SaaS business. Revenue comes from three channels: (1) custom development for agencies who need bespoke CRM fields or integrations, (2) deployment & security consulting for self-hosted teams, (3) optional GitHub Sponsors from users who want to tip. No subscriptions. No VC funding. No growth targets that would force us to compromise on privacy."
+    }
+  },
+  "deploy": {
+    "title": "Deploy Lead Machine anywhere",
+    "subtitle": "Run on your laptop in 3 commands, or deploy to any VPS/serverless platform.",
+    "options": {
+      "local": {
+        "title": "Laptop (Recommended)",
+        "badge": "Best for individuals",
+        "steps": [
+          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "cd lead-machine && npm install && npm run setup",
+          "npm run dev → open http://localhost:3000"
+        ],
+        "notes": "Zero config. SQLite file at prisma/dev.db. Works offline."
+      },
+      "vps": {
+        "title": "VPS / VM (Caddy + Basic Auth)",
+        "badge": "Teams / always-on",
+        "steps": [
+          "Spin up a $5/mo VPS (Ubuntu 22.04, 1GB RAM minimum)",
+          "Install Node 20 LTS. Clone repo, npm ci, npm run setup",
+          "Run behind Caddy with automatic HTTPS + basic_auth"
+        ],
+        "notes": "Daily SQLite backup via cron + rclone to S3-compatible storage."
+      },
+      "serverless": {
+        "title": "Serverless (Vercel / Fly.io)",
+        "badge": "Managed + zero ops",
+        "steps": [
+          "Fork the repo, connect to Vercel / Fly.io",
+          "Attach persistent volume for SQLite OR swap DATABASE_URL to Postgres",
+          "Set NEXT_PUBLIC_BASE_URL env var. Done."
+        ],
+        "notes": "⚠️ Vercel ephemeral FS — you MUST mount a volume or use Postgres for durable storage."
+      }
+    },
+    "copied": "Copied to clipboard"
+  },
+  "legal": {
+    "lastUpdated": "Last updated",
+    "today": "July 31, 2026",
+    "privacy": {
+      "title": "Privacy Policy",
+      "subtitle": "Full GDPR & CCPA compliant privacy policy.",
+      "controller": {
+        "title": "1. Data Controller",
+        "body": "The data controller for this website is:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\nFor matters relating to this Privacy Policy, you may contact the Controller at any time at the email above."
+      },
+      "collected": {
+        "title": "2. Categories of Data Collected",
+        "body": "Lead Machine collects the absolute minimum of personal data. In practice, only the following:\n\na) Contact form data: if you voluntarily fill in a contact form (demo request, partnership, bug report, waitlist), we collect the name and email address you provide. Processing is based solely on your explicit, opt-in consent.\n\nb) Server logs: our web hosts (Vercel, GitHub Pages) may retain transient IP-based connection logs for up to 7 days for pure security/anti-abuse purposes. We do not have access to these logs unless a legal request compels the host to provide them.\n\nc) We explicitly do NOT collect:\n— Third-party analytics (no Google Analytics, no GA4, no Matomo, no Plausible)\n— Advertising or marketing tracking cookies (no Meta Pixel, no LinkedIn Insight, no Twitter/X Ads)\n— User behavioral profiling of any kind\n— Cross-device tracking\n— Financial data (we don't process payments)"
+      },
+      "purposes": {
+        "title": "3. Purposes of Processing",
+        "body": "The Data Controller processes personal data solely for the following purposes:\n\n— Responding to contact requests: when you email us or submit a form, we use your data to reply. Period.\n— Security & anti-abuse: transient IP logs processed by our hosting providers solely to prevent DDoS, brute-force attacks and spam.\n— Compliance with a legal obligation: where we are compelled by binding EU or national law to produce records."
+      },
+      "basis": {
+        "title": "4. Legal Basis for Processing",
+        "body": "Processing is based on one or more of the following, as applicable under Art. 6 GDPR:\n\n(a) Explicit, specific, revocable consent (Art. 6(1)(a)) — for contact form submissions and waitlist signups. You may withdraw consent at any time by emailing axsen_kurtoski@financier.com.\n\n(b) Compliance with a legal obligation (Art. 6(1)(c)) — e.g., tax record retention.\n\n(c) Legitimate interests (Art. 6(1)(f)) — only in the narrow case of server-level anti-abuse/security logs. We balance these interests against your rights and find the impact to be minimal (transient, unprofiled, never used for marketing)."
+      },
+      "retention": {
+        "title": "5. Data Retention",
+        "body": "Data categories are retained for the following maximum periods:\n\n— Contact form submissions (name + email): 36 months from the last interaction with you. This allows us to recognize returning conversations. After 36 months, we permanently delete.\n\n— Transient host-level security logs: up to 7 days (outside our control).\n\n— Financial/customer records relating to consulting or custom builds: 10 years per Italian civil & tax law (Art. 2220 c.c., Art. 3 D.P.R. 600/1973)."
+      },
+      "rights": {
+        "title": "6. Your Rights (GDPR Articles 15–22)",
+        "body": "Under the EU General Data Protection Regulation (and comparable laws like the CCPA), you have the following rights, free of charge:\n\n— Right of access (Art. 15): you may request confirmation of whether we process your data and obtain a copy.\n— Right to rectification (Art. 16): correct inaccurate or incomplete data.\n— Right to erasure (“right to be forgotten”, Art. 17): request deletion, subject to legal retention exceptions.\n— Right to restriction (Art. 18): suspend processing in certain cases.\n— Right to data portability (Art. 20): receive your data in a machine-readable format.\n— Right to object (Art. 21): object to processing based on legitimate interests.\n— Right to withdraw consent at any time, without affecting the lawfulness of processing based on consent before withdrawal.\n— Right to lodge a complaint with a supervisory authority.\n\nHow to exercise: email axsen_kurtoski@financier.com with the subject “GDPR Request”. We respond within 30 calendar days."
+      },
+      "cookies": {
+        "title": "7. Cookies",
+        "body": "A dedicated Cookie Policy exists at /cookies. We set 3 (three) first-party strictly-necessary cookies only. No tracking cookies, no marketing cookies, no third-party cookies of any kind are set by this website."
+      },
+      "transfer": {
+        "title": "8. International Transfers (Extra-EU)",
+        "body": "To the extent that any processing involves a transfer of personal data outside the European Economic Area, we rely exclusively on one of the following:\n\n(a) Standard Contractual Clauses (SCCs / Standardvertragsklauseln) as adopted by the European Commission (Decision 2021/914 and subsequent);\n(b) Adequacy decisions (e.g., UK IDTA, Switzerland FAIA, Japan APPI);\n(c) Explicit, informed, opt-in consent (Art. 49(1)(a) GDPR) after you have been specifically informed of the risks.\n\nWe never transfer personal data to the United States without SCCs + documented supplementary technical measures (end-to-end encryption at rest and in transit)."
+      },
+      "authority": {
+        "title": "9. Supervisory Authority",
+        "body": "The lead supervisory authority for Lead Machine is the Italian Data Protection Authority (Garante per la protezione dei dati personali — www.garanteprivacy.it). You may lodge a complaint at any time, in any EU language, with the Garante or with the DPA of your habitual residence, place of work, or place of the alleged infringement."
+      },
+      "changes": {
+        "title": "10. Changes to this Policy",
+        "body": "We reserve the right to modify this Privacy Policy at any time. Material changes will be flagged with a banner on the homepage for 30 days after publication, and the “Last updated” date at the top of this page will be incremented. Continued use of the site after changes constitutes acceptance."
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "The contract between you and the Lead Machine project.",
+      "definitions": {
+        "title": "1. Definitions",
+        "body": "a) “Service” means the Lead Machine software, this marketing website (leadmachine.dev or any subdomain), documentation, and community resources operated by the Lead Machine open-source project.\n\nb) “User” means any natural or legal person that accesses or uses the Service, whether or not they register an account.\n\nc) “Software” means the Lead Machine Next.js application, released under the MIT License as set out in the LICENSE file in the GitHub repository.\n\nd) “Parties” means the User on one side and Lead Machine Contributors on the other."
+      },
+      "service": {
+        "title": "2. Description of the Service",
+        "body": "Lead Machine provides a self-hosted, local-first lead-generation and CRM application for freelancers and small web agencies. The Software is offered under the MIT License, which allows use, modification, distribution, sublicensing and sale of copies. This website serves as informational, documentation and community hub."
+      },
+      "account": {
+        "title": "3. User Account & Registration",
+        "body": "The core, self-hosted Software has no user accounts or authentication system by design — it is intended for single-user local use. Custom multi-user builds may include accounts. For those, the User agrees to:\n\na) Provide accurate, complete, and current registration data;\nb) Maintain the security of any credentials and immediately notify Lead Machine of unauthorized use;\nc) Be fully responsible for all activities conducted under their account, whether authorized or not."
+      },
+      "license": {
+        "title": "4. MIT License & Open Source Rules",
+        "body": "The Lead Machine Software is released under the MIT License, a permissive, OSI-approved open-source license. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+      },
+      "prohibited": {
+        "title": "5. Prohibited Conduct",
+        "body": "Users agree not to:\n\na) Use the Service for any unlawful purpose or in violation of any applicable national, EU, or international law or regulation;\nb) Upload, distribute, or transmit malware, viruses, ransomware, spyware, or any code of a destructive or intrusive nature;\nc) Attempt to gain unauthorized access to other Users' accounts, systems, or networks;\nd) Perform load testing, DDoS, scraping, or aggressive crawling that disrupts the Service;\ne) Impersonate any person or entity or falsely state or otherwise misrepresent an affiliation with a person or entity;\nf) Remove or modify any copyright, trademark, or other proprietary notices from the Software or documentation."
+      },
+      "liability": {
+        "title": "6. Limitation of Liability",
+        "body": "To the maximum extent permitted by applicable law:\n\na) The Service and Software are provided “AS IS” and “AS AVAILABLE”, WITHOUT WARRANTY OF ANY KIND — express, implied, or statutory — including but not limited to warranties of merchantability, fitness for a particular purpose, non-infringement, title, and quiet enjoyment.\n\nb) In no event shall Lead Machine Contributors, its maintainers, volunteers, or suppliers be liable for any indirect, incidental, special, consequential, or punitive damages, including lost profits, lost revenue, loss of data, loss of goodwill, or procurement costs of substitute goods.\n\nc) Total cumulative aggregate liability, under any legal theory (contract, tort, strict liability, statute, or otherwise), shall not exceed €100 EUR (maximum aggregate liability for any single claim).\n\nd) Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be excluded under applicable mandatory law."
+      },
+      "jurisdiction": {
+        "title": "7. Governing Law & Jurisdiction",
+        "body": "These Terms are governed by and construed in accordance with the law of the Italian Republic, without regard to its conflict-of-laws rules.\n\nFor any dispute arising out of or relating to these Terms or the Service:\n\n— If the User is a consumer resident in the European Union: the User may also bring proceedings in the courts of the Member State of their habitual residence.\n— Otherwise: the Parties irrevocably submit to the exclusive jurisdiction of the Court of Milano, Italy (Foro di Milano).\n\nThe Parties expressly exclude application of the United Nations Convention on Contracts for the International Sale of Goods (CISG, Vienna 1980)."
+      },
+      "changes": {
+        "title": "8. Changes to the Service or Terms",
+        "body": "Lead Machine may, at its sole discretion, modify, suspend, or discontinue — temporarily or permanently — features, subdomains, or community resources, with or without notice.\n\nMaterial changes to these Terms will be announced on the homepage for 30 days. Continued use after the 30-day notice period constitutes acceptance of the updated Terms."
+      },
+      "contacts": {
+        "title": "9. Contact Information",
+        "body": "For legal inquiries, send registered communication to:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
+      }
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "subtitle": "Only strictly necessary cookies. Zero tracking, zero marketing.",
+      "intro": "In accordance with Art. 122 of the Italian Privacy Code (D. Lgs. 196/2003 as amended) and Art. 5(3) of the ePrivacy Directive (2002/58/EC), as well as the Guidelines issued by the Italian Data Protection Authority (Garante Privacy, Provv. 10/06/2021 n. 231), this website uses ONLY first-party strictly-necessary technical cookies. No profiling cookies. No marketing cookies. No third-party cookies of any description.",
+      "whatAre": {
+        "title": "What are cookies",
+        "body": "Cookies are small text files that a website can store on your browser when you visit it. They are widely used to make websites work efficiently, remember preferences, and — in the case of tracking cookies — build advertising profiles about you."
+      },
+      "strictlyNecessary": {
+        "title": "Strictly Necessary Cookies (no consent required)",
+        "body": "Under the aforementioned EU/Italian regulatory framework, strictly necessary cookies — those required for the basic functioning of the site — can be set without prior consent, and users have a right to delete them via browser settings at any time. These are the only cookies set by this website:"
+      },
+      "table": {
+        "cols": [
+          "Cookie name",
+          "Purpose",
+          "Duration",
+          "Controller"
+        ],
+        "rows": [
+          [
+            "next-intl-locale",
+            "Remembers your interface language preference so you don't get re-prompted on every pageload",
+            "1 year (365 days)",
+            "First-party — Lead Machine (functional)"
+          ],
+          [
+            "lm_license",
+            "Reserved cookie name for future optional OSS enterprise features. 100% NOT SET in the current open-source release.",
+            "10 years",
+            "First-party — Lead Machine (functional)"
+          ],
+          [
+            "lm_consent",
+            "Remembers that you have seen and acknowledged the cookie banner on this site. Stores no personal information.",
+            "90 days",
+            "First-party — Lead Machine (functional)"
+          ]
+        ]
+      },
+      "notUsedTitle": "Cookies explicitly NOT used on this site",
+      "notUsedBody": "For absolute clarity and as a matter of policy, the following cookies and tracking mechanisms are actively and permanently disabled on this website:\n\n— Google Analytics / GA4 / Universal Analytics cookies (_ga, _gid, _gat, _ga_*)\n— Meta Pixel / Facebook cookies (_fbp, _fbc, fr, sb, tr, wd)\n— LinkedIn Insight Tag (li_gc, lidc, AnalyticsSyncHistory)\n— Twitter/X advertising conversion pixels\n— Hotjar, Fullstory, Microsoft Clarity session recordings\n— Any AdSense, DoubleClick, AdRoll, Criteo, or remarketing cookies\n— Any third-party social media widget cookies (social widgets are implemented as privacy-friendly static badges, not iframes)\n\nWe do not set any of the above. We never will. If you find such a cookie on this domain, it is a bug — please report it to axsen_kurtoski@financier.com and we will fix it promptly."
+    },
+    "imprint": {
+      "title": "Imprint / Impressum (Art. 7 Abs. 1 TMG & D. Lgs. 70/2003)",
+      "subtitle": "Required by Italian and German law for every commercial website.",
+      "body": "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nAxsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAxsen-Studio — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
+    },
+    "dpa": {
+      "title": "Data Processing Agreement (DPA / AVV Art. 28 GDPR)",
+      "subtitle": "Standard EU model clauses. Available on demand.",
+      "intro": "Under Article 28 of the EU General Data Protection Regulation (GDPR), where a controller engages a processor to process personal data on its behalf, the parties must sign a written Data Processing Agreement (DPA / AVV — Accordo sul Trattamento dei Dati Personali) that meets the requirements of Art. 28(3) GDPR.",
+      "body": "Lead Machine Contributors maintain a template DPA incorporating the European Commission's Standard Contractual Clauses (Module 2: Controller-to-Processor, Decision 2021/914/EU and subsequent amendments), including the Technical and Organisational Measures (TOMs / Misure Tecniche e Organizzative) Annex.\n\nThis DPA is primarily relevant to Users who run community or self-hosted custom deployments, or who request a signed DPA for internal compliance reasons.\n\nTo obtain a signed copy, please email axsen_kurtoski@financier.com with the subject line “DPA Request” and include:\n— The full legal name, address, VAT ID, and registered email of the Controller;\n— Description of the processing to be carried out (which services, categories of data subjects, categories of data, duration).\n\nWe will return a countersigned DPA PDF within 7 working days."
+    },
+    "security": {
+      "title": "Security Policy",
+      "subtitle": "Full policy at SECURITY.md in the repo. Short version here.",
+      "intro": "The Lead Machine security policy lives in SECURITY.md in the main repository and is maintained alongside the code. This page is a human-readable summary for website visitors. The canonical version is the Markdown file on GitHub."
+    }
+  },
+  "cta": {
+    "title": "Ready to own your pipeline?",
+    "subtitle": "Deploy Lead Machine on your laptop in 3 commands — or self-host it anywhere. Free forever, no sign-up, no credit card.",
+    "primary": "Deploy Now — Free",
+    "secondary": "Star on GitHub",
+    "demo": "Try the live demo"
+  },
+  "forms": {
+    "name": "Name",
+    "email": "Email",
+    "company": "Company (optional)",
+    "message": "Message",
+    "send": "Send",
+    "sending": "Sending…",
+    "successTitle": "Message sent",
+    "successDesc": "Thanks — we usually reply within 24 hours.",
+    "errorTitle": "Could not send",
+    "errorDesc": "Please check the fields and try again.",
+    "demo-request": {
+      "title": "Request a Demo",
+      "subtitle": "See Lead Machine live: search, score, contact — in under 3 minutes.",
+      "cta": "Request Demo"
+    },
+    "partnership": {
+      "title": "Partnerships",
+      "subtitle": "Let's grow the ecosystem together. Agencies, integrators, resellers — write to us.",
+      "cta": "Send proposal"
+    },
+    "report-issue": {
+      "title": "Report an Issue",
+      "subtitle": "Found a bug? Describe it and we'll fix it fast. Include your OS & browser.",
+      "cta": "Send report"
+    },
+    "waitlist": {
+      "title": "Join the Waitlist",
+      "subtitle": "Be first in line for the hosted managed version, custom builds & early features.",
+      "cta": "Join Waitlist"
+    }
+  },
+  "resources": {
+    "docs": {
+      "title": "Documentation",
+      "subtitle": "Everything you need to install, configure and master Lead Machine.",
+      "body": "Step-by-step guides for local setup, VPS deployment, BYOK keys, AI providers (Gemini & Groq), SMTP and the quote pipeline. The full documentation lives in the repository's /docs folder and the README."
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Stories, guides and field notes from the Lead Machine team.",
+      "body": "Articles about lead generation for freelancers, CRM workflows, self-hosting tips and open-source philosophy. New posts are announced on GitHub Discussions."
+    },
+    "changelog": {
+      "title": "Changelog",
+      "subtitle": "Every release, every fix, every new feature — in chronological order.",
+      "body": "We follow semantic versioning. Releases are published on GitHub Releases with detailed notes, migration steps and breaking-change warnings when applicable."
+    },
+    "roadmap": {
+      "title": "Roadmap",
+      "subtitle": "Where Lead Machine is going next.",
+      "body": "The roadmap is public and community-driven. Upvote ideas and suggest features in GitHub Discussions — we build what users actually need."
+    },
+    "contributors": {
+      "title": "Contributors",
+      "subtitle": "The people who make Lead Machine possible.",
+      "body": "Lead Machine is built by volunteers: developers, designers, translators and users who share their feedback. Every contribution is welcome — from docs fixes to new features."
+    },
+    "status": {
+      "title": "Status",
+      "subtitle": "Real-time status of all Lead Machine services.",
+      "body": "Lead Machine is an open-source project: there are no cloud servers to go down. The website, the code repository and community channels are maintained by volunteers. Report outages on GitHub."
+    },
+    "about": {
+      "title": "About",
+      "subtitle": "Why Lead Machine exists.",
+      "body": "We are freelancers who got tired of paying for tools that lock our data in the cloud. Lead Machine is our answer: a professional lead-generation stack that is free, private and open. It is developed in the open, used daily by its own maintainers."
+    }
+  },
+  "demo": {
+    "title": "Live Demo — Try Lead Machine in Your Browser",
+    "subtitle": "Search real businesses on OpenStreetMap, score leads and generate AI outreach — right here, with your own API keys. Nothing is stored on any server.",
+    "search": {
+      "title": "1 · Find leads",
+      "categoryLabel": "Business category",
+      "categoryPlaceholder": "e.g. plumber, bakery, dentist…",
+      "cityLabel": "City",
+      "cityPlaceholder": "e.g. Milan",
+      "radiusLabel": "Radius",
+      "search": "Search",
+      "searching": "Searching…",
+      "results": "leads found",
+      "noResults": "No businesses found. Try another category or city.",
+      "error": "Search failed. Check your connection and try again.",
+      "score": "Score",
+      "distance": "away",
+      "sortLabel": "Sort by",
+      "bestScore": "Best score",
+      "nearest": "Nearest",
+      "exportCsv": "Export CSV",
+      "exported": "Leads exported"
+    },
+    "lead": {
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "hours": "Open hours",
+      "address": "Address"
+    },
+    "ai": {
+      "title": "2 · AI outreach (optional)",
+      "desc": "Generate a cold email or call script for any lead. Use your own Gemini or Groq key — encrypted in YOUR browser, never sent to us. Or use your free credits.",
+      "geminiKey": "Gemini API key",
+      "groqKey": "Groq API key",
+      "saveKeys": "Save keys (encrypted)",
+      "keysSaved": "Keys saved encrypted in your browser",
+      "eraseKeys": "Erase keys",
+      "keysErased": "Keys erased",
+      "keysNeverLeave": "Your keys never leave this browser — AES-256-GCM + PBKDF2.",
+      "genEmail": "Generate email draft",
+      "genScript": "Generate call script",
+      "generating": "Generating…",
+      "selectLead": "Select a lead first",
+      "copy": "Copy",
+      "creditError": "No key configured and free credits are unavailable."
+    },
+    "credits": {
+      "left": "{count} free AI credits left",
+      "byokPrompt": "Credits used up. Add your own Gemini or Groq key above — unlimited, free forever."
+    },
+    "trust": {
+      "title": "Your trust, our architecture",
+      "body": "This demo runs entirely in your browser. Keys are encrypted client-side with AES-256-GCM (PBKDF2, 100k iterations) and stored only in your localStorage. Don't trust us? Download the full app and run it on your machine.",
+      "selfHost": "Self-host from GitHub",
+      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+    }
+  },
+  "showcase": {
+    "title": "See it in action — right now",
+    "subtitle": "Real businesses from OpenStreetMap. Real lead scores. Real AI outreach with your own keys. No sign-up, no installation.",
+    "cta": "Open the live demo",
+    "credits": "10 free AI credits",
+    "playVideo": "Watch the demo",
+    "unmuteVideo": "Unmute",
+    "muteVideo": "Mute"
+  },
+  "footer": {
+    "product": "Product",
+    "resources": "Resources",
+    "legal": "Legal"
+  }
 }

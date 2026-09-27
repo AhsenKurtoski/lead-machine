@@ -16,7 +16,7 @@
 [![License: MIT](https://img.shields.io/github/license/lead-machine/lead-machine?color=0969da)](./LICENSE)
 
 ---
-**👨‍💻 A DevDuos Creation**
+**👨‍💻 An Axsen-Studio Creation**
 *The perfect blend of human vision and AI execution.*
 **Idea & Vision:** Axsen Kurtoski (teenager developer & visionary)
 **AI Execution:** Built flawlessly by Artificial Intelligence
@@ -53,6 +53,14 @@ Everything is built-in — no plugins to buy:
 - **0–100 AI-assisted score** based on: category, presence of email/phone/website, social signals, last-changed-in-OSM timestamp, distance from office, city affluence proxy.
 - **Heatmap dashboard** to understand **when** you were most productive (hours vs. days).
 - **Tags** (hot / warm / cold / bespoke) and **custom statuses** for every stage of the funnel.
+
+### 🔌 Public API for external projects (`/api/v1/*`)
+- Generate an **API key** from *Impostazioni → API Key & Integrazioni esterne* and connect Lead Machine to a website builder, a script or any other tool.
+- Keys are stored **hashed (SHA-256)**; the secret is shown exactly once. Each key can be suspended or revoked with one click.
+- Authenticate with `x-api-key: lm_live_…` or `Authorization: Bearer lm_live_…`. `CORS` is enabled, so it works from any browser domain or port.
+- Endpoints: `GET /api/v1/leads` (filter by city, category, website presence, score), `GET /api/v1/leads/{id}`, `POST /api/v1/leads` (create), `POST /api/v1/search` (live OpenStreetMap search), `POST /api/v1/demo/generate` (AI website for a lead).
+- Requests are never left hanging: every source has a time budget and the response carries a `warnings` array explaining what was unavailable.
+- Full reference: [API.md](./API.md#20-public-api-for-external-projects-api-v1).
 
 ### 📞 Multi-channel CRM
 - Unified timeline with **calls, emails, WhatsApp, meetings, research notes, follow-ups**.
@@ -403,7 +411,7 @@ See [LICENSE](./LICENSE) for the exact legal text.
 
 ## ❤️ Acknowledgments & Credits
 
-**A DevDuos Creation**
+**An Axsen-Studio Creation**
 - 🧠 **Idea & Vision:** Axsen Kurtoski, a passionate teenager developer.
 - 🤖 **Development & Execution:** Built by Artificial Intelligence (OpenCode / Antigravity).
 - 🤝 **The Mission:** Proving that with the right AI tools and a great human vision, anyone can build enterprise-grade software.

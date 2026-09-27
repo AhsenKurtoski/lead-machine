@@ -2,8 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { CATEGORIES } from "@/lib/categories";
 import { parseCsv } from "@/lib/csv";
+
+import { CATEGORIES } from "@/lib/categories";
+import { toast } from "@/components/ui/use-toast";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useLocale } from "@/components/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +49,7 @@ type Lead = {
 };
 
 export default function CrmPage() {
+  const { t } = useLocale();
   const [leads, setLeads] = React.useState<Lead[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
@@ -55,6 +60,8 @@ export default function CrmPage() {
   const [bulkStatus, setBulkStatus] = React.useState("");
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -108,15 +115,36 @@ export default function CrmPage() {
     load();
   }
 
-  async function bulkDelete() {
+  async function confirmBulkDelete() {
     if (selected.size === 0) return;
-    if (!confirm(`Eliminare ${selected.size} lead? L'azione e irreversibile.`)) return;
-    await fetch("/api/leads/bulk", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: Array.from(selected), action: "delete" }),
-    });
-    load();
+    try {
+      const res = await fetch("/api/leads/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selected), action: "delete" }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast({
+          title: t("toast.deletedTitle"),
+          description: t("toast.deletedDesc"),
+          variant: "success",
+        });
+        load();
+      } else {
+        toast({
+          title: t("toast.errorTitle"),
+          description: data.error || t("toast.deleteFailedDesc"),
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: t("toast.networkTitle"),
+        description: t("toast.networkDesc"),
+        variant: "destructive",
+      });
+    }
   }
 
   // Esporta tutti i lead in CSV (compatibile Excel) tramite la route /api/leads/export.
@@ -137,13 +165,25 @@ export default function CrmPage() {
       });
       const data = await res.json();
       if (data.ok) {
-        alert("Importati " + data.created + " lead nuovi (" + data.skipped + " saltati).");
+        toast({
+          title: t("toast.importDoneTitle"),
+          description: t("toast.importDoneDesc", { created: data.created ?? 0, skipped: data.skipped ?? 0 }),
+          variant: "success",
+        });
         load();
       } else {
-        alert("Import non riuscito.");
+        toast({
+          title: t("toast.importErrorTitle"),
+          description: data.error || t("toast.importErrorDesc"),
+          variant: "destructive",
+        });
       }
     } catch {
-      alert("File CSV non valido.");
+      toast({
+        title: t("toast.csvInvalidTitle"),
+        description: t("toast.csvInvalidDesc"),
+        variant: "destructive",
+      });
     }
     setImporting(false);
   }
@@ -236,11 +276,22 @@ export default function CrmPage() {
           <Button size="sm" onClick={bulkApply} disabled={!bulkStatus}>
             Applica
           </Button>
-          <Button size="sm" variant="destructive" onClick={bulkDelete}>
+          <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
             <Trash2 className="h-4 w-4" /> Elimina
           </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={t("confirm.leadsTitle")}
+        description={t("confirm.leadsDesc", { n: selected.size })}
+        confirmText={t("confirm.leadsAction")}
+        cancelText={t("confirm.cancel")}
+        variant="destructive"
+        onConfirm={confirmBulkDelete}
+      />
 
       {/* Tabella */}
       <Card>

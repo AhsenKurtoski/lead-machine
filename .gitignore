@@ -63,5 +63,26 @@ next-env.d.ts
 
 # IDE/tool specs and accidental path duplications
 /.trae
+
+# database SQLite fuori dalla cartella prisma (copie locali, test)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# log e file temporanei generati dai test locali
+/test-server.log
+/test-server.err
+
+# cartelle di strumenti/IDE e progetti locali non correlati
+/.omo
+/.playwright-mcp
+/restaurant-website
+/.kilo
+
+/test-key.txt
+/temp_*.json
+/audit-*.png
+
 /C
 

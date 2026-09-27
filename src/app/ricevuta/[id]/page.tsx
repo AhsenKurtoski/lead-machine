@@ -24,7 +24,7 @@ export default async function RicevutaPage({ params }: { params: { id: string } 
   const r = computeRitenuta(totals.total, true);
   const lead = quote.lead;
 
-  const holder = settings.brand_holder || settings.brand_owner || settings.brand_name || "________________";
+  const holder = settings.brand_owner || settings.brand_name || "________________";
   const operator = settings.brand_owner || "";
   const brandName = settings.brand_name || "";
   const brandLogo = settings.brand_logo || "/logo.png";

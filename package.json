@@ -45,8 +45,12 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "i18n:merge": "node scripts/merge-i18n.mjs",
+    "qa": "npm run typecheck && npm run lint && npm run i18n:check",
     "setup": "prisma db push && tsx prisma/seed.ts",
-    "setup:screenshot": "npm install -D playwright && npx playwright install chromium"
+    "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
+    "screenshots": "node scripts/screenshot.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -83,6 +87,7 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
+    "playwright": "^1.63.0",
     "postcss": "^8.4.47",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.14",

@@ -42,7 +42,7 @@ export async function GET(req: Request) {
       }
       return s;
     });
-    const redactedQuotes = quotes.map((q) => ({ ...q, internalNotes: q.internalNotes ? "[REDACTED]" : "" }));
+    const redactedQuotes = quotes;
 
     const backup = {
       app: "lead-machine",

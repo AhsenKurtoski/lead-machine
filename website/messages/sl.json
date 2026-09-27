@@ -1,576 +1,576 @@
-﻿{
-    "meta":  {
-                 "title":  "Lead Machine — Odprtokodni CRM za generiranje leadov",
-                 "description":  "Brezplačna, odprtokodna in samogostitljiva platforma za generiranje leadov za freelance delavce in majhne agencije. Poiščite bližnje podjetja, jih ocenite, kontaktirajte, ustvarite ponudbe. €0 v naročninah.",
-                 "ogTitle":  "Lead Machine — Brezplačni CRM za vedno za freelance delavce",
-                 "ogDescription":  "100% odprtokodno. Vaši podatki. Vaša baza. Šifriranje BYOK ali pa nobeni ključi. Nič naročnin, nič sledenja.",
-                 "keywords":  "generiranje leadov, crm, odprta koda, samogostitev, orodja za freelance, malo podjetje, openstreetmap, ponudbe, fakturiranje",
-                 "license":  "Objavljeno pod licenco MIT."
-             },
-    "nav":  {
-                "home":  "Domov",
-                "features":  "Funkcionalnosti",
-                "pricing":  "Cenik",
-                "byok":  "BYOK \u0026 Zasebnost",
-                "transparency":  "Transparentnost",
-                "deploy":  "Namestitev",
-                "docs":  "Dokumentacija",
-                "blog":  "Blog",
-                "changelog":  "Seznam sprememb",
-                "roadmap":  "Roadmap",
-                "about":  "O nas",
-                "demo":  "Zahtevaj demo",
-                "contact":  "Kontakt",
-                "contributors":  "Sodelavci",
-                "status":  "Stanje",
-                "getStarted":  "Začnite",
-                "starOnGithub":  "Dodaj zvezdo na GitHub",
-                "legal":  {
-                              "privacy":  "Politika zasebnosti",
-                              "terms":  "Pogoji uporabe",
-                              "cookies":  "Politika piškotkov",
-                              "imprint":  "Natisak",
-                              "dpa":  "Obdelava podatkov",
-                              "security":  "Varnost"
-                          },
-                "language":  "Jezik",
-                "partnership":  "Partnerstva",
-                "liveDemo":  "Živa predstavitev"
-            },
-    "byokBanner":  {
-                       "title":  "🔒 Vaši API ključi · Vaši podatki · Vaša baza.",
-                       "subtitle":  "Ne vidimo, ne beležimo in ne shranjujemo ničesar. BYOK: ključi so šifrirani v VAŠEM brskalniku. Za vedno: nič potrebnih ključev.",
-                       "cta":  "Izvedi več →"
-                   },
-    "cookieBanner":  {
-                         "text":  "🍪 Uporabljamo samo tehnične piškotke za osnovno delovanje strani. 0 sledilnih piškotkov. 0 marketinških piškotkov.",
-                         "accept":  "Razumem",
-                         "more":  "Politika piškotkov →"
-                     },
-    "hero":  {
-                 "eyebrow":  "Odprtokodno · Brezplačno za vedno · Samogostljivo",
-                 "title":  "Prenehajte plačevati €200/mesec za orodja za leads.",
-                 "titleHighlight":  "Imajte svoj pipeline. Za €0.",
-                 "subtitle":  "Lead Machine je ena sama odprtokodna Next.js aplikacija, ki deluje na vašem prenosniku. Preišči več kot 40M podjetij na OpenStreetMap, oceni prospekte, pošlji e-pošto, WhatsApp, ustvari ponudbe in račune. Brez naročnin. Vaši podatki ostanejo na vašem računalniku.",
-                 "ctas":  {
-                              "primary":  "Začnite — Brezplačno",
-                              "secondary":  "Oglejte si demo (2 min)",
-                              "tertiary":  "Oglejte si na GitHub ⭐"
-                          },
-                 "stats":  {
-                               "businesses":  "M+ podjetij je iskalnih",
-                               "countries":  "Podprte države",
-                               "languages":  "Jeziki",
-                               "price":  "€/mesec za vedno"
-                           },
-                 "trust":  {
-                               "text":  "Zaupajo ga freelance delavci in majhne agencije v",
-                               "countries":  "37+ državah"
-                           }
-             },
-    "features":  {
-                     "title":  "Vse, kar potrebujete. Ničesar nepotrebnega.",
-                     "subtitle":  "Zgradili so ga freelance delavci za freelance delavce. Vse funkcionalnosti so vključene — brez dodatnih prodaj, brez zidov \"nadgradnje pro\".",
-                     "categories":  {
-                                        "research":  "Raziskovanje \u0026 Prospekcija",
-                                        "crm":  "Večkanalni CRM",
-                                        "quotes":  "Ponudbe \u0026 Računi",
-                                        "ai":  "UI (Izbirni BYOK)",
-                                        "privacy":  "Zasebnost na prvem mestu"
-                                    },
-                     "research":  {
-                                      "geo_title":  "Geografsko iskanje na OpenStreetMap",
-                                      "geo_desc":  "Poizvedujte po več kot 40M podjetjih po kategoriji, polmeru in mestu — brezplačno, preko Overpass API. Ni potreben ključ za Google Maps.",
-                                      "dedup_title":  "Pametna deduplikacija",
-                                      "dedup_desc":  "3 ravni deduplikacije: OSM ID → ime+mesto → mehka. Vaš CRM ostane samodejno čist.",
-                                      "crawler_title":  "Poišči spletne strani in kontakte",
-                                      "crawler_desc":  "Za dan lead: samodejno poišči domačo stran, izvleci e-pošto, telefon, družbene povezave. Slika domače strani z enim klikom (Playwright).",
-                                      "map_title":  "Interaktivni pogled na zemljevid",
-                                      "map_desc":  "Zemljevid Leaflet s združevanjem točk. Barvno obarvani statusi leadov. Kliknite na zavihek → pokličite, pošljite e-pošto, WhatsApp takoj."
-                                  },
-                     "crm":  {
-                                 "scoring_title":  "Ocenjevanje leadov 0–100",
-                                 "scoring_desc":  "Kategorija, prisotnost e-pošte/telefona/spletne strani, družbeni signali, svežina, razdalja. Vedite, koga poklicati najprej.",
-                                 "timeline_title":  "Združena časovnica",
-                                 "timeline_desc":  "Klici, e-pošta, WhatsApp, sestanki, beležke, nadgradnje — en pogled za vsak lead. Nič ne uide.",
-                                 "email_title":  "E-pošta s SMTP ali .eml lokalno",
-                                 "email_desc":  "Pošljite preko vašega SMTP (geslo aplikacije Gmail, SendGrid, Postfix…). Ni SMTP? E-pošta se shrani kot .eml lokalno.",
-                                 "whatsapp_title":  "WhatsApp z enim klikom",
-                                 "whatsapp_desc":  "Globoka povezava do wa.me s predlogami za vsak lead. Vključuje oznake in polja za združevanje.",
-                                 "followups_title":  "Skatle za nadgradnje",
-                                 "followups_desc":  "“Danes / Ta teden / Zamujeno / Opravljeno” — samodejno. Prejemite opomnik preko obvestil brskalnika."
-                             },
-                     "quotes":  {
-                                    "lineitems_title":  "Ponudbe po postavkah z DDV",
-                                    "lineitems_desc":  "Količine, popusti, davčne stopnje DDV, plačilni pogoji, veljavnost. Oznake v slovenščini/italijanščini/nemščini/angleščini/španščini/portugalščini/francoščini.",
-                                    "pdf_title":  "Ustvarjanje PDF",
-                                    "pdf_desc":  "PDF dokumenti, pripravljeni za tisk z vašo blagovno znamko. Profesionalni prvi vtis za stranko, vsakič.",
-                                    "workflow_title":  "Potek delovnega procesa",
-                                    "workflow_desc":  "Osnutek → Poslano → Sprejeto → Izstavljen račun → Plačano (ali zavrnjeno/Preklicano). Opomniki se pošiljajo samodejno.",
-                                    "csv_title":  "Izvozi CSV / JSON",
-                                    "csv_desc":  "Vsi podatki so izvozljivi. Vaša SQLite datoteka je prenosljiva in enostavna za varnostno kopiranje."
-                                },
-                     "ai":  {
-                                "failover_title":  "UI z dvema ponudnikoma z nadomestnim delovanjem",
-                                "failover_desc":  "Gemini + Groq. Če eni pride do napake ali dosežejo omejitve, drugi vstopi. Rezultati so določljivi za vsak vnos.",
-                                "scripts_title":  "Skripte za klice na hladno in nadgradnje",
-                                "scripts_desc":  "Osebni predstavitveni govori, osnutki e-pošt, utemeljitve ocenjevanja leadov, pogoji pogodb.",
-                                "byok_title":  "BYOK — ključi nikoli ne zapustijo vašega brskalnika",
-                                "byok_desc":  "Vaši ključi Gemini/Groq/SMTP so šifrirani AES-GCM 256-bit v VAŠEM localStorage. PBKDF2 100k ponovitev. Nikoli jih ne dotaknemo."
-                            },
-                     "privacy":  {
-                                     "local_title":  "Lokalni SQLite kot prva možnost",
-                                     "local_desc":  "Ena sama datoteka prisma/dev.db. Kopirajte jo, varnostno kopirajte, premaknite. Deluje brez povezave — razen za klice OSM/UI.",
-                                     "zero_title":  "Brez telemetrije, brez sledenja",
-                                     "zero_desc":  "Brez Google Analytics, brez Meta Pixel, brez Sentry kot privzeto. Vaše poslovanje, vaši podatki.",
-                                     "opensource_title":  "100% odprtokodno (MIT)",
-                                     "opensource_desc":  "Preverite vsako vrstico na GitHub. Forcajte, spremenite, prodajajte prilagojene izdaje. Pripis je izbiren, zelo cenjen."
-                                 }
-                 },
-    "pricing":  {
-                    "title":  "Dve načini uporabe Lead Machine.",
-                    "subtitle":  "Oba sta za vedno €0. Resno. Brez naročnin, brez kreditne kartice, brez drobnih črk.",
-                    "byok":  {
-                                 "badge":  "🎁 BYOK Brezplačno za vedno",
-                                 "price":  "€0",
-                                 "period":  "za vedno",
-                                 "headline":  "Prinesite svoje ključe. 100% funkcionalnosti. Vedno brezplačno.",
-                                 "desc":  "Popolnoma za tehnične uporabnike in puriste zasebnosti. Vi prinesete ključe Gemini, Groq in SMTP. Mi prinesemo svetovnež CRM. Vaši ključi ostanejo v VAŠEM brskalniku, šifrirani z AES-256-GCM.",
-                                 "features":  [
-                                                  "Vse funkcionalnosti so odklenjene — raziskovanje, CRM, ponudbe, zemljevid, UI",
-                                                  "Vaši API ključi — šifrirani AES-GCM 256 v vašem localStorage",
-                                                  "Ključi se NIKOLI ne pošiljajo na naše strežnike. NIKOLI beleženi. NIKOLI shranjeni",
-                                                  "Licenca MIT — forcaj, spremeni, ponovno prodaj",
-                                                  "Podpora skupnosti na GitHub Issues",
-                                                  "7 jezikov uporabniškega vmesnika"
-                                              ],
-                                 "cta":  "Pridobi BYOK brezplačno za vedno"
-                             },
-                    "opensource":  {
-                                       "badge":  "💻 Samogostitev (Ni potrebnih ključev)",
-                                       "price":  "€0",
-                                       "period":  "enkratna plačila",
-                                       "headline":  "Zaženite sami. Uporabljajte brez UI, če hočete.",
-                                       "desc":  "Klonirajte repozitorij, npm install, končano. CRM deluje popolnoma brez kakršnihkoli API ključev — iskanje, zemljevid, ponudbe, računi delujejo vse brez povezave. Dodajte UI samo ko/če hočete.",
-                                       "features":  [
-                                                        "Zaženite na vašem prenosniku ali katerem koli VPS",
-                                                        "SQLite baza — ena sama prenosljiva datoteka",
-                                                        "Nobenih API ključev potrebnih za osnovni CRM",
-                                                        "Deluje 100% brez povezave (razen klicev OSM/UI)",
-                                                        "Prisma — preklopite na Postgres z 1 spremenljivko okolja",
-                                                        "Poln dostop do izvorne kode"
-                                                    ],
-                                       "cta":  "Namesti zdaj — Brezplačno"
-                                   },
-                    "compareTitle":  "Primerjajte možnosti",
-                    "compare":  {
-                                    "research":  "OSM raziskovanje \u0026 40M+ podjetij",
-                                    "crm":  "Poln CRM (statusi, oznake, časovnica)",
-                                    "map":  "Pogled zemljevida \u0026 združevanje",
-                                    "quotes":  "Ponudbe \u0026 računi s PDF",
-                                    "aiFeatures":  "UI (skripte za klice na hladno, e-pošta)",
-                                    "smtp":  "Pošiljanje e-pošte",
-                                    "whatsapp":  "Globoke povezave WhatsApp",
-                                    "i18n":  "7 jezikov",
-                                    "selfHost":  "Možnost samogostitve",
-                                    "offline":  "Deluje brez povezave (osnova)",
-                                    "privacy":  "Lokalni SQLite kot prva možnost",
-                                    "license":  "Licenca MIT"
-                                },
-                    "faq":  {
-                                "title":  "Pogosta vprašanja o cenik",
-                                "q1":  "Počakajte — je to resnično brezplačno? Nobenega skritega pasti?",
-                                "a1":  "Da. Lead Machine je odprtokodna programska oprema z licenco MIT. Lahko jo prenesete, zaženete, spremenite, prodajate izvedene izdelke, vse brezplačno, za vedno. Projekt vzdržujejo prostovoljci, ki ga uporabljajo vsak dan.",
-                                "q2":  "Zakaj ne zaračunavate naročnin kot vsi ostali?",
-                                "a2":  "Ker je bistvo Lead Machine odpraviti SaaS sklad za €200/mesec za freelance delavce. Zaračunavanje bi uničilo misijo. Denar zaslužimo s prodajo prilagojenih izdaj in svetovanjem, ne z gnojenjem uporabnikov.",
-                                "q3":  "In za BYOK — so moji ključi v varnosti?",
-                                "a3":  "Vaši ključi so šifrirani na strani odjemalca z AES-GCM 256-bit pri uporabi PBKDF2 s 100.000 ponovitvami, vezani na prstni odtis vašega brskalnika in shranjeni samo v VAŠEM localStorage. NIKOLI se ne pošiljajo v nezakodirani obliki na noben strežnik. Lahko preverite kodo crypto.ts na GitHub.",
-                                "q4":  "Lahko gostim samo na Vercel / Fly.io / Coolify?",
-                                "a4":  "Da — glejte dokumentacijo za namestitev. Za Vercel pripnite trajni nosilec za SQLite (ali preklopite na Postgres — samo sprememba DATABASE_URL).",
-                                "q5":  "Ali obstaja gostovana upravljana različica?",
-                                "a5":  "Trenutno ne, vendar skupnost deluje na njej. Dodajte zvezdo in sledite repozitoriju za posodobitve."
-                            },
-                    "included":  "Vključeno"
-                },
-    "byok":  {
-                 "title":  "BYOK \u0026 Arhitektura Zero-Knowledge",
-                 "subtitle":  "Zgradili smo Lead Machine, da bi mu sami zaupali. Evo točno, kako vaši skrivnosti ostanejo vaši.",
-                 "tabs":  {
-                              "crypto":  "Kako deluje šifriranje AES-GCM",
-                              "zeroknowledge":  "Občutek Zero-Knowledge"
-                          },
-                 "crypto":  {
-                                "p1":  "Vsi API ključi, ki jih prilepite v Lead Machine (Gemini, Groq, SMTP uporabnik/geslo), se šifrirajo v vašem brskalniku PREDEN se zgodi kaj drugega.",
-                                "p2":  "Uporabljamo izvorno brskalnikovo API Web Crypto — nobenih knjižnic za šifriranje tretjih ponudnikov. Izvedbo je mogoče preveriti v lib/crypto.ts.",
-                                "stepsTitle":  "Korak za korakom pretok šifriranja",
-                                "step1":  "Za vsak brani se ustvari 16-bajtno kriptografsko naključno sol (crypto.getRandomValues).",
-                                "step2":  "Za vsako šifriranje se ustvari 12-bajtni naključni IV (vektor inicializacije) — ne ponavlja se, skladno z GCM.",
-                                "step3":  "Prstni odtis vašega brskalnika (UA+jezik+platforma+ločljivost+časovni pas+jedra+pomnilnik) se uporablja kot geslo.",
-                                "step4":  "PBKDF2 s SHA-256 raztegne to geslo prek 100.000 ponovitev v 256-bitni AES ključ.",
-                                "step5":  "AES-GCM 256 šifrira vaše ključe. Avtentikacijska oznaka je vključena v šifrirano besedilo (lastnost GCM).",
-                                "step6":  "Sol + IV + šifrirano besedilo + število ponovitev se kodirajo v base64 in JSON-stringify. Rezultat shranjen SAMO v vašem localStorage."
-                            },
-                 "zeroknowledge":  {
-                                       "p1":  "“Zero knowledge” v Lead Machine pomeni: po zasnovi strežniška infrastruktura fizično ne more dostopati do vaših ključev, vaših leadov ali vaših poslovnih podatkov.",
-                                       "p2":  "Ni posrednika. Ni posredniškega strežnika. Ni “naši strežniki kličejo UI za vas”. Brskalnik neposredno kliče Gemini/Groq/Nodemailer — ali, če gostite sami na vašem prenosniku, vaš Node proces jih kliče iz VAŠEGA naslova IP.",
-                                       "promisesTitle":  "5 železnih obljub",
-                                       "prom1":  "NIKOLI ne prejmemo ali beležimo API ključev v nezakodirani obliki. Nikoli. Nemogoče.",
-                                       "prom2":  "NIKOLI ne pošiljamo vaših leadov, kontaktov ali podatkov o ponudbah na strežnike tretjih.",
-                                       "prom3":  "NIKOLI ne vključujemo sledilnih skript (ni GA, ni Meta, ni Pixel, ni Segment, ni Sentry kot privzeto).",
-                                       "prom4":  "NIKOLI ne prodajamo ali delimo podatkov z nikomer — jih nimamo, da bi jih delili.",
-                                       "prom5":  "Vse zgoraj našteto je mogoče preveriti z branjem izvorne kode z licenco MIT na GitHub. Če najdete kaj drugačnega, gre za napako — pišite na axsen_kurtoski@financier.com za nagrado."
-                                   },
-                 "cta":  {
-                             "verify":  "Preverite šifriranje na GitHub",
-                             "start":  "Začnite uporabljati BYOK brezplačno za vedno"
-                         }
-             },
-    "transparency":  {
-                         "title":  "Polno poročilo o transparentnosti",
-                         "subtitle":  "Lead Machine je odprta knjiga. Evo kaj delamo, kaj ne delamo in zakaj.",
-                         "sections":  {
-                                          "dataTitle":  "Katere podatke dejansko obdelujemo",
-                                          "dataBody":  "Če zaženete Lead Machine na vašem prenosniku (priporočena metoda za posameznike): NIČ. Ne prejmemo ničesar, ne shranjujemo ničesar, ne obdelujemo ničesar. Vsak bajt živi v vaši SQLite datoteki prisma/dev.db.\n\nČe uporabljate javno demo instanco skupnosti (ki jo ne upravlja neposredno projekt Lead Machine) ali prilagojeno upravljano izdajo, ki jo upravlja tretja oseba: veljajo politike podatkov tega upravitelja. Samo osnova odprte kode Lead Machine ne izvaja nobenih klicev domov.",
-                                          "cookiesTitle":  "Piškotki — samo tisti, ki so strogo potrebni",
-                                          "cookiesBody":  "Nastavljamo 3 funkcionalne piškotke prve stranke in ničesar drugega:\n\nnext-intl-locale — 1 leto — si zapomni vašo jezikovno nastavitev.\nlm_license — 10 let — shrani licenčni ključ, če ga kdaj prejmete (prilagojene izdaje).\nlm_consent — 90 dni — si zapomni, da ste videli obvestilo o piškotkih.\n\nTo je vse. Ni Google Analytics. Ni Meta Pixel. Ni LinkedIn Insight. Ni Hotjar. Nobenih piškotkov tretjih. Ničesar.",
-                                          "opensourceTitle":  "100% Odprta koda — preverite vse",
-                                          "opensourceBody":  "Vsaka vrstica kode, ki se dostavi v Lead Machine, je na GitHub pod licenco MIT. Gradnja je reproducibilna. Drevesa odvisnosti so fiksirana (package-lock.json). Če znate brati TypeScript, lahko preverite vsako trditev na tej strani.",
-                                          "securityTitle":  "Varnostna pozicija",
-                                          "securityBody":  "Omejevanje hitrosti na vsakem končnem točki za pisanje. Čiščenje vnosa na vsakem parametru. Bela lista nastavitev (masovna injekcija nemogoča). Skrivnosti so izključene iz strežniških odgovorov. Transakcije Prisma + paketske operacije (brez delčnih zapisov). CSP-prijazen kot privzeto. Glejte SECURITY.md za polno politiko in postopek za razkrivanje ranljivosti.",
-                                          "financialTitle":  "Kako projekt preživi finančno",
-                                          "financialBody":  "Lead Machine je delo ljubezni, ne SaaS posel. Prihodki prihajajo iz treh kanalov: (1) prilagojen razvoj za agencije, ki potrebujejo po meri narejene polja CRM ali integracije, (2) svetovanje o namestitvi in varnosti za ekipe z samogostitvijo, (3) izbirni GitHub Sponsors uporabnikov, ki želijo dati pijačo. Ni naročnin. Nobenega financiranja VC. Nobenih ciljev rasti, ki bi nas prisilili kompromisovati zasebnost."
-                                      }
-                     },
-    "deploy":  {
-                   "title":  "Namestite Lead Machine kjerkoli",
-                   "subtitle":  "Zaženite na vašem prenosniku v 3 ukazih ali namestite na katero koli platformo VPS/brez strežnika.",
-                   "options":  {
-                                   "local":  {
-                                                 "title":  "Prenosnik (Priporočeno)",
-                                                 "badge":  "Najboljše za posameznike",
-                                                 "steps":  [
-                                                               "git clone https://github.com/AxsenXzc/lead-machine.git",
-                                                               "cd lead-machine \u0026\u0026 npm install \u0026\u0026 npm run setup",
-                                                               "npm run dev → odprite http://localhost:3000"
-                                                           ],
-                                                 "notes":  "Brez konfiguracije. SQLite datoteka na prisma/dev.db. Deluje brez povezave."
-                                             },
-                                   "vps":  {
-                                               "title":  "VPS / VM (Caddy + Basic Auth)",
-                                               "badge":  "Ekipe / vedno vklopljeno",
-                                               "steps":  [
-                                                             "Zaženite VPS za $5/mesec (Ubuntu 22.04, najmanj 1GB RAM)",
-                                                             "Namestite Node 20 LTS. Klonirajte repozitorij, npm ci, npm run setup",
-                                                             "Zaženite za Caddy z avtomatskim HTTPS + basic_auth"
-                                                         ],
-                                               "notes":  "Dnevna varnostna kopija SQLite preko cron + rclone na S3-združljivo shrambo."
-                                           },
-                                   "serverless":  {
-                                                      "title":  "Brez strežnika (Vercel / Fly.io)",
-                                                      "badge":  "Upravljano + brez operacij",
-                                                      "steps":  [
-                                                                    "Forkirajte repozitorij, povežite z Vercel / Fly.io",
-                                                                    "Pripnite trajni nosilec za SQLite ALI zamenjajte DATABASE_URL z Postgres",
-                                                                    "Nastavite spremenljivko okolja NEXT_PUBLIC_BASE_URL. Končano."
-                                                                ],
-                                                      "notes":  "⚠️ Vercel mimolski datotečni sistem — MORATE namestiti nosilec ali uporabiti Postgres za trajno shranjevanje."
-                                                  }
-                               },
-                   "copied":  "Kopirano v odložišče"
-               },
-    "legal":  {
-                  "lastUpdated":  "Zadnja posodobitev",
-                  "today":  "31. julij 2026",
-                  "privacy":  {
-                                  "title":  "Politika zasebnosti",
-                                  "subtitle":  "Polna politika zasebnosti skladna z GDPR in CCPA.",
-                                  "controller":  {
-                                                     "title":  "1. Upravljavec z osebnimi podatki",
-                                                     "body":  "Upravljavec z osebnimi podatki za to spletno stran je:\nLead Machine Open Source Project\nc/o Lead Machine Contributors\nVia Privacy 1, 20121 Milano MI — Italija\nDavčna številka: IT00000000000\nE-pošta: axsen_kurtoski@financier.com\nZa zadeve, povezane s to Politiko zasebnosti, lahko upravljavca kadarkoli kontaktirate na gornjem e-poštnem naslovu."
-                                                 },
-                                  "collected":  {
-                                                    "title":  "2. Kategorije zbranih podatkov",
-                                                    "body":  "Lead Machine zbira absolutno najmanjše možne osebne podatke. V praksi samo sledeče:\n\na) Podatki iz kontaktnega obrazca: če prostovoljno izpolnite kontaktni obrazec (zahteva za demo, partnerstvo, poročilo o napaki, čakalna lista), zbiramo ime in e-poštni naslov, ki ju podate. Obdelava temelji izključno na vašem eksplicitnem soglasju.\n\nb) Strežniški dnevniki: naši spletni gostitelji (Vercel, GitHub Pages) lahko ohranijo začasne dnevniške zapise povezav, ki temeljijo na naslovu IP, do 7 dni izključno za varnostne in protizlorabne namene. Do teh dnevnikov nimamo dostopa, razen če nas zakon da obveže, da nam jih gostitelj ponudi.\n\nc) Izrecno NE zbiramo:\n— Analitik tretjih (ni Google Analytics, ni GA4, ni Matomo, ni Plausible)\n— Sledilni ali marketinški piškotki (ni Meta Pixel, ni LinkedIn Insight, ni oglasi Twitter/X)\n— Nobene vrste profiliranja vedenja uporabnikov\n— Sledenje prek naprav\n— Finančne podatke (ne obdelujemo plačil za osnovno brezplačno različico)"
-                                                },
-                                  "purposes":  {
-                                                   "title":  "3. Nameni obdelave",
-                                                   "body":  "Upravljavec z osebnimi podatki obdeluje osebne podatke izključno za sledeče namene:\n\n— Odgovarjanje na kontaktne zahteve: ko nam pišete ali pošljete obrazec, uporabimo vaše podatke za odgovor. Točka.\n— Upravljanje licenčnih ključev za prilagojene izdaje, če obstajajo: licence za vedno (kjer velja) so povezane z e-pošto kupca za overitev. Sami licenčni ključi so psevdonimni alfanumerični kodi.\n— Varnost \u0026 protizloraba: začasni IP dnevniki, ki jih obdelujejo naši ponudniki gostitve izključno za preprečevanje DDoS napadov, napadov z grobo silo in nezaželene pošte.\n— Ustreznost zakonski obveznosti: kjer smo vezani z zavezujočim EU-ali nacionalnim zakonom, da izdam dokumentacijo."
-                                               },
-                                  "basis":  {
-                                                "title":  "4. Pravna osnova za obdelavo",
-                                                "body":  "Obdelava temelji na eni ali večih od sledečih, glede na veljavnost v skladu z čl. 6 GDPR:\n\n(a) Eksplicitno, specifično in prekličljivo soglasje (čl. 6(1)(a)) — za pošiljanje kontaktnih obrazcev in prijave na čakalne liste. Soglasje lahko kadarkoli prekličete z e-pošto na axsen_kurtoski@financier.com.\n\n(b) Izpolnitev pogodbe ali ukrepi pred sklenitvijo pogodbe (čl. 6(1)(b)) — če kupite prilagojeno izdajo ali svetovalno storitev pri nas.\n\n(c) Ustreznost zakonski obveznosti (čl. 6(1)(c)) — npr. ohranjanje davčnih dokumentov.\n\n(d) Pravni interes (čl. 6(1)(f)) — samo v ozkem primeru varnostnih/protizlorabnih dnevnikov na ravni strežnika. Te interese uravnotežujemo z vašimi pravicami in menimo, da vpliv je minimalen (začasni, niso profilirani, nikoli uporabljeni za trženje)."
-                                            },
-                                  "retention":  {
-                                                    "title":  "5. Ohranjanje podatkov",
-                                                    "body":  "Kategorije podatkov so ohranjene za sledeče najdaljše obdobje:\n\n— Pošiljanja kontaktnih obrazcev (ime + e-pošta): 36 mesecev od zadnje interakcije z vami. To nam omogoča prepoznati obnove pogovorov. Po 36 mesecih trajno izbrišemo.\n\n— Zapisi licenčnih ključev (samo prilagojene izdaje): 10 let od nakupa, za reševanje prihodnjih zahtev za ponovno aktivacijo. Sami ključi so 16-mestni alfanumerični kodi, ki ne razkrivajo ničesar brez ustrezne baze.\n\n— Začasni dnevnik varnosti na ravni gostitelja: do 7 dni (izven naše nadzora).\n\n— Finančni/stranski zapisi, povezani s plačanim svetovanjem ali prilagojenimi izdajami: 10 let skladno z italijanskim civilnim in davčnim zakonom (čl. 2220 c.c., čl. 3 D.P.R. 600/1973)."
-                                                },
-                                  "rights":  {
-                                                 "title":  "6. Vaše pravice (člani 15–22 GDPR)",
-                                                 "body":  "Skladno z EU Splošnim uredbom o varstvu osebnih podatkov (in primerljivimi zakoni kot CCPA) imate naslednje pravice, brezplačno:\n\n— Pravico do dostopa (čl. 15): lahko zahtevate potrdilo, ali vaše podatke obdelujemo, in dobite njihovo kopijo.\n— Pravico do popravka (čl. 16): popravite netočne ali nepopolne podatke.\n— Pravico do izbrisa («pravico do pozabe», čl. 17): zahtevajte izbris, s predpisanimi izjemami ohranjanja na podlagi zakona.\n— Pravico do omejitve (čl. 18): zaustavite obdelavo v določenih primerih.\n— Pravico do prenosljivosti podatkov (čl. 20): prejmite svoje podatke v formatu, ki ga lahko prebere računalnik.\n— Pravico do ugovora (čl. 21): ugovorite se obdelavi, ki temelji na pravnem interesu.\n— Pravico do preklica soglasja kadarkoli, brez da bi to vplivalo na zakonitost obdelave, ki je temeljila na soglasju pred preklicom.\n— Pravico do vložbe pritožbe nad nadzornim organom.\n\nKako uveljaviti: pošljite e-pošto na axsen_kurtoski@financier.com z zadevo «Zahteva GDPR». Odgovorimo v 30 koledarskih dneh."
-                                             },
-                                  "cookies":  {
-                                                  "title":  "7. Piškotki",
-                                                  "body":  "Posebna Politika piškotkov obstaja na /cookies. Nastavljamo samo 3 (tri) piškotke prve stranke, ki so strogo potrebni. Nobenih sledilnih piškotkov, nobenih marketinških piškotkov, nobenih piškotkov tretjih katere koli vrste ne nastavi ta spletna stran."
-                                              },
-                                  "transfer":  {
-                                                   "title":  "8. Mednarodni prenosi (zunaj EU)",
-                                                   "body":  "V kolikor katera koli obdelava vključuje prenos osebnih podatkov izven Evropskega gospodarskega prostora, se opremo izključno na eno od sledečih:\n\n(a) Standardne pogodbene klavzule (SCC) kot jih je sprejela Evropska komisija (Odločba 2021/914 in kasnejše);\n(b) Odločbe o ustreznosti (npr. UK IDTA, Švica FAIA, Japonska APPI);\n(c) Eksplicitno, informirano in vnaprej dano soglasje (čl. 49(1)(a) GDPR), potem ko ste bili specifično obveščeni o tveganjih.\n\nNikoli ne prenašamo osebnih podatkov v Združene države brez SCC + dokumentiranih dodatnih tehničnih ukrepov (šifriranje od konca do konca v mirovanju in med prenosom)."
-                                               },
-                                  "authority":  {
-                                                    "title":  "9. Nadzorni organ",
-                                                    "body":  "Glavni nadzorni organ za Lead Machine je italijanski organ za varstvo podatkov (Garante per la protezione dei dati personali — www.garanteprivacy.it). Kadarkoli lahko vložite pritožbo v katerem koli jeziku EU pri Garante ali pri organu DPA vašega običajnega bivanja, delovnega mesta ali mesta domnevnega kršitve."
-                                                },
-                                  "changes":  {
-                                                  "title":  "10. Spremembe te politike",
-                                                  "body":  "Pridržujemo si pravico, da to Politiko zasebnosti kadarkoli spremenimo. Bistvene spremembe bodo označene z obvestilom na domači strani 30 dni po objavi, datum «Zadnja posodobitev» na vrhu te strani pa bo povečan. Nadaljnja uporaba strani po spremembah pomeni sprejetje."
-                                              }
-                              },
-                  "terms":  {
-                                "title":  "Pogoji uporabe",
-                                "subtitle":  "Pogodba med vami in projektom Lead Machine.",
-                                "definitions":  {
-                                                    "title":  "1. Definicije",
-                                                    "body":  "a) «Storitev» pomeni programsko opremo Lead Machine, to marketinško spletno stran (leadmachine.dev ali katerikoli poddomén), dokumentacijo in skupnostne vire, ki jih upravlja projekt odprte kode Lead Machine.\n\nb) «Uporabnik» pomeni vsako fizično ali pravno osebo, ki dostopa do Storitve ali jo uporablja, ne glede na to, ali registrira račun ali ne.\n\nc) «Programska oprema» pomeni aplikacijo Lead Machine Next.js, ki je objavljena pod licenco MIT, kot je določeno v datoteki LICENSE v repozitoriju GitHub.\n\nd) «Strani» pomenita Uporabnika na eni strani in Lead Machine Contributors na drugi strani."
-                                                },
-                                "service":  {
-                                                "title":  "2. Opis storitve",
-                                                "body":  "Lead Machine ponuja samogostljivo, lokalno osredotočeno aplikacijo za generiranje leadov in CRM za freelance delavce in majhne spletne agencije. Programska oprema je ponujena pod licenco MIT, ki dovoljuje uporabo, spreminjanje, distribucijo, podlicenco in prodajo kopij. Ta spletna stran služi kot informacijski, dokumentacijski in skupnostni središče."
-                                            },
-                                "account":  {
-                                                "title":  "3. Uporabniški račun \u0026 Registracija",
-                                                "body":  "Osnovna samogostljiva programska oprema po zasnovi nima uporabniških računov ali sistema avtentikacije — namenjena je za lokalno eno-uporabniško uporabo. Prilagojene več-uporabniške izdaje lahko vključujejo račune. Zanje se Uporabnik strinja, da bo:\n\na) Dal točne, popolne in aktualne registracijske podatke;\nb) Ohranjeval varnost vsakih poverilnic in nemudoma obvestil Lead Machine o nepooblaščeni uporabi;\nc) Polno odgovoren za vse dejavnosti, opravljene pod njegovim računom, ne glede na to, ali so pooblaščene ali ne."
-                                            },
-                                "license":  {
-                                                "title":  "4. MIT licenca in pravila Open Source",
-                                                "body":  "Programska oprema je objavljena pod licenco MIT (glejte datoteko LICENSE v skladišču GitHub). Vsaki osebi, ki pridobi kopijo te programske opreme in povezanih datotek z dokumentacijo, se s tem brezplačno podeli pravica, da uporablja, kopira, spreminja, združuje, objavlja, distribuira, podlicencira in/ali prodaja kopije programske opreme ter dovoljuje osebam, ki jim je programska oprema zagotovljena, da storijo enako, pod naslednjimi pogoji: zgornje obvestilo o avtorskih pravicah in to dovoljenje sta vključena v vse kopije ali pomembne dele programske opreme.\n\nPROGRAMSKA OPREMA JE NA VOLJO «TAKŠNA KOT JE», BREZ KAKRŠNIH KOLI GARANCIJ, IZREČENIH ALI NAMIGANIH, VKLJUČNO ZA, A NE OMEJENO NA, GARANCIJE TRGOVSKO VREDNOSTI, PRIMERNOSTI ZA DOLOČEN NAMEN IN NEKRŠENJA PRAVIC. V NOBENEM PRIMERU AVTORJI ALI LASTNIKI AVTORSKIH PRAVIC NE BOJO ODGOVORNI ZA KAKRŠNO KOLI REKLAMACIJO, ŠKODO ALI DRUGO ODGOVORNOST, ALI V OKVIRU POGODBE, NEZAKONITEGA DEJANJA ALI DRUGAČE, KI IZHAGA IZ ALI V POVEZAVI S PROGRAMSKO OPREMO ALI UPORABO ALI DRUGIMI DEJANJI V PROGRAMSKI OPREMI."
-                                            },
-                                "prohibited":  {
-                                                   "title":  "6. Prepovedano ravnanje",
-                                                   "body":  "Uporabniki se strinjajo, da ne bodo:\n\na) Uporabljali Storitev za kakršenkoli nezakonit namen ali v kršitvi katerega koli veljavnega nacionalnega, EU-ali mednarodnega zakona ali predpisa;\nb) Nalagali, distribuirali ali prenašali zlonamerne programe, viruse, programe za izsiljevanje, špijonsko programsko opremo ali katero koli kodo uničujočega ali vdretih značaja;\nc) Poskušali pridobiti nepooblaščen dostop do računov, sistemov ali omrežij drugih Uporabnikov;\nd) Izvajali testiranje obremenitve, napade DDoS, struženje ali agresiven iskanje, ki moti Storitev;\ne) Se predstavljali za katero koli osebo ali entiteto ali napačno trdili ali drugače lažno predstavljali povezanost z osebo ali entiteto;\nf) Odstranjevali ali spreminjali vsako obvestilo o avtorskih pravicah, blagovni znamki ali drugih lastniških pravicah iz programske opreme ali dokumentacije."
-                                               },
-                                "liability":  {
-                                                  "title":  "6. Omejitev odgovornosti",
-                                                  "body":  "V največjem možnem obsegu, ki ga dovoljuje veljavno pravo:\n\na) Storitev in programska oprema so nudene «TAKORNE, KOT SO» in «NA RASPOLOŽENJE», BREZ KAKRŠNIH KOLI JAMSTEV — izrecnih, implicitnih ali zakonskih — vključno, vendar ne omejeno na jamstva trgovske vrednosti, ustreznosti za določen namen, nekršitve, lastništva in mirnega uživanja.\n\nb) V nobenem primeru ne bodo Lead Machine Contributors, njegovih vzdrževalcev, prostovoljcev ali dobaviteljev odgovorni za posredne, slučajne, posebne, posledične ali kazenske škode, vključno s izgubljenimi dobički, izgubljenimi prihodki, izgubo podatkov, izgubo ugleda ali stroški nabave nadomestnih blagov.\n\nc) Skupna kumulativna odgovornost, glede na katero koli pravno teorijo (pogodba, deliktna odgovornost, stroga odgovornost, zakon ali drugače), ne bo presegla 100 EUR (skupni največji znesek za vsako posamezno reklamacijo).\n\nd) Ničesar v teh pogojih ne izključuje ali ne omejuje odgovornosti za smrt ali telesno poškodbo, ki sta posledica neprevida, goljufije ali goljufivega lažnega trditve ali katere koli druge odgovornosti, ki je ni mogoče izključiti na podlagi veljavnega obvezujočega prava."
-                                              },
-                                "jurisdiction":  {
-                                                     "title":  "8. Uporabno pravo \u0026 Tožnost",
-                                                     "body":  "Ti pogoji se urejajo in tolmačijo v skladu s pravom Italijanske republike, brez upoštevanja njenih pravil o sporih med zakoni.\n\nZa vsako spore, ki izhaja iz ali je povezano s temi pogoji ali Storitvijo:\n\n— Če je Uporabnik potrošnik, ki prebiva v Evropski uniji: Uporabnik lahko pravdo tudi vloži pri sodišču države članice njegovega običajnega bivanja.\n— V nasprotnem primeru: Strani nepovratno podlegajo izključni tožnosti sodišča v Milanu, Italija (Foro di Milano).\n\nStrani izrecno izključujejo uporabo Konvencije Združenih narodov o pogodbah o mednarodni prodaji blaga (CISG, Dunaj 1980)."
-                                                 },
-                                "changes":  {
-                                                "title":  "9. Spremembe Storitve ali pogojev",
-                                                "body":  "Lead Machine lahko po lastni presoji spremeni, suspendira ali prekine — začasno ali trajno — funkcionalnosti, poddoméne ali skupnostne vire, z ali brez obvestila.\n\nBistvene spremembe teh pogojev bodo objavljene na domači strani 30 dni. Nadaljnja uporaba po 30-dnevnem obdobju obvestila pomeni sprejetje posodobljenih pogojev."
-                                            },
-                                "contacts":  {
-                                                 "title":  "10. Kontaktni podatki",
-                                                 "body":  "Za pravne zahteve pošljite registrirano sporočilo na:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italija\nE-pošta: axsen_kurtoski@financier.com\nCertificirana e-pošta (PEC): axsen_kurtoski@financier.com\n\nZa varnostne ranljivosti glejte SECURITY.md in pišite na axsen_kurtoski@financier.com (PGP na zahtevo)."
-                                             }
-                            },
-                  "cookies":  {
-                                  "title":  "Politika piškotkov",
-                                  "subtitle":  "Samo strogo potrebni piškotki. Brez sledenja, brez trženja.",
-                                  "intro":  "Skladno z čl. 122 italijanskega zakonika o varstvu podatkov (D. Lgs. 196/2003 v spremenjeni obliki) in čl. 5(3) direktive o ePrivacy (2002/58/EC), pa tudi smernicami, ki jih je izdal italijanski organ za varstvo podatkov (Garante Privacy, Provv. 10/06/2021 n. 231), ta spletna stran uporablja SAMO strogo potrebne tehnične piškotke prve stranke. Ni profilnih piškotkov. Ni marketinških piškotkov. Ni nobenih piškotkov tretjih katerih koli opisov.",
-                                  "whatAre":  {
-                                                  "title":  "Kaj so piškotki",
-                                                  "body":  "Piškotki so majhni besedilni datoteki, ki jih lahko spletna stran shrani v vašem brskalniku, ko jo obiščete. Široko se uporabljajo za učinkovito delovanje spletnih strani, zapomninje nastavitev in — v primeru sledilnih piškotkov — ustvarjanje oglasnih profilov o vami."
-                                              },
-                                  "strictlyNecessary":  {
-                                                            "title":  "Strogo potrebni piškotki (ni potrebno soglasje)",
-                                                            "body":  "Skladno z zgoraj omenjenim EU/italijanskim urednim okvirom lahko strogo potrebni piškotki — tisti, ki so potrebni za osnovno delovanje strani — nastavljeni brez predhodnega soglasja, uporabniki pa imajo pravico, da jih kadarkoli izbrišejo preko nastavitev brskalnika. To so edini piškotki, ki jih nastavi ta spletna stran:"
-                                                        },
-                                  "table":  {
-                                                "cols":  [
-                                                             "Ime piškotka",
-                                                             "Namen",
-                                                             "Trajanje",
-                                                             "Upravljavec"
-                                                         ],
-                                                "rows":  [
-                                                             [
-                                                                 "next-intl-locale",
-                                                                 "Si zapomni vašo nastavitev jezika uporabniškega vmesnika, da vas ne sprašuje ponovno ob vsakem nalaganju strani",
-                                                                 "1 leto (365 dni)",
-                                                                 "Prva stranka — Lead Machine (funkcionalno)"
-                                                             ],
-                                                             [
-                                                                 "lm_license",
-                                                                 "Rezervirano ime piškotka za morebitne prihodnje podjetniške funkcije open source. 100% NIKOLI NI NASTAVLJENO v trenutni izdaji open source. Danes nikoli ni zapisano v nobenem uporabnikovem brskalniku.",
-                                                                 "10 let",
-                                                                 "Prva stranka — Lead Machine (funkcionalno)"
-                                                             ],
-                                                             [
-                                                                 "lm_consent",
-                                                                 "Si zapomni, da ste videli in potrdili obvestilo o piškotkih na tej strani. Ne shrani nobenih osebnih podatkov.",
-                                                                 "90 dni",
-                                                                 "Prva stranka — Lead Machine (funkcionalno)"
-                                                             ]
-                                                         ]
-                                            },
-                                  "notUsedTitle":  "Piškotki, ki na tej strani izrecno NISO uporabljeni",
-                                  "notUsedBody":  "Za popolno jasnost in kot politični ukrep so sledeči piškotki in mehanizmi sledenja aktivno in trajno onemogočeni na tej spletni strani:\n\n— Google Analytics / GA4 / Universal Analytics piškotki (_ga, _gid, _gat, _ga_*)\n— Meta Pixel / Facebook piškotki (_fbp, _fbc, fr, sb, tr, wd)\n— LinkedIn Insight Tag (li_gc, lidc, AnalyticsSyncHistory)\n— Twitter/X oglasni konverzijski piksli\n— Hotjar, Fullstory, Microsoft Clarity snemanja sej\n— Vsaki AdSense, DoubleClick, AdRoll, Criteo ali remarketing piškotki\n— Vsaki piškotki tretjih za gradnike družbenih omrežij (družbeni gradniki so implementirani kot varne za zasebnost statične značke, ne kot iframe)\n\nMi ne nastavljamo nobenih zgoraj naštetih. Nikoli ne bomo. Če najdete tak piškotek na tej domeni, gre za napako — prosimo, da to prijavite na axsen_kurtoski@financier.com in ga bomo hitro popravili."
-                              },
-                  "imprint":  {
-                                  "title":  "Natisak / Impressum (Art. 7 Abs. 1 TMG \u0026 D. Lgs. 70/2003)",
-                                  "subtitle":  "Zahtevano italijanskim in nemškim zakonom za vsako komercialno spletno stran.",
-                                  "body":  "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nLead Machine Contributors — Open Source Project\nPredstavlja: Lead Machine Maintainers\nNaslov sedeža: Via Privacy 1, 20121 Milano MI, Italija\n\nDavčna številka (USt-IdNr.): IT00000000000\nPoslovni register (REA / Handelsregister): Milano REA n. MI-0000000\nKapital: € 10.000,00 i.v.\n\nE-pošta — Splošno: axsen_kurtoski@financier.com\nE-pošta — Zasebnost: axsen_kurtoski@financier.com\nE-pošta — Pravno / PEC: axsen_kurtoski@financier.com\nE-pošta — Varnost / Ranljivosti: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nLead Machine Maintainers — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
-                              },
-                  "dpa":  {
-                              "title":  "Sporazum o obdelavi osebnih podatkov (DPA / AVV Art. 28 GDPR)",
-                              "subtitle":  "Standardne EU klavzule. Na zahtevo na voljo.",
-                              "intro":  "Skladno z 28. členom EU Splošnega uredbe o varstvu osebnih podatkov (GDPR), ko upravljavec za zaveža obdelovalka, da obdeluje osebne podatke v njegovem imenu, morata strani podpisati pisni Sporazum o obdelavi osebnih podatkov (DPA / AVV — Accordo sul Trattamento dei Dati Personali), ki ustreza zahtevam čl. 28(3) GDPR.",
-                              "body":  "Lead Machine Contributors vzdržuje predlogo DPA, ki vključuje Standardne pogodbene klavzule Evropske komisije (Modul 2: Upravljavec–Obdelovalec, Odločba 2021/914/EU in kasnejše spremembe), vključno z Prilogo o Tehničnih in Organizacijskih ukrepih (TOMs / Misure Tecniche e Organizzative).\n\nTa DPA je predvsem relevantno za Uporabnike, ki izvajajo skupnostne ali samostojno gostovane prilagojene namestitve, ali potrebujejo podpisani DPA zaradi notranjih skladnostnih razlogov.\n\nČe želite dobiti podpisano kopijo, prosimo, da pošljete e-pošto na axsen_kurtoski@financier.com z zadevo «Zahteva DPA» in vključite:\n— Polno pravno ime, naslov, davčno številko in registrirano e-pošto Upravljavca;\n— Opis obdelave, ki se bo izvedla (katere storitve, kategorije prizadetih oseb, kategorije podatkov, trajanje).\n\nVrnili bomo podpisano PDF DPA v 7 delovnih dneh."
-                          },
-                  "security":  {
-                                   "title":  "Varnostna politika",
-                                   "subtitle":  "Polna politika v SECURITY.md v repozitoriju. Kratek opis tukaj.",
-                                   "intro":  "Varnostna politika Lead Machine se nahaja v SECURITY.md v glavnem repozitoriju in se vzdržuje skupaj s kodo. Ta stran je berljiv povzetek za obiskovalce spletne strani. Kanonična različica je Markdown datoteka na GitHub."
-                               }
-              },
-    "cta":  {
-                "title":  "Pripravljen na svoj prodajni lijak?",
-                "subtitle":  "Namestite Lead Machine na prenosnik s 3 ukazi — ali gostite sami kjer koli. Zastonj za vedno, brez registracije, brez kartice.",
-                "primary":  "Namesti zdaj — Brezplačno",
-                "secondary":  "Zvezdica na GitHubu",
-                "demo":  "Preizkusite živo predstavitev"
-            },
-    "forms":  {
-                  "name":  "Ime",
-                  "email":  "E-pošta",
-                  "company":  "Podjetje (neobvezno)",
-                  "message":  "Sporočilo",
-                  "send":  "Pošlji",
-                  "sending":  "Pošiljanje…",
-                  "successTitle":  "Sporočilo poslano",
-                  "successDesc":  "Hvala — običajno odgovorimo v 24 urah.",
-                  "errorTitle":  "Ni mogoče poslati",
-                  "errorDesc":  "Preverite polja in poskusite znova.",
-                  "demo-request":  {
-                                       "title":  "Zahtevaj demo",
-                                       "subtitle":  "Oglejte si Lead Machine v živo: iskanje, ocenjevanje, stik — v manj kot 3 minutah.",
-                                       "cta":  "Zahtevaj demo"
-                                   },
-                  "partnership":  {
-                                      "title":  "Partnerstva",
-                                      "subtitle":  "Skupaj razvijajmo ekosistem. Agencije, integratorji, preprodajalci — pišite nam.",
-                                      "cta":  "Pošlji predlog"
-                                  },
-                  "report-issue":  {
-                                       "title":  "Prijavi težavo",
-                                       "subtitle":  "Ste našli napako? Opišite jo in jo bomo hitro odpravili. Vključite OS in brskalnik.",
-                                       "cta":  "Pošlji prijavo"
-                                   },
-                  "waitlist":  {
-                                   "title":  "Pridruži se čakalni listi",
-                                   "subtitle":  "Bodite prvi za gostovano različico, prilagojene namestitve in zgodnje funkcije.",
-                                   "cta":  "Pridruži se listi"
-                               }
-              },
-    "resources":  {
-                      "docs":  {
-                                   "title":  "Dokumentacija",
-                                   "subtitle":  "Vse, kar potrebujete za namestitev, nastavitev in obvladovanje Lead Machine.",
-                                   "body":  "Vodniki po korakih za lokalno namestitev, namestitev na VPS, BYOK ključe, AI ponudnike (Gemini in Groq), SMTP in ponudbeni tok. Celotna dokumentacija je v mapi /docs repozitorija in v README."
-                               },
-                      "blog":  {
-                                   "title":  "Blog",
-                                   "subtitle":  "Zgodbe, vodniki in terenske opombe ekipe Lead Machine.",
-                                   "body":  "Članki o pridobivanju strank za samostojne podjetnike, CRM tokovih, nasvetih za lastno gostovanje in odprtokodni filozofiji. Novi prispevki so objavljeni na GitHub Discussions."
-                               },
-                      "changelog":  {
-                                        "title":  "Dnevnik sprememb",
-                                        "subtitle":  "Vsaka izdaja, vsak popravek, vsaka nova funkcija — v kronološkem vrstnem redu.",
-                                        "body":  "Sledimo semantičnemu različkomanju. Izdaje so objavljene na GitHub Releases s podrobnimi opombami, koraki migracije in opozorili o spremembah, ki rušijo združljivost."
-                                    },
-                      "roadmap":  {
-                                      "title":  "Načrt",
-                                      "subtitle":  "Kam gre Lead Machine naprej.",
-                                      "body":  "Načrt je javen in ga vodi skupnost. Glasujte za ideje in predlagajte funkcije na GitHub Discussions — gradimo tisto, kar uporabniki res potrebujejo."
-                                  },
-                      "contributors":  {
-                                           "title":  "Sodelavci",
-                                           "subtitle":  "Ljudje, ki omogočajo Lead Machine.",
-                                           "body":  "Lead Machine gradijo prostovoljci: razvijalci, oblikovalci, prevajalci in uporabniki, ki delijo povratne informacije. Vsak prispevek je dobrodošel — od popravkov dokumentacije do novih funkcij."
-                                       },
-                      "status":  {
-                                     "title":  "Stanje",
-                                     "subtitle":  "Stanje vseh storitev Lead Machine v realnem času.",
-                                     "body":  "Lead Machine je odprtokodni projekt: ni oblačnih strežnikov, ki bi lahko padli. Spletno mesto, repozitorij in skupnostni kanali jih vzdržujejo prostovoljci. Izpade prijavite na GitHubu."
-                                 },
-                      "about":  {
-                                    "title":  "O projektu",
-                                    "subtitle":  "Zakaj obstaja Lead Machine.",
-                                    "body":  "Smo samostojni podjetniki, naveličani plačevanja orodij, ki naše podatke zapirajo v oblak. Lead Machine je naš odgovor: profesionalni sklop za pridobivanje strank, brezplačen, zaseben in odprt. Razvit javno, vsak dan ga uporabljajo njegovi vzdrževalci."
-                                }
-                  },
-    "demo":  {
-                 "title":  "Živa predstavitev — Preizkusite Lead Machine v brskalniku",
-                 "subtitle":  "Poiščite prava podjetja na OpenStreetMap, ocenite stike in ustvarite AI nagovore — tukaj, s svojimi API ključi. Nič se ne shranjuje na nobenem strežniku.",
-                 "search":  {
-                                "title":  "1 · Najdi stike",
-                                "categoryLabel":  "Kategorija podjetja",
-                                "categoryPlaceholder":  "npr. vodovodar, pekarna, zobozdravnik…",
-                                "cityLabel":  "Mesto",
-                                "cityPlaceholder":  "npr. Milano",
-                                "radiusLabel":  "Polmer",
-                                "search":  "Išči",
-                                "searching":  "Iskanje…",
-                                "results":  "najdenih stikov",
-                                "noResults":  "Ni najdenih podjetij. Poskusite drugo kategorijo ali mesto.",
-                                "error":  "Iskanje ni uspelo. Preverite povezavo in poskusite znova.",
-                                "score":  "Ocena",
-                                "distance":  "stran",
-                                "sortLabel":  "Razvrsti po",
-                                "bestScore":  "Najboljši rezultat",
-                                "nearest":  "Najbližji",
-                                "exportCsv":  "Izvozi CSV",
-                                "exported":  "Lead-i izvoženi"
-                            },
-                 "lead":  {
-                              "email":  "E-pošta",
-                              "phone":  "Telefon",
-                              "website":  "Spletna stran",
-                              "hours":  "Delovni čas",
-                              "address":  "Naslov"
-                          },
-                 "ai":  {
-                            "title":  "2 · AI nagovor (neobvezno)",
-                            "desc":  "Ustvarite hladno e-pošto ali skript za klic za poljuben stik. Uporabite svoj Gemini ali Groq ključ — šifriran v VAŠEM brskalniku, nikoli nam ne poslan. Ali uporabite svoje brezplačne kredite.",
-                            "geminiKey":  "Gemini API ključ",
-                            "groqKey":  "Groq API ključ",
-                            "saveKeys":  "Shrani ključe (šifrirane)",
-                            "keysSaved":  "Ključi shranjeni šifrirani v vašem brskalniku",
-                            "eraseKeys":  "Izbriši ključe",
-                            "keysErased":  "Ključi izbrisani",
-                            "keysNeverLeave":  "Vaši ključi nikoli ne zapustijo tega brskalnika — AES-256-GCM + PBKDF2.",
-                            "genEmail":  "Ustvari osnutek e-pošte",
-                            "genScript":  "Ustvari skript za klic",
-                            "generating":  "Ustvarjanje…",
-                            "selectLead":  "Najprej izberite stik",
-                            "copy":  "Kopiraj",
-                            "creditError":  "Ni konfiguriranega ključa in brezplačni krediti niso na voljo."
-                        },
-                 "credits":  {
-                                 "left":  "na voljo še {count} brezplačnih AI kreditov",
-                                 "byokPrompt":  "Krediti porabljeni. Zgoraj dodajte svoj Gemini ali Groq ključ — neomejeno, za vedno brezplačno."
-                             },
-                 "trust":  {
-                               "title":  "Vaše zaupanje, naša arhitektura",
-                               "body":  "Ta predstavitev v celoti deluje v vašem brskalniku. Ključi so šifrirani na strani odjemalca z AES-256-GCM (PBKDF2, 100 tisoč ponovitev) in shranjeni samo v vašem localStorage. Nam ne zaupate? Prenesite celotno aplikacijo in jo zaženite na svojem računalniku.",
-                               "selfHost":  "Lastno gostovanje z GitHub",
-                               "clone":  "git clone https://github.com/AxsenXzc/lead-machine.git"
-                           }
-             },
-    "showcase":  {
-                     "title":  "Oglejte si ga v akciji — zdaj",
-                     "subtitle":  "Prava podjetja iz OpenStreetMapa. Pravi rezultati. Pravo AI nagovarjanje z vašimi ključi. Brez registracije, brez namestitve.",
-                     "cta":  "Odpri živo predstavitev",
-                     "credits":  "10 brezplačnih AI kreditov",
-                     "playVideo":  "Oglej demo",
-                     "unmuteVideo":  "Vklopi zvok",
-                     "muteVideo":  "Utišaj zvok"
-                 },
-    "footer":  {
-                   "product":  "Izdelek",
-                   "resources":  "Viri",
-                   "legal":  "Pravno"
-               }
+{
+  "meta": {
+    "title": "Lead Machine — Odprtokodni CRM za generiranje leadov",
+    "description": "Brezplačna, odprtokodna in samogostitljiva platforma za generiranje leadov za freelance delavce in majhne agencije. Poiščite bližnje podjetja, jih ocenite, kontaktirajte, ustvarite ponudbe. €0 v naročninah.",
+    "ogTitle": "Lead Machine — Brezplačni CRM za vedno za freelance delavce",
+    "ogDescription": "100% odprtokodno. Vaši podatki. Vaša baza. Šifriranje BYOK ali pa nobeni ključi. Nič naročnin, nič sledenja.",
+    "keywords": "generiranje leadov, crm, odprta koda, samogostitev, orodja za freelance, malo podjetje, openstreetmap, ponudbe, fakturiranje",
+    "license": "Objavljeno pod licenco MIT."
+  },
+  "nav": {
+    "home": "Domov",
+    "features": "Funkcionalnosti",
+    "pricing": "Cenik",
+    "byok": "BYOK & Zasebnost",
+    "transparency": "Transparentnost",
+    "deploy": "Namestitev",
+    "docs": "Dokumentacija",
+    "blog": "Blog",
+    "changelog": "Seznam sprememb",
+    "roadmap": "Roadmap",
+    "about": "O nas",
+    "demo": "Zahtevaj demo",
+    "contact": "Kontakt",
+    "contributors": "Sodelavci",
+    "status": "Stanje",
+    "getStarted": "Začnite",
+    "starOnGithub": "Dodaj zvezdo na GitHub",
+    "legal": {
+      "privacy": "Politika zasebnosti",
+      "terms": "Pogoji uporabe",
+      "cookies": "Politika piškotkov",
+      "imprint": "Natisak",
+      "dpa": "Obdelava podatkov",
+      "security": "Varnost"
+    },
+    "language": "Jezik",
+    "partnership": "Partnerstva",
+    "liveDemo": "Živa predstavitev"
+  },
+  "byokBanner": {
+    "title": "🔒 Vaši API ključi · Vaši podatki · Vaša baza.",
+    "subtitle": "Ne vidimo, ne beležimo in ne shranjujemo ničesar. BYOK: ključi so šifrirani v VAŠEM brskalniku. Za vedno: nič potrebnih ključev.",
+    "cta": "Izvedi več →"
+  },
+  "cookieBanner": {
+    "text": "🍪 Uporabljamo samo tehnične piškotke za osnovno delovanje strani. 0 sledilnih piškotkov. 0 marketinških piškotkov.",
+    "accept": "Razumem",
+    "more": "Politika piškotkov →"
+  },
+  "hero": {
+    "eyebrow": "Odprtokodno · Brezplačno za vedno · Samogostljivo",
+    "title": "Prenehajte plačevati €200/mesec za orodja za leads.",
+    "titleHighlight": "Imajte svoj pipeline. Za €0.",
+    "subtitle": "Lead Machine je ena sama odprtokodna Next.js aplikacija, ki deluje na vašem prenosniku. Preišči več kot 40M podjetij na OpenStreetMap, oceni prospekte, pošlji e-pošto, WhatsApp, ustvari ponudbe in račune. Brez naročnin. Vaši podatki ostanejo na vašem računalniku.",
+    "ctas": {
+      "primary": "Začnite — Brezplačno",
+      "secondary": "Oglejte si demo (2 min)",
+      "tertiary": "Oglejte si na GitHub ⭐"
+    },
+    "stats": {
+      "businesses": "M+ podjetij je iskalnih",
+      "countries": "Podprte države",
+      "languages": "Jeziki",
+      "price": "€/mesec za vedno"
+    },
+    "trust": {
+      "text": "Zaupajo ga freelance delavci in majhne agencije v",
+      "countries": "37+ državah"
+    }
+  },
+  "features": {
+    "title": "Vse, kar potrebujete. Ničesar nepotrebnega.",
+    "subtitle": "Zgradili so ga freelance delavci za freelance delavce. Vse funkcionalnosti so vključene — brez dodatnih prodaj, brez zidov \"nadgradnje pro\".",
+    "categories": {
+      "research": "Raziskovanje & Prospekcija",
+      "crm": "Večkanalni CRM",
+      "quotes": "Ponudbe & Računi",
+      "ai": "UI (Izbirni BYOK)",
+      "privacy": "Zasebnost na prvem mestu"
+    },
+    "research": {
+      "geo_title": "Geografsko iskanje na OpenStreetMap",
+      "geo_desc": "Poizvedujte po več kot 40M podjetjih po kategoriji, polmeru in mestu — brezplačno, preko Overpass API. Ni potreben ključ za Google Maps.",
+      "dedup_title": "Pametna deduplikacija",
+      "dedup_desc": "3 ravni deduplikacije: OSM ID → ime+mesto → mehka. Vaš CRM ostane samodejno čist.",
+      "crawler_title": "Poišči spletne strani in kontakte",
+      "crawler_desc": "Za dan lead: samodejno poišči domačo stran, izvleci e-pošto, telefon, družbene povezave. Slika domače strani z enim klikom (Playwright).",
+      "map_title": "Interaktivni pogled na zemljevid",
+      "map_desc": "Zemljevid Leaflet s združevanjem točk. Barvno obarvani statusi leadov. Kliknite na zavihek → pokličite, pošljite e-pošto, WhatsApp takoj."
+    },
+    "crm": {
+      "scoring_title": "Ocenjevanje leadov 0–100",
+      "scoring_desc": "Kategorija, prisotnost e-pošte/telefona/spletne strani, družbeni signali, svežina, razdalja. Vedite, koga poklicati najprej.",
+      "timeline_title": "Združena časovnica",
+      "timeline_desc": "Klici, e-pošta, WhatsApp, sestanki, beležke, nadgradnje — en pogled za vsak lead. Nič ne uide.",
+      "email_title": "E-pošta s SMTP ali .eml lokalno",
+      "email_desc": "Pošljite preko vašega SMTP (geslo aplikacije Gmail, SendGrid, Postfix…). Ni SMTP? E-pošta se shrani kot .eml lokalno.",
+      "whatsapp_title": "WhatsApp z enim klikom",
+      "whatsapp_desc": "Globoka povezava do wa.me s predlogami za vsak lead. Vključuje oznake in polja za združevanje.",
+      "followups_title": "Skatle za nadgradnje",
+      "followups_desc": "“Danes / Ta teden / Zamujeno / Opravljeno” — samodejno. Prejemite opomnik preko obvestil brskalnika."
+    },
+    "quotes": {
+      "lineitems_title": "Ponudbe po postavkah z DDV",
+      "lineitems_desc": "Količine, popusti, davčne stopnje DDV, plačilni pogoji, veljavnost. Oznake v slovenščini/italijanščini/nemščini/angleščini/španščini/portugalščini/francoščini.",
+      "pdf_title": "Ustvarjanje PDF",
+      "pdf_desc": "PDF dokumenti, pripravljeni za tisk z vašo blagovno znamko. Profesionalni prvi vtis za stranko, vsakič.",
+      "workflow_title": "Potek delovnega procesa",
+      "workflow_desc": "Osnutek → Poslano → Sprejeto → Izstavljen račun → Plačano (ali zavrnjeno/Preklicano). Opomniki se pošiljajo samodejno.",
+      "csv_title": "Izvozi CSV / JSON",
+      "csv_desc": "Vsi podatki so izvozljivi. Vaša SQLite datoteka je prenosljiva in enostavna za varnostno kopiranje."
+    },
+    "ai": {
+      "failover_title": "UI z dvema ponudnikoma z nadomestnim delovanjem",
+      "failover_desc": "Gemini + Groq. Če eni pride do napake ali dosežejo omejitve, drugi vstopi. Rezultati so določljivi za vsak vnos.",
+      "scripts_title": "Skripte za klice na hladno in nadgradnje",
+      "scripts_desc": "Osebni predstavitveni govori, osnutki e-pošt, utemeljitve ocenjevanja leadov, pogoji pogodb.",
+      "byok_title": "BYOK — ključi nikoli ne zapustijo vašega brskalnika",
+      "byok_desc": "Vaši ključi Gemini/Groq/SMTP so šifrirani AES-GCM 256-bit v VAŠEM localStorage. PBKDF2 100k ponovitev. Nikoli jih ne dotaknemo."
+    },
+    "privacy": {
+      "local_title": "Lokalni SQLite kot prva možnost",
+      "local_desc": "Ena sama datoteka prisma/dev.db. Kopirajte jo, varnostno kopirajte, premaknite. Deluje brez povezave — razen za klice OSM/UI.",
+      "zero_title": "Brez telemetrije, brez sledenja",
+      "zero_desc": "Brez Google Analytics, brez Meta Pixel, brez Sentry kot privzeto. Vaše poslovanje, vaši podatki.",
+      "opensource_title": "100% odprtokodno (MIT)",
+      "opensource_desc": "Preverite vsako vrstico na GitHub. Forcajte, spremenite, prodajajte prilagojene izdaje. Pripis je izbiren, zelo cenjen."
+    }
+  },
+  "pricing": {
+    "title": "Dve načini uporabe Lead Machine.",
+    "subtitle": "Oba sta za vedno €0. Resno. Brez naročnin, brez kreditne kartice, brez drobnih črk.",
+    "byok": {
+      "badge": "🎁 BYOK Brezplačno za vedno",
+      "price": "€0",
+      "period": "za vedno",
+      "headline": "Prinesite svoje ključe. 100% funkcionalnosti. Vedno brezplačno.",
+      "desc": "Popolnoma za tehnične uporabnike in puriste zasebnosti. Vi prinesete ključe Gemini, Groq in SMTP. Mi prinesemo svetovnež CRM. Vaši ključi ostanejo v VAŠEM brskalniku, šifrirani z AES-256-GCM.",
+      "features": [
+        "Vse funkcionalnosti so odklenjene — raziskovanje, CRM, ponudbe, zemljevid, UI",
+        "Vaši API ključi — šifrirani AES-GCM 256 v vašem localStorage",
+        "Ključi se NIKOLI ne pošiljajo na naše strežnike. NIKOLI beleženi. NIKOLI shranjeni",
+        "Licenca MIT — forcaj, spremeni, ponovno prodaj",
+        "Podpora skupnosti na GitHub Issues",
+        "7 jezikov uporabniškega vmesnika"
+      ],
+      "cta": "Pridobi BYOK brezplačno za vedno"
+    },
+    "opensource": {
+      "badge": "💻 Samogostitev (Ni potrebnih ključev)",
+      "price": "€0",
+      "period": "enkratna plačila",
+      "headline": "Zaženite sami. Uporabljajte brez UI, če hočete.",
+      "desc": "Klonirajte repozitorij, npm install, končano. CRM deluje popolnoma brez kakršnihkoli API ključev — iskanje, zemljevid, ponudbe, računi delujejo vse brez povezave. Dodajte UI samo ko/če hočete.",
+      "features": [
+        "Zaženite na vašem prenosniku ali katerem koli VPS",
+        "SQLite baza — ena sama prenosljiva datoteka",
+        "Nobenih API ključev potrebnih za osnovni CRM",
+        "Deluje 100% brez povezave (razen klicev OSM/UI)",
+        "Prisma — preklopite na Postgres z 1 spremenljivko okolja",
+        "Poln dostop do izvorne kode"
+      ],
+      "cta": "Namesti zdaj — Brezplačno"
+    },
+    "compareTitle": "Primerjajte možnosti",
+    "compare": {
+      "research": "OSM raziskovanje & 40M+ podjetij",
+      "crm": "Poln CRM (statusi, oznake, časovnica)",
+      "map": "Pogled zemljevida & združevanje",
+      "quotes": "Ponudbe & računi s PDF",
+      "aiFeatures": "UI (skripte za klice na hladno, e-pošta)",
+      "smtp": "Pošiljanje e-pošte",
+      "whatsapp": "Globoke povezave WhatsApp",
+      "i18n": "7 jezikov",
+      "selfHost": "Možnost samogostitve",
+      "offline": "Deluje brez povezave (osnova)",
+      "privacy": "Lokalni SQLite kot prva možnost",
+      "license": "Licenca MIT"
+    },
+    "faq": {
+      "title": "Pogosta vprašanja o cenik",
+      "q1": "Počakajte — je to resnično brezplačno? Nobenega skritega pasti?",
+      "a1": "Da. Lead Machine je odprtokodna programska oprema z licenco MIT. Lahko jo prenesete, zaženete, spremenite, prodajate izvedene izdelke, vse brezplačno, za vedno. Projekt vzdržujejo prostovoljci, ki ga uporabljajo vsak dan.",
+      "q2": "Zakaj ne zaračunavate naročnin kot vsi ostali?",
+      "a2": "Ker je bistvo Lead Machine odpraviti SaaS sklad za €200/mesec za freelance delavce. Zaračunavanje bi uničilo misijo. Denar zaslužimo s prodajo prilagojenih izdaj in svetovanjem, ne z gnojenjem uporabnikov.",
+      "q3": "In za BYOK — so moji ključi v varnosti?",
+      "a3": "Vaši ključi so šifrirani na strani odjemalca z AES-GCM 256-bit pri uporabi PBKDF2 s 100.000 ponovitvami, vezani na prstni odtis vašega brskalnika in shranjeni samo v VAŠEM localStorage. NIKOLI se ne pošiljajo v nezakodirani obliki na noben strežnik. Lahko preverite kodo crypto.ts na GitHub.",
+      "q4": "Lahko gostim samo na Vercel / Fly.io / Coolify?",
+      "a4": "Da — glejte dokumentacijo za namestitev. Za Vercel pripnite trajni nosilec za SQLite (ali preklopite na Postgres — samo sprememba DATABASE_URL).",
+      "q5": "Ali obstaja gostovana upravljana različica?",
+      "a5": "Trenutno ne, vendar skupnost deluje na njej. Dodajte zvezdo in sledite repozitoriju za posodobitve."
+    },
+    "included": "Vključeno"
+  },
+  "byok": {
+    "title": "BYOK & Arhitektura Zero-Knowledge",
+    "subtitle": "Zgradili smo Lead Machine, da bi mu sami zaupali. Evo točno, kako vaši skrivnosti ostanejo vaši.",
+    "tabs": {
+      "crypto": "Kako deluje šifriranje AES-GCM",
+      "zeroknowledge": "Občutek Zero-Knowledge"
+    },
+    "crypto": {
+      "p1": "Vsi API ključi, ki jih prilepite v Lead Machine (Gemini, Groq, SMTP uporabnik/geslo), se šifrirajo v vašem brskalniku PREDEN se zgodi kaj drugega.",
+      "p2": "Uporabljamo izvorno brskalnikovo API Web Crypto — nobenih knjižnic za šifriranje tretjih ponudnikov. Izvedbo je mogoče preveriti v lib/crypto.ts.",
+      "stepsTitle": "Korak za korakom pretok šifriranja",
+      "step1": "Za vsak brani se ustvari 16-bajtno kriptografsko naključno sol (crypto.getRandomValues).",
+      "step2": "Za vsako šifriranje se ustvari 12-bajtni naključni IV (vektor inicializacije) — ne ponavlja se, skladno z GCM.",
+      "step3": "Prstni odtis vašega brskalnika (UA+jezik+platforma+ločljivost+časovni pas+jedra+pomnilnik) se uporablja kot geslo.",
+      "step4": "PBKDF2 s SHA-256 raztegne to geslo prek 100.000 ponovitev v 256-bitni AES ključ.",
+      "step5": "AES-GCM 256 šifrira vaše ključe. Avtentikacijska oznaka je vključena v šifrirano besedilo (lastnost GCM).",
+      "step6": "Sol + IV + šifrirano besedilo + število ponovitev se kodirajo v base64 in JSON-stringify. Rezultat shranjen SAMO v vašem localStorage."
+    },
+    "zeroknowledge": {
+      "p1": "“Zero knowledge” v Lead Machine pomeni: po zasnovi strežniška infrastruktura fizično ne more dostopati do vaših ključev, vaših leadov ali vaših poslovnih podatkov.",
+      "p2": "Ni posrednika. Ni posredniškega strežnika. Ni “naši strežniki kličejo UI za vas”. Brskalnik neposredno kliče Gemini/Groq/Nodemailer — ali, če gostite sami na vašem prenosniku, vaš Node proces jih kliče iz VAŠEGA naslova IP.",
+      "promisesTitle": "5 železnih obljub",
+      "prom1": "NIKOLI ne prejmemo ali beležimo API ključev v nezakodirani obliki. Nikoli. Nemogoče.",
+      "prom2": "NIKOLI ne pošiljamo vaših leadov, kontaktov ali podatkov o ponudbah na strežnike tretjih.",
+      "prom3": "NIKOLI ne vključujemo sledilnih skript (ni GA, ni Meta, ni Pixel, ni Segment, ni Sentry kot privzeto).",
+      "prom4": "NIKOLI ne prodajamo ali delimo podatkov z nikomer — jih nimamo, da bi jih delili.",
+      "prom5": "Vse zgoraj našteto je mogoče preveriti z branjem izvorne kode z licenco MIT na GitHub. Če najdete kaj drugačnega, gre za napako — pišite na axsen_kurtoski@financier.com za nagrado."
+    },
+    "cta": {
+      "verify": "Preverite šifriranje na GitHub",
+      "start": "Začnite uporabljati BYOK brezplačno za vedno"
+    }
+  },
+  "transparency": {
+    "title": "Polno poročilo o transparentnosti",
+    "subtitle": "Lead Machine je odprta knjiga. Evo kaj delamo, kaj ne delamo in zakaj.",
+    "sections": {
+      "dataTitle": "Katere podatke dejansko obdelujemo",
+      "dataBody": "Če zaženete Lead Machine na vašem prenosniku (priporočena metoda za posameznike): NIČ. Ne prejmemo ničesar, ne shranjujemo ničesar, ne obdelujemo ničesar. Vsak bajt živi v vaši SQLite datoteki prisma/dev.db.\n\nČe uporabljate javno demo instanco skupnosti (ki jo ne upravlja neposredno projekt Lead Machine) ali prilagojeno upravljano izdajo, ki jo upravlja tretja oseba: veljajo politike podatkov tega upravitelja. Samo osnova odprte kode Lead Machine ne izvaja nobenih klicev domov.",
+      "cookiesTitle": "Piškotki — samo tisti, ki so strogo potrebni",
+      "cookiesBody": "Nastavljamo 3 funkcionalne piškotke prve stranke in ničesar drugega:\n\nnext-intl-locale — 1 leto — si zapomni vašo jezikovno nastavitev.\nlm_license — 10 let — shrani licenčni ključ, če ga kdaj prejmete (prilagojene izdaje).\nlm_consent — 90 dni — si zapomni, da ste videli obvestilo o piškotkih.\n\nTo je vse. Ni Google Analytics. Ni Meta Pixel. Ni LinkedIn Insight. Ni Hotjar. Nobenih piškotkov tretjih. Ničesar.",
+      "opensourceTitle": "100% Odprta koda — preverite vse",
+      "opensourceBody": "Vsaka vrstica kode, ki se dostavi v Lead Machine, je na GitHub pod licenco MIT. Gradnja je reproducibilna. Drevesa odvisnosti so fiksirana (package-lock.json). Če znate brati TypeScript, lahko preverite vsako trditev na tej strani.",
+      "securityTitle": "Varnostna pozicija",
+      "securityBody": "Omejevanje hitrosti na vsakem končnem točki za pisanje. Čiščenje vnosa na vsakem parametru. Bela lista nastavitev (masovna injekcija nemogoča). Skrivnosti so izključene iz strežniških odgovorov. Transakcije Prisma + paketske operacije (brez delčnih zapisov). CSP-prijazen kot privzeto. Glejte SECURITY.md za polno politiko in postopek za razkrivanje ranljivosti.",
+      "financialTitle": "Kako projekt preživi finančno",
+      "financialBody": "Lead Machine je delo ljubezni, ne SaaS posel. Prihodki prihajajo iz treh kanalov: (1) prilagojen razvoj za agencije, ki potrebujejo po meri narejene polja CRM ali integracije, (2) svetovanje o namestitvi in varnosti za ekipe z samogostitvijo, (3) izbirni GitHub Sponsors uporabnikov, ki želijo dati pijačo. Ni naročnin. Nobenega financiranja VC. Nobenih ciljev rasti, ki bi nas prisilili kompromisovati zasebnost."
+    }
+  },
+  "deploy": {
+    "title": "Namestite Lead Machine kjerkoli",
+    "subtitle": "Zaženite na vašem prenosniku v 3 ukazih ali namestite na katero koli platformo VPS/brez strežnika.",
+    "options": {
+      "local": {
+        "title": "Prenosnik (Priporočeno)",
+        "badge": "Najboljše za posameznike",
+        "steps": [
+          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "cd lead-machine && npm install && npm run setup",
+          "npm run dev → odprite http://localhost:3000"
+        ],
+        "notes": "Brez konfiguracije. SQLite datoteka na prisma/dev.db. Deluje brez povezave."
+      },
+      "vps": {
+        "title": "VPS / VM (Caddy + Basic Auth)",
+        "badge": "Ekipe / vedno vklopljeno",
+        "steps": [
+          "Zaženite VPS za $5/mesec (Ubuntu 22.04, najmanj 1GB RAM)",
+          "Namestite Node 20 LTS. Klonirajte repozitorij, npm ci, npm run setup",
+          "Zaženite za Caddy z avtomatskim HTTPS + basic_auth"
+        ],
+        "notes": "Dnevna varnostna kopija SQLite preko cron + rclone na S3-združljivo shrambo."
+      },
+      "serverless": {
+        "title": "Brez strežnika (Vercel / Fly.io)",
+        "badge": "Upravljano + brez operacij",
+        "steps": [
+          "Forkirajte repozitorij, povežite z Vercel / Fly.io",
+          "Pripnite trajni nosilec za SQLite ALI zamenjajte DATABASE_URL z Postgres",
+          "Nastavite spremenljivko okolja NEXT_PUBLIC_BASE_URL. Končano."
+        ],
+        "notes": "⚠️ Vercel mimolski datotečni sistem — MORATE namestiti nosilec ali uporabiti Postgres za trajno shranjevanje."
+      }
+    },
+    "copied": "Kopirano v odložišče"
+  },
+  "legal": {
+    "lastUpdated": "Zadnja posodobitev",
+    "today": "31. julij 2026",
+    "privacy": {
+      "title": "Politika zasebnosti",
+      "subtitle": "Polna politika zasebnosti skladna z GDPR in CCPA.",
+      "controller": {
+        "title": "1. Upravljavec z osebnimi podatki",
+        "body": "Upravljavec z osebnimi podatki za to spletno stran je:\nAxsen-Studio\nE-pošta: axsen_kurtoski@financier.com\nZa zadeve, povezane s to Politiko zasebnosti, lahko upravljavca kadarkoli kontaktirate na gornjem e-poštnem naslovu."
+      },
+      "collected": {
+        "title": "2. Kategorije zbranih podatkov",
+        "body": "Lead Machine zbira absolutno najmanjše možne osebne podatke. V praksi samo sledeče:\n\na) Podatki iz kontaktnega obrazca: če prostovoljno izpolnite kontaktni obrazec (zahteva za demo, partnerstvo, poročilo o napaki, čakalna lista), zbiramo ime in e-poštni naslov, ki ju podate. Obdelava temelji izključno na vašem eksplicitnem soglasju.\n\nb) Strežniški dnevniki: naši spletni gostitelji (Vercel, GitHub Pages) lahko ohranijo začasne dnevniške zapise povezav, ki temeljijo na naslovu IP, do 7 dni izključno za varnostne in protizlorabne namene. Do teh dnevnikov nimamo dostopa, razen če nas zakon da obveže, da nam jih gostitelj ponudi.\n\nc) Izrecno NE zbiramo:\n— Analitik tretjih (ni Google Analytics, ni GA4, ni Matomo, ni Plausible)\n— Sledilni ali marketinški piškotki (ni Meta Pixel, ni LinkedIn Insight, ni oglasi Twitter/X)\n— Nobene vrste profiliranja vedenja uporabnikov\n— Sledenje prek naprav\n— Finančne podatke (ne obdelujemo plačil za osnovno brezplačno različico)"
+      },
+      "purposes": {
+        "title": "3. Nameni obdelave",
+        "body": "Upravljavec z osebnimi podatki obdeluje osebne podatke izključno za sledeče namene:\n\n— Odgovarjanje na kontaktne zahteve: ko nam pišete ali pošljete obrazec, uporabimo vaše podatke za odgovor. Točka.\n— Upravljanje licenčnih ključev za prilagojene izdaje, če obstajajo: licence za vedno (kjer velja) so povezane z e-pošto kupca za overitev. Sami licenčni ključi so psevdonimni alfanumerični kodi.\n— Varnost & protizloraba: začasni IP dnevniki, ki jih obdelujejo naši ponudniki gostitve izključno za preprečevanje DDoS napadov, napadov z grobo silo in nezaželene pošte.\n— Ustreznost zakonski obveznosti: kjer smo vezani z zavezujočim EU-ali nacionalnim zakonom, da izdam dokumentacijo."
+      },
+      "basis": {
+        "title": "4. Pravna osnova za obdelavo",
+        "body": "Obdelava temelji na eni ali večih od sledečih, glede na veljavnost v skladu z čl. 6 GDPR:\n\n(a) Eksplicitno, specifično in prekličljivo soglasje (čl. 6(1)(a)) — za pošiljanje kontaktnih obrazcev in prijave na čakalne liste. Soglasje lahko kadarkoli prekličete z e-pošto na axsen_kurtoski@financier.com.\n\n(b) Izpolnitev pogodbe ali ukrepi pred sklenitvijo pogodbe (čl. 6(1)(b)) — če kupite prilagojeno izdajo ali svetovalno storitev pri nas.\n\n(c) Ustreznost zakonski obveznosti (čl. 6(1)(c)) — npr. ohranjanje davčnih dokumentov.\n\n(d) Pravni interes (čl. 6(1)(f)) — samo v ozkem primeru varnostnih/protizlorabnih dnevnikov na ravni strežnika. Te interese uravnotežujemo z vašimi pravicami in menimo, da vpliv je minimalen (začasni, niso profilirani, nikoli uporabljeni za trženje)."
+      },
+      "retention": {
+        "title": "5. Ohranjanje podatkov",
+        "body": "Kategorije podatkov so ohranjene za sledeče najdaljše obdobje:\n\n— Pošiljanja kontaktnih obrazcev (ime + e-pošta): 36 mesecev od zadnje interakcije z vami. To nam omogoča prepoznati obnove pogovorov. Po 36 mesecih trajno izbrišemo.\n\n— Zapisi licenčnih ključev (samo prilagojene izdaje): 10 let od nakupa, za reševanje prihodnjih zahtev za ponovno aktivacijo. Sami ključi so 16-mestni alfanumerični kodi, ki ne razkrivajo ničesar brez ustrezne baze.\n\n— Začasni dnevnik varnosti na ravni gostitelja: do 7 dni (izven naše nadzora).\n\n— Finančni/stranski zapisi, povezani s plačanim svetovanjem ali prilagojenimi izdajami: 10 let skladno z italijanskim civilnim in davčnim zakonom (čl. 2220 c.c., čl. 3 D.P.R. 600/1973)."
+      },
+      "rights": {
+        "title": "6. Vaše pravice (člani 15–22 GDPR)",
+        "body": "Skladno z EU Splošnim uredbom o varstvu osebnih podatkov (in primerljivimi zakoni kot CCPA) imate naslednje pravice, brezplačno:\n\n— Pravico do dostopa (čl. 15): lahko zahtevate potrdilo, ali vaše podatke obdelujemo, in dobite njihovo kopijo.\n— Pravico do popravka (čl. 16): popravite netočne ali nepopolne podatke.\n— Pravico do izbrisa («pravico do pozabe», čl. 17): zahtevajte izbris, s predpisanimi izjemami ohranjanja na podlagi zakona.\n— Pravico do omejitve (čl. 18): zaustavite obdelavo v določenih primerih.\n— Pravico do prenosljivosti podatkov (čl. 20): prejmite svoje podatke v formatu, ki ga lahko prebere računalnik.\n— Pravico do ugovora (čl. 21): ugovorite se obdelavi, ki temelji na pravnem interesu.\n— Pravico do preklica soglasja kadarkoli, brez da bi to vplivalo na zakonitost obdelave, ki je temeljila na soglasju pred preklicom.\n— Pravico do vložbe pritožbe nad nadzornim organom.\n\nKako uveljaviti: pošljite e-pošto na axsen_kurtoski@financier.com z zadevo «Zahteva GDPR». Odgovorimo v 30 koledarskih dneh."
+      },
+      "cookies": {
+        "title": "7. Piškotki",
+        "body": "Posebna Politika piškotkov obstaja na /cookies. Nastavljamo samo 3 (tri) piškotke prve stranke, ki so strogo potrebni. Nobenih sledilnih piškotkov, nobenih marketinških piškotkov, nobenih piškotkov tretjih katere koli vrste ne nastavi ta spletna stran."
+      },
+      "transfer": {
+        "title": "8. Mednarodni prenosi (zunaj EU)",
+        "body": "V kolikor katera koli obdelava vključuje prenos osebnih podatkov izven Evropskega gospodarskega prostora, se opremo izključno na eno od sledečih:\n\n(a) Standardne pogodbene klavzule (SCC) kot jih je sprejela Evropska komisija (Odločba 2021/914 in kasnejše);\n(b) Odločbe o ustreznosti (npr. UK IDTA, Švica FAIA, Japonska APPI);\n(c) Eksplicitno, informirano in vnaprej dano soglasje (čl. 49(1)(a) GDPR), potem ko ste bili specifično obveščeni o tveganjih.\n\nNikoli ne prenašamo osebnih podatkov v Združene države brez SCC + dokumentiranih dodatnih tehničnih ukrepov (šifriranje od konca do konca v mirovanju in med prenosom)."
+      },
+      "authority": {
+        "title": "9. Nadzorni organ",
+        "body": "Glavni nadzorni organ za Lead Machine je italijanski organ za varstvo podatkov (Garante per la protezione dei dati personali — www.garanteprivacy.it). Kadarkoli lahko vložite pritožbo v katerem koli jeziku EU pri Garante ali pri organu DPA vašega običajnega bivanja, delovnega mesta ali mesta domnevnega kršitve."
+      },
+      "changes": {
+        "title": "10. Spremembe te politike",
+        "body": "Pridržujemo si pravico, da to Politiko zasebnosti kadarkoli spremenimo. Bistvene spremembe bodo označene z obvestilom na domači strani 30 dni po objavi, datum «Zadnja posodobitev» na vrhu te strani pa bo povečan. Nadaljnja uporaba strani po spremembah pomeni sprejetje."
+      }
+    },
+    "terms": {
+      "title": "Pogoji uporabe",
+      "subtitle": "Pogodba med vami in projektom Lead Machine.",
+      "definitions": {
+        "title": "1. Definicije",
+        "body": "a) «Storitev» pomeni programsko opremo Lead Machine, to marketinško spletno stran (leadmachine.dev ali katerikoli poddomén), dokumentacijo in skupnostne vire, ki jih upravlja projekt odprte kode Lead Machine.\n\nb) «Uporabnik» pomeni vsako fizično ali pravno osebo, ki dostopa do Storitve ali jo uporablja, ne glede na to, ali registrira račun ali ne.\n\nc) «Programska oprema» pomeni aplikacijo Lead Machine Next.js, ki je objavljena pod licenco MIT, kot je določeno v datoteki LICENSE v repozitoriju GitHub.\n\nd) «Strani» pomenita Uporabnika na eni strani in Lead Machine Contributors na drugi strani."
+      },
+      "service": {
+        "title": "2. Opis storitve",
+        "body": "Lead Machine ponuja samogostljivo, lokalno osredotočeno aplikacijo za generiranje leadov in CRM za freelance delavce in majhne spletne agencije. Programska oprema je ponujena pod licenco MIT, ki dovoljuje uporabo, spreminjanje, distribucijo, podlicenco in prodajo kopij. Ta spletna stran služi kot informacijski, dokumentacijski in skupnostni središče."
+      },
+      "account": {
+        "title": "3. Uporabniški račun & Registracija",
+        "body": "Osnovna samogostljiva programska oprema po zasnovi nima uporabniških računov ali sistema avtentikacije — namenjena je za lokalno eno-uporabniško uporabo. Prilagojene več-uporabniške izdaje lahko vključujejo račune. Zanje se Uporabnik strinja, da bo:\n\na) Dal točne, popolne in aktualne registracijske podatke;\nb) Ohranjeval varnost vsakih poverilnic in nemudoma obvestil Lead Machine o nepooblaščeni uporabi;\nc) Polno odgovoren za vse dejavnosti, opravljene pod njegovim računom, ne glede na to, ali so pooblaščene ali ne."
+      },
+      "license": {
+        "title": "4. MIT licenca in pravila Open Source",
+        "body": "Programska oprema je objavljena pod licenco MIT (glejte datoteko LICENSE v skladišču GitHub). Vsaki osebi, ki pridobi kopijo te programske opreme in povezanih datotek z dokumentacijo, se s tem brezplačno podeli pravica, da uporablja, kopira, spreminja, združuje, objavlja, distribuira, podlicencira in/ali prodaja kopije programske opreme ter dovoljuje osebam, ki jim je programska oprema zagotovljena, da storijo enako, pod naslednjimi pogoji: zgornje obvestilo o avtorskih pravicah in to dovoljenje sta vključena v vse kopije ali pomembne dele programske opreme.\n\nPROGRAMSKA OPREMA JE NA VOLJO «TAKŠNA KOT JE», BREZ KAKRŠNIH KOLI GARANCIJ, IZREČENIH ALI NAMIGANIH, VKLJUČNO ZA, A NE OMEJENO NA, GARANCIJE TRGOVSKO VREDNOSTI, PRIMERNOSTI ZA DOLOČEN NAMEN IN NEKRŠENJA PRAVIC. V NOBENEM PRIMERU AVTORJI ALI LASTNIKI AVTORSKIH PRAVIC NE BOJO ODGOVORNI ZA KAKRŠNO KOLI REKLAMACIJO, ŠKODO ALI DRUGO ODGOVORNOST, ALI V OKVIRU POGODBE, NEZAKONITEGA DEJANJA ALI DRUGAČE, KI IZHAGA IZ ALI V POVEZAVI S PROGRAMSKO OPREMO ALI UPORABO ALI DRUGIMI DEJANJI V PROGRAMSKI OPREMI."
+      },
+      "prohibited": {
+        "title": "6. Prepovedano ravnanje",
+        "body": "Uporabniki se strinjajo, da ne bodo:\n\na) Uporabljali Storitev za kakršenkoli nezakonit namen ali v kršitvi katerega koli veljavnega nacionalnega, EU-ali mednarodnega zakona ali predpisa;\nb) Nalagali, distribuirali ali prenašali zlonamerne programe, viruse, programe za izsiljevanje, špijonsko programsko opremo ali katero koli kodo uničujočega ali vdretih značaja;\nc) Poskušali pridobiti nepooblaščen dostop do računov, sistemov ali omrežij drugih Uporabnikov;\nd) Izvajali testiranje obremenitve, napade DDoS, struženje ali agresiven iskanje, ki moti Storitev;\ne) Se predstavljali za katero koli osebo ali entiteto ali napačno trdili ali drugače lažno predstavljali povezanost z osebo ali entiteto;\nf) Odstranjevali ali spreminjali vsako obvestilo o avtorskih pravicah, blagovni znamki ali drugih lastniških pravicah iz programske opreme ali dokumentacije."
+      },
+      "liability": {
+        "title": "6. Omejitev odgovornosti",
+        "body": "V največjem možnem obsegu, ki ga dovoljuje veljavno pravo:\n\na) Storitev in programska oprema so nudene «TAKORNE, KOT SO» in «NA RASPOLOŽENJE», BREZ KAKRŠNIH KOLI JAMSTEV — izrecnih, implicitnih ali zakonskih — vključno, vendar ne omejeno na jamstva trgovske vrednosti, ustreznosti za določen namen, nekršitve, lastništva in mirnega uživanja.\n\nb) V nobenem primeru ne bodo Lead Machine Contributors, njegovih vzdrževalcev, prostovoljcev ali dobaviteljev odgovorni za posredne, slučajne, posebne, posledične ali kazenske škode, vključno s izgubljenimi dobički, izgubljenimi prihodki, izgubo podatkov, izgubo ugleda ali stroški nabave nadomestnih blagov.\n\nc) Skupna kumulativna odgovornost, glede na katero koli pravno teorijo (pogodba, deliktna odgovornost, stroga odgovornost, zakon ali drugače), ne bo presegla 100 EUR (skupni največji znesek za vsako posamezno reklamacijo).\n\nd) Ničesar v teh pogojih ne izključuje ali ne omejuje odgovornosti za smrt ali telesno poškodbo, ki sta posledica neprevida, goljufije ali goljufivega lažnega trditve ali katere koli druge odgovornosti, ki je ni mogoče izključiti na podlagi veljavnega obvezujočega prava."
+      },
+      "jurisdiction": {
+        "title": "8. Uporabno pravo & Tožnost",
+        "body": "Ti pogoji se urejajo in tolmačijo v skladu s pravom Italijanske republike, brez upoštevanja njenih pravil o sporih med zakoni.\n\nZa vsako spore, ki izhaja iz ali je povezano s temi pogoji ali Storitvijo:\n\n— Če je Uporabnik potrošnik, ki prebiva v Evropski uniji: Uporabnik lahko pravdo tudi vloži pri sodišču države članice njegovega običajnega bivanja.\n— V nasprotnem primeru: Strani nepovratno podlegajo izključni tožnosti sodišča v Milanu, Italija (Foro di Milano).\n\nStrani izrecno izključujejo uporabo Konvencije Združenih narodov o pogodbah o mednarodni prodaji blaga (CISG, Dunaj 1980)."
+      },
+      "changes": {
+        "title": "9. Spremembe Storitve ali pogojev",
+        "body": "Lead Machine lahko po lastni presoji spremeni, suspendira ali prekine — začasno ali trajno — funkcionalnosti, poddoméne ali skupnostne vire, z ali brez obvestila.\n\nBistvene spremembe teh pogojev bodo objavljene na domači strani 30 dni. Nadaljnja uporaba po 30-dnevnem obdobju obvestila pomeni sprejetje posodobljenih pogojev."
+      },
+      "contacts": {
+        "title": "10. Kontaktni podatki",
+        "body": "Za pravne zahteve pošljite registrirano sporočilo na:\nLead Machine Contributors — Legal\nVia Privacy 1, 20121 Milano MI — Italija\nE-pošta: axsen_kurtoski@financier.com\n\nZa varnostne ranljivosti glejte SECURITY.md in pišite na axsen_kurtoski@financier.com (PGP na zahtevo)."
+      }
+    },
+    "cookies": {
+      "title": "Politika piškotkov",
+      "subtitle": "Samo strogo potrebni piškotki. Brez sledenja, brez trženja.",
+      "intro": "Skladno z čl. 122 italijanskega zakonika o varstvu podatkov (D. Lgs. 196/2003 v spremenjeni obliki) in čl. 5(3) direktive o ePrivacy (2002/58/EC), pa tudi smernicami, ki jih je izdal italijanski organ za varstvo podatkov (Garante Privacy, Provv. 10/06/2021 n. 231), ta spletna stran uporablja SAMO strogo potrebne tehnične piškotke prve stranke. Ni profilnih piškotkov. Ni marketinških piškotkov. Ni nobenih piškotkov tretjih katerih koli opisov.",
+      "whatAre": {
+        "title": "Kaj so piškotki",
+        "body": "Piškotki so majhni besedilni datoteki, ki jih lahko spletna stran shrani v vašem brskalniku, ko jo obiščete. Široko se uporabljajo za učinkovito delovanje spletnih strani, zapomninje nastavitev in — v primeru sledilnih piškotkov — ustvarjanje oglasnih profilov o vami."
+      },
+      "strictlyNecessary": {
+        "title": "Strogo potrebni piškotki (ni potrebno soglasje)",
+        "body": "Skladno z zgoraj omenjenim EU/italijanskim urednim okvirom lahko strogo potrebni piškotki — tisti, ki so potrebni za osnovno delovanje strani — nastavljeni brez predhodnega soglasja, uporabniki pa imajo pravico, da jih kadarkoli izbrišejo preko nastavitev brskalnika. To so edini piškotki, ki jih nastavi ta spletna stran:"
+      },
+      "table": {
+        "cols": [
+          "Ime piškotka",
+          "Namen",
+          "Trajanje",
+          "Upravljavec"
+        ],
+        "rows": [
+          [
+            "next-intl-locale",
+            "Si zapomni vašo nastavitev jezika uporabniškega vmesnika, da vas ne sprašuje ponovno ob vsakem nalaganju strani",
+            "1 leto (365 dni)",
+            "Prva stranka — Lead Machine (funkcionalno)"
+          ],
+          [
+            "lm_license",
+            "Rezervirano ime piškotka za morebitne prihodnje podjetniške funkcije open source. 100% NIKOLI NI NASTAVLJENO v trenutni izdaji open source. Danes nikoli ni zapisano v nobenem uporabnikovem brskalniku.",
+            "10 let",
+            "Prva stranka — Lead Machine (funkcionalno)"
+          ],
+          [
+            "lm_consent",
+            "Si zapomni, da ste videli in potrdili obvestilo o piškotkih na tej strani. Ne shrani nobenih osebnih podatkov.",
+            "90 dni",
+            "Prva stranka — Lead Machine (funkcionalno)"
+          ]
+        ]
+      },
+      "notUsedTitle": "Piškotki, ki na tej strani izrecno NISO uporabljeni",
+      "notUsedBody": "Za popolno jasnost in kot politični ukrep so sledeči piškotki in mehanizmi sledenja aktivno in trajno onemogočeni na tej spletni strani:\n\n— Google Analytics / GA4 / Universal Analytics piškotki (_ga, _gid, _gat, _ga_*)\n— Meta Pixel / Facebook piškotki (_fbp, _fbc, fr, sb, tr, wd)\n— LinkedIn Insight Tag (li_gc, lidc, AnalyticsSyncHistory)\n— Twitter/X oglasni konverzijski piksli\n— Hotjar, Fullstory, Microsoft Clarity snemanja sej\n— Vsaki AdSense, DoubleClick, AdRoll, Criteo ali remarketing piškotki\n— Vsaki piškotki tretjih za gradnike družbenih omrežij (družbeni gradniki so implementirani kot varne za zasebnost statične značke, ne kot iframe)\n\nMi ne nastavljamo nobenih zgoraj naštetih. Nikoli ne bomo. Če najdete tak piškotek na tej domeni, gre za napako — prosimo, da to prijavite na axsen_kurtoski@financier.com in ga bomo hitro popravili."
+    },
+    "imprint": {
+      "title": "Natisak / Impressum (Art. 7 Abs. 1 TMG & D. Lgs. 70/2003)",
+      "subtitle": "Zahtevano italijanskim in nemškim zakonom za vsako komercialno spletno stran.",
+      "body": "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nAxsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAxsen-Studio — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
+    },
+    "dpa": {
+      "title": "Sporazum o obdelavi osebnih podatkov (DPA / AVV Art. 28 GDPR)",
+      "subtitle": "Standardne EU klavzule. Na zahtevo na voljo.",
+      "intro": "Skladno z 28. členom EU Splošnega uredbe o varstvu osebnih podatkov (GDPR), ko upravljavec za zaveža obdelovalka, da obdeluje osebne podatke v njegovem imenu, morata strani podpisati pisni Sporazum o obdelavi osebnih podatkov (DPA / AVV — Accordo sul Trattamento dei Dati Personali), ki ustreza zahtevam čl. 28(3) GDPR.",
+      "body": "Lead Machine Contributors vzdržuje predlogo DPA, ki vključuje Standardne pogodbene klavzule Evropske komisije (Modul 2: Upravljavec–Obdelovalec, Odločba 2021/914/EU in kasnejše spremembe), vključno z Prilogo o Tehničnih in Organizacijskih ukrepih (TOMs / Misure Tecniche e Organizzative).\n\nTa DPA je predvsem relevantno za Uporabnike, ki izvajajo skupnostne ali samostojno gostovane prilagojene namestitve, ali potrebujejo podpisani DPA zaradi notranjih skladnostnih razlogov.\n\nČe želite dobiti podpisano kopijo, prosimo, da pošljete e-pošto na axsen_kurtoski@financier.com z zadevo «Zahteva DPA» in vključite:\n— Polno pravno ime, naslov, davčno številko in registrirano e-pošto Upravljavca;\n— Opis obdelave, ki se bo izvedla (katere storitve, kategorije prizadetih oseb, kategorije podatkov, trajanje).\n\nVrnili bomo podpisano PDF DPA v 7 delovnih dneh."
+    },
+    "security": {
+      "title": "Varnostna politika",
+      "subtitle": "Polna politika v SECURITY.md v repozitoriju. Kratek opis tukaj.",
+      "intro": "Varnostna politika Lead Machine se nahaja v SECURITY.md v glavnem repozitoriju in se vzdržuje skupaj s kodo. Ta stran je berljiv povzetek za obiskovalce spletne strani. Kanonična različica je Markdown datoteka na GitHub."
+    }
+  },
+  "cta": {
+    "title": "Pripravljen na svoj prodajni lijak?",
+    "subtitle": "Namestite Lead Machine na prenosnik s 3 ukazi — ali gostite sami kjer koli. Zastonj za vedno, brez registracije, brez kartice.",
+    "primary": "Namesti zdaj — Brezplačno",
+    "secondary": "Zvezdica na GitHubu",
+    "demo": "Preizkusite živo predstavitev"
+  },
+  "forms": {
+    "name": "Ime",
+    "email": "E-pošta",
+    "company": "Podjetje (neobvezno)",
+    "message": "Sporočilo",
+    "send": "Pošlji",
+    "sending": "Pošiljanje…",
+    "successTitle": "Sporočilo poslano",
+    "successDesc": "Hvala — običajno odgovorimo v 24 urah.",
+    "errorTitle": "Ni mogoče poslati",
+    "errorDesc": "Preverite polja in poskusite znova.",
+    "demo-request": {
+      "title": "Zahtevaj demo",
+      "subtitle": "Oglejte si Lead Machine v živo: iskanje, ocenjevanje, stik — v manj kot 3 minutah.",
+      "cta": "Zahtevaj demo"
+    },
+    "partnership": {
+      "title": "Partnerstva",
+      "subtitle": "Skupaj razvijajmo ekosistem. Agencije, integratorji, preprodajalci — pišite nam.",
+      "cta": "Pošlji predlog"
+    },
+    "report-issue": {
+      "title": "Prijavi težavo",
+      "subtitle": "Ste našli napako? Opišite jo in jo bomo hitro odpravili. Vključite OS in brskalnik.",
+      "cta": "Pošlji prijavo"
+    },
+    "waitlist": {
+      "title": "Pridruži se čakalni listi",
+      "subtitle": "Bodite prvi za gostovano različico, prilagojene namestitve in zgodnje funkcije.",
+      "cta": "Pridruži se listi"
+    }
+  },
+  "resources": {
+    "docs": {
+      "title": "Dokumentacija",
+      "subtitle": "Vse, kar potrebujete za namestitev, nastavitev in obvladovanje Lead Machine.",
+      "body": "Vodniki po korakih za lokalno namestitev, namestitev na VPS, BYOK ključe, AI ponudnike (Gemini in Groq), SMTP in ponudbeni tok. Celotna dokumentacija je v mapi /docs repozitorija in v README."
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Zgodbe, vodniki in terenske opombe ekipe Lead Machine.",
+      "body": "Članki o pridobivanju strank za samostojne podjetnike, CRM tokovih, nasvetih za lastno gostovanje in odprtokodni filozofiji. Novi prispevki so objavljeni na GitHub Discussions."
+    },
+    "changelog": {
+      "title": "Dnevnik sprememb",
+      "subtitle": "Vsaka izdaja, vsak popravek, vsaka nova funkcija — v kronološkem vrstnem redu.",
+      "body": "Sledimo semantičnemu različkomanju. Izdaje so objavljene na GitHub Releases s podrobnimi opombami, koraki migracije in opozorili o spremembah, ki rušijo združljivost."
+    },
+    "roadmap": {
+      "title": "Načrt",
+      "subtitle": "Kam gre Lead Machine naprej.",
+      "body": "Načrt je javen in ga vodi skupnost. Glasujte za ideje in predlagajte funkcije na GitHub Discussions — gradimo tisto, kar uporabniki res potrebujejo."
+    },
+    "contributors": {
+      "title": "Sodelavci",
+      "subtitle": "Ljudje, ki omogočajo Lead Machine.",
+      "body": "Lead Machine gradijo prostovoljci: razvijalci, oblikovalci, prevajalci in uporabniki, ki delijo povratne informacije. Vsak prispevek je dobrodošel — od popravkov dokumentacije do novih funkcij."
+    },
+    "status": {
+      "title": "Stanje",
+      "subtitle": "Stanje vseh storitev Lead Machine v realnem času.",
+      "body": "Lead Machine je odprtokodni projekt: ni oblačnih strežnikov, ki bi lahko padli. Spletno mesto, repozitorij in skupnostni kanali jih vzdržujejo prostovoljci. Izpade prijavite na GitHubu."
+    },
+    "about": {
+      "title": "O projektu",
+      "subtitle": "Zakaj obstaja Lead Machine.",
+      "body": "Smo samostojni podjetniki, naveličani plačevanja orodij, ki naše podatke zapirajo v oblak. Lead Machine je naš odgovor: profesionalni sklop za pridobivanje strank, brezplačen, zaseben in odprt. Razvit javno, vsak dan ga uporabljajo njegovi vzdrževalci."
+    }
+  },
+  "demo": {
+    "title": "Živa predstavitev — Preizkusite Lead Machine v brskalniku",
+    "subtitle": "Poiščite prava podjetja na OpenStreetMap, ocenite stike in ustvarite AI nagovore — tukaj, s svojimi API ključi. Nič se ne shranjuje na nobenem strežniku.",
+    "search": {
+      "title": "1 · Najdi stike",
+      "categoryLabel": "Kategorija podjetja",
+      "categoryPlaceholder": "npr. vodovodar, pekarna, zobozdravnik…",
+      "cityLabel": "Mesto",
+      "cityPlaceholder": "npr. Milano",
+      "radiusLabel": "Polmer",
+      "search": "Išči",
+      "searching": "Iskanje…",
+      "results": "najdenih stikov",
+      "noResults": "Ni najdenih podjetij. Poskusite drugo kategorijo ali mesto.",
+      "error": "Iskanje ni uspelo. Preverite povezavo in poskusite znova.",
+      "score": "Ocena",
+      "distance": "stran",
+      "sortLabel": "Razvrsti po",
+      "bestScore": "Najboljši rezultat",
+      "nearest": "Najbližji",
+      "exportCsv": "Izvozi CSV",
+      "exported": "Lead-i izvoženi"
+    },
+    "lead": {
+      "email": "E-pošta",
+      "phone": "Telefon",
+      "website": "Spletna stran",
+      "hours": "Delovni čas",
+      "address": "Naslov"
+    },
+    "ai": {
+      "title": "2 · AI nagovor (neobvezno)",
+      "desc": "Ustvarite hladno e-pošto ali skript za klic za poljuben stik. Uporabite svoj Gemini ali Groq ključ — šifriran v VAŠEM brskalniku, nikoli nam ne poslan. Ali uporabite svoje brezplačne kredite.",
+      "geminiKey": "Gemini API ključ",
+      "groqKey": "Groq API ključ",
+      "saveKeys": "Shrani ključe (šifrirane)",
+      "keysSaved": "Ključi shranjeni šifrirani v vašem brskalniku",
+      "eraseKeys": "Izbriši ključe",
+      "keysErased": "Ključi izbrisani",
+      "keysNeverLeave": "Vaši ključi nikoli ne zapustijo tega brskalnika — AES-256-GCM + PBKDF2.",
+      "genEmail": "Ustvari osnutek e-pošte",
+      "genScript": "Ustvari skript za klic",
+      "generating": "Ustvarjanje…",
+      "selectLead": "Najprej izberite stik",
+      "copy": "Kopiraj",
+      "creditError": "Ni konfiguriranega ključa in brezplačni krediti niso na voljo."
+    },
+    "credits": {
+      "left": "na voljo še {count} brezplačnih AI kreditov",
+      "byokPrompt": "Krediti porabljeni. Zgoraj dodajte svoj Gemini ali Groq ključ — neomejeno, za vedno brezplačno."
+    },
+    "trust": {
+      "title": "Vaše zaupanje, naša arhitektura",
+      "body": "Ta predstavitev v celoti deluje v vašem brskalniku. Ključi so šifrirani na strani odjemalca z AES-256-GCM (PBKDF2, 100 tisoč ponovitev) in shranjeni samo v vašem localStorage. Nam ne zaupate? Prenesite celotno aplikacijo in jo zaženite na svojem računalniku.",
+      "selfHost": "Lastno gostovanje z GitHub",
+      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+    }
+  },
+  "showcase": {
+    "title": "Oglejte si ga v akciji — zdaj",
+    "subtitle": "Prava podjetja iz OpenStreetMapa. Pravi rezultati. Pravo AI nagovarjanje z vašimi ključi. Brez registracije, brez namestitve.",
+    "cta": "Odpri živo predstavitev",
+    "credits": "10 brezplačnih AI kreditov",
+    "playVideo": "Oglej demo",
+    "unmuteVideo": "Vklopi zvok",
+    "muteVideo": "Utišaj zvok"
+  },
+  "footer": {
+    "product": "Izdelek",
+    "resources": "Viri",
+    "legal": "Pravno"
+  }
 }

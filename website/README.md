@@ -259,7 +259,7 @@ Yes — see [Translations](#-translations).
 
 ---
 
-### 👨‍💻 A DevDuos Creation
+### 👨‍💻 An Axsen-Studio Creation
 This project is the result of a powerful collaboration:
 - **Vision & Idea by:** Axsen Kurtoski (teenager developer & visionary)
 - **Built by:** Artificial Intelligence (OpenCode / Antigravity)

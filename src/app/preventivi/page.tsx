@@ -19,6 +19,9 @@ import {
   type QuoteItem,
 } from "@/lib/quotes";
 import { FileText, Plus, Trash2, ExternalLink, Loader2, Sparkles, Copy, Download } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/components/ui/use-toast";
+import { useLocale } from "@/components/locale-provider";
 
 type LeadLite = { id: string; name: string };
 type QuoteRow = {
@@ -74,6 +77,7 @@ function ValidityBadge({ q }: { q: QuoteRow }) {
 }
 
 export default function PreventiviPage() {
+  const { t } = useLocale();
   const [leads, setLeads] = React.useState<LeadLite[]>([]);
   const [quotes, setQuotes] = React.useState<QuoteRow[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -92,6 +96,8 @@ export default function PreventiviPage() {
   const [deliveryTime, setDeliveryTime] = React.useState("");
   const [notes, setNotes] = React.useState("");
   const [validUntil, setValidUntil] = React.useState(addDaysIso(30));
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+
 
   const loadAll = React.useCallback(async () => {
     setLoading(true);
@@ -225,10 +231,37 @@ export default function PreventiviPage() {
     if (data.quote) window.location.href = "/preventivo/" + data.quote.id;
   }
 
-  async function remove(id: string) {
-    if (!confirm("Eliminare questo preventivo?")) return;
+  async function confirmRemoveQuote() {
+    if (!deleteId) return;
+    const id = deleteId;
     setQuotes((prev) => prev.filter((q) => q.id !== id));
-    await fetch("/api/quotes/" + id, { method: "DELETE" });
+    try {
+      const res = await fetch("/api/quotes/" + id, { method: "DELETE" });
+      const data = await res.json();
+      if (data.ok) {
+        toast({
+          title: t("toast.quoteDeletedTitle"),
+          description: t("toast.quoteDeletedDesc"),
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: t("toast.errorTitle"),
+          description: data.error || t("toast.deleteFailedDesc"),
+          variant: "destructive",
+        });
+        loadAll();
+      }
+    } catch {
+      toast({
+        title: t("toast.networkTitle"),
+        description: t("toast.networkDesc"),
+        variant: "destructive",
+      });
+      loadAll();
+    } finally {
+      setDeleteId(null);
+    }
   }
 
   return (
@@ -482,7 +515,7 @@ export default function PreventiviPage() {
                   <Button variant="outline" size="sm" onClick={() => duplicate(q)}>
                     <Copy className="mr-1 h-4 w-4" /> Duplica
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => remove(q.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => setDeleteId(q.id)}>
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </CardContent>
@@ -491,6 +524,17 @@ export default function PreventiviPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title={t("confirm.quoteTitle")}
+        description={t("confirm.quoteDesc")}
+        confirmText={t("confirm.quoteAction")}
+        cancelText={t("confirm.cancel")}
+        variant="destructive"
+        onConfirm={confirmRemoveQuote}
+      />
     </div>
   );
 }

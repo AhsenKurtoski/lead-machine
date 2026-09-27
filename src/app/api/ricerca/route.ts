@@ -5,6 +5,7 @@ import { runAiFinderSearch } from "@/lib/ai-finder";
 import { getCategoryById } from "@/lib/categories";
 import { scoreCandidate } from "@/lib/scoring";
 import { rateLimitedResponse, asString, asInt, asBoolean, asArray } from "@/lib/security";
+import { withTimeout } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -46,28 +47,42 @@ export async function POST(req: Request) {
 
   type Center = { lat: number; lng: number; city?: string };
   const rawCenters = asArray(body.centers) || [];
-  const centers: Center[] = (rawCenters as unknown[])
-    .map((c: unknown) => {
-      if (c && typeof c === "object") {
-        const cc = c as Record<string, unknown>;
-        const cLat = Number(cc.lat);
-        const cLng = Number(cc.lng);
-        if (Number.isFinite(cLat) && Number.isFinite(cLng)) {
-          return { lat: cLat, lng: cLng, city: typeof cc.city === "string" ? cc.city : undefined };
-        }
+  const centers: Center[] = [];
+  for (const c of rawCenters as unknown[]) {
+    if (c && typeof c === "object") {
+      const cc = c as Record<string, unknown>;
+      const cLat = Number(cc.lat);
+      const cLng = Number(cc.lng);
+      if (Number.isFinite(cLat) && Number.isFinite(cLng)) {
+        centers.push({ lat: cLat, lng: cLng, city: typeof cc.city === "string" ? cc.city : undefined });
       }
-      return null;
-    })
-    .filter((c): c is Center => c !== null);
+    }
+  }
   if (centers.length === 0) centers.push({ lat, lng, city: cityName });
 
   const warnings: string[] = [];
 
+  // Budget globale di tempo: i mirror Overpass e i provider AI possono essere
+  // lenti o irraggiungibili. Smettiamo di interrogare nuove fonti quando il tempo
+  // e scaduto, cosi la ricerca risponde comunque con quello che e' riuscito a trovare.
+  const START = Date.now();
+  const BUDGET_MS = 100_000;
+  const remaining = () => BUDGET_MS - (Date.now() - START);
+  const budgetLeft = () => Math.min(Math.max(remaining() - 5_000, 5_000), 60_000);
+
   let osm: OsmCandidate[] = [];
   let osmOk = false;
   for (const center of centers) {
+    if (remaining() <= 0) {
+      warnings.push("Tempo di ricerca esaurito: alcune zone non sono state interrogate.");
+      break;
+    }
     try {
-      const part = await runOverpassSearch(categories, center.lat, center.lng, radius, contactEmail);
+      const part = await withTimeout(
+        runOverpassSearch(categories, center.lat, center.lng, radius, contactEmail),
+        budgetLeft(),
+        "OpenStreetMap"
+      );
       osm = osm.concat(part);
       osmOk = true;
     } catch (err) {
@@ -79,8 +94,16 @@ export async function POST(req: Request) {
   let geo: OsmCandidate[] = [];
   if (geoEnabled) {
     for (const center of centers) {
+      if (remaining() <= 0) {
+        warnings.push("Tempo di ricerca esaurito: Geoapify non e' stato interrogato.");
+        break;
+      }
       try {
-        const part = await runGeoapifySearch(categories, center.lat, center.lng, radius);
+        const part = await withTimeout(
+          runGeoapifySearch(categories, center.lat, center.lng, radius),
+          budgetLeft(),
+          "Geoapify"
+        );
         geo = geo.concat(part);
       } catch (err) {
         warnings.push("Geoapify (" + (center.city ?? "zona") + "): " + (err instanceof Error ? err.message : "errore"));
@@ -90,13 +113,17 @@ export async function POST(req: Request) {
 
   let ai: OsmCandidate[] = [];
   let aiUsed = false;
-  if (useAi) {
+  if (useAi && remaining() > 0) {
     try {
       const labels = categories
         .map((id) => getCategoryById(id)?.label)
         .filter((l): l is string => Boolean(l));
       const aiCity = centers.length > 1 ? "provincia di Belluno" : (centers[0].city ?? cityName);
-      const res = await runAiFinderSearch(labels, centers[0].lat, centers[0].lng, radius, aiCity);
+      const res = await withTimeout(
+        runAiFinderSearch(labels, centers[0].lat, centers[0].lng, radius, aiCity),
+        budgetLeft(),
+        "AI"
+      );
       ai = res.candidates;
       aiUsed = res.used;
     } catch (err) {

@@ -488,9 +488,139 @@ The rate limiter is **in-memory** (per Node.js process). If you scale horizontal
 
 ---
 
+## 20. Public API for external projects (`/api/v1/*`)
+
+This is the **authenticated, CORS-enabled** surface designed to let other
+applications (website builders, scripts, automations, AI agents) read and write
+Lead Machine data over HTTP.
+
+### 20.1 Creating a key
+
+Go to **Impostazioni → API Key & Integrazioni esterne** in the web UI, or call:
+
+```
+POST /api/keys          { "name": "My Website Builder" }
+→ { ok: true, apiKey: { id, name, keyPrefix, permissions, enabled, createdAt }, rawKey: "lm_live_…" }
+```
+
+`rawKey` is returned **only once**. Only its SHA-256 hash is stored in the database.
+
+| Admin endpoint | Method | Purpose |
+|---|---|---|
+| `/api/keys` | `GET` | List keys (prefix, status, created, last used — never the secret) |
+| `/api/keys` | `POST` | Create a new key |
+| `/api/keys/{id}` | `PATCH` | Enable / suspend a key (`{ "enabled": false }`) |
+| `/api/keys/{id}` | `DELETE` | Revoke permanently |
+
+### 20.2 Authentication
+
+Send the key with either header:
+
+```
+x-api-key: lm_live_…
+Authorization: Bearer lm_live_…
+```
+
+| Status | Meaning |
+|---|---|
+| `401` | Missing, malformed, unknown or revoked key |
+| `403` | Key exists but is suspended |
+
+Every successful call updates `lastUsedAt` on the key record.
+
+### 20.3 CORS
+
+All `/api/v1/*` routes answer preflight `OPTIONS` requests and send:
+
+```
+Access-Control-Allow-Origin:  *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization, x-api-key
+```
+
+So they can be called straight from a browser on another domain or port.
+
+### 20.4 Endpoints
+
+#### `GET /api/v1/leads` — read saved leads
+
+| Query param | Type | Notes |
+|---|---|---|
+| `city` | string | Substring match on the city |
+| `category` | string | Exact category id (`ristorante`, `panificio`, …) |
+| `status` | string | `NUOVO` / `CONTATTATO` / `IN_TRATTATIVA` / `CLIENTE` / `SCARTATO` |
+| `hasWebsite` | `true` \| `false` | Filter by web presence |
+| `onlyNoWeb` | `1` | Same as `hasWebsite=false` |
+| `minScore` | number | Minimum priority score (0–100) |
+| `limit` | number | 1–500, default 100 |
+| `offset` | number | default 0 |
+
+```bash
+curl -H "x-api-key: lm_live_…" \
+  "http://localhost:3000/api/v1/leads?hasWebsite=false&city=Feltre&limit=25"
+```
+
+#### `GET /api/v1/leads/{id}` — single lead
+
+Returns the full record plus the last 20 activities and all quotes.
+
+#### `POST /api/v1/leads` — create a lead
+
+```json
+{ "name": "Osteria Da Mario", "city": "Feltre", "category": "ristorante", "phone": "+39 333 1234567" }
+```
+
+`name` is the only required field. Returns `201` with the created lead.
+
+#### `POST /api/v1/search` — live territory search
+
+Runs the real OpenStreetMap / Overpass search (plus Geoapify when a key is
+configured in Impostazioni). No fake or simulated data is ever returned.
+
+| Field | Type | Default |
+|---|---|---|
+| `categories` | `string[]` | all categories |
+| `lat` / `lng` | number | from `.env` (`NEXT_PUBLIC_SEARCH_LAT` / `_LNG`) |
+| `radius` | number (m) | `5000` |
+| `searchCity` | string | `Feltre` |
+| `timeoutMs` | number | `45000` (clamped 5000–100000) |
+
+```json
+{
+  "ok": true,
+  "count": 42,
+  "area": { "city": "Feltre", "lat": 46.0172, "lng": 11.9069, "radiusM": 5000 },
+  "timedOut": false,
+  "warnings": [],
+  "leads": [ { "osmId": "node/123", "name": "…", "priorityScore": 82, "priorityReason": "…" } ]
+}
+```
+
+If the free Overpass mirrors are slow or unreachable, the call still returns
+`200` with `timedOut: true` and a human-readable entry in `warnings` instead of
+hanging.
+
+#### `POST /api/v1/demo/generate` — AI website for a lead
+
+```json
+{ "leadId": "clx…", "force": false, "prompt": "Sottotitolo in dialetto" }
+```
+
+Returns `{ ok, provider, html, length }`. With `force: false` an already
+generated site is returned from cache (`cached: true`).
+
+Requires an AI key (Gemini or Groq) in Impostazioni. The client automatically
+falls back to alternative models if the configured one has been retired by the
+provider.
+
+---
+
 ## 19. CORS & same-origin
 
-All routes are same-origin by default (`next.config.mjs` has no special CORS headers). If you're embedding widgets or calling from a second origin, add a middleware or proxy layer.
+Internal `/api/*` routes are same-origin by default (`next.config.mjs` has no
+special CORS headers). If you need to expose one of them to a second origin,
+put an authenticating reverse proxy in front. The `/api/v1/*` routes documented
+above are already authenticated **and** CORS-enabled out of the box.
 
 ---
 

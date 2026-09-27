@@ -1,6 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "@/components/ui/use-toast";
+import { useLocale } from "@/components/locale-provider";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +38,7 @@ type Template = {
 const EMPTY = { id: "", name: "", channel: "whatsapp", subject: "", body: "", isDefault: false };
 
 export default function MessaggiPage() {
+  const { t } = useLocale();
   const [templates, setTemplates] = React.useState<Template[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [form, setForm] = React.useState({ ...EMPTY });
@@ -44,6 +49,9 @@ export default function MessaggiPage() {
   const [bulkSending, setBulkSending] = React.useState(false);
   const [bulkResult, setBulkResult] = React.useState<string | null>(null);
   const [onlyNew, setOnlyNew] = React.useState(true);
+  const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [bulkConfirmOpen, setBulkConfirmOpen] = React.useState(false);
+
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -122,27 +130,43 @@ export default function MessaggiPage() {
     load();
   }
 
-  async function del(id: string) {
-    if (!confirm("Eliminare questo template?")) return;
-    await fetch("/api/templates/" + id, { method: "DELETE" });
-    load();
+  async function confirmDeleteTemplate() {
+    if (!deleteId) return;
+    try {
+      const res = await fetch("/api/templates/" + deleteId, { method: "DELETE" });
+      const data = await res.json();
+      if (data.ok) {
+        toast({
+          title: t("toast.templateDeletedTitle"),
+          description: t("toast.templateDeletedDesc"),
+          variant: "success",
+        });
+        load();
+      } else {
+        toast({
+          title: t("toast.errorTitle"),
+          description: data.error || t("toast.deleteFailedDesc"),
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: t("toast.networkTitle"),
+        description: t("toast.networkDesc"),
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteId(null);
+    }
   }
 
   function insertVar(v: string) {
     setForm((f) => ({ ...f, body: f.body + " " + v }));
   }
 
-  async function sendBulk() {
+  async function executeBulkSend() {
     const count = bulkPreview?.total ?? 0;
     if (count === 0) return;
-    if (
-      !confirm(
-        "Inviare l'email automatica a " +
-          count +
-          " lead? A chi ha gia un sito verra proposto un restyling a pochi euro, a chi non ce l'ha la creazione di un nuovo sito.",
-      )
-    )
-      return;
     setBulkSending(true);
     setBulkResult(null);
     try {
@@ -164,9 +188,20 @@ export default function MessaggiPage() {
       if (data.failed) msg += " Non riuscite: " + data.failed + ".";
       if (data.remaining) msg += " Rimangono " + data.remaining + " lead (rilancia per continuare).";
       setBulkResult(msg);
+      toast({
+        title: t("toast.bulkSentTitle"),
+        description: msg,
+        variant: "success",
+      });
       loadBulkPreview();
     } catch (e) {
-      setBulkResult(e instanceof Error ? e.message : "Errore durante l'invio massivo");
+      const errText = e instanceof Error ? e.message : "Errore durante l'invio massivo";
+      setBulkResult(errText);
+      toast({
+        title: t("toast.bulkErrorTitle"),
+        description: errText,
+        variant: "destructive",
+      });
     } finally {
       setBulkSending(false);
     }
@@ -225,7 +260,7 @@ export default function MessaggiPage() {
             Invia solo ai lead mai contattati via email
           </label>
           <div className="flex flex-wrap items-center gap-3">
-            <Button onClick={sendBulk} disabled={bulkSending || (bulkPreview?.total ?? 0) === 0}>
+            <Button onClick={() => setBulkConfirmOpen(true)} disabled={bulkSending || (bulkPreview?.total ?? 0) === 0}>
               {bulkSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Invia ora a {bulkPreview?.total ?? 0} lead
             </Button>
@@ -363,7 +398,7 @@ export default function MessaggiPage() {
                   <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => startEdit(t)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => del(t.id)}>
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(t.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -378,6 +413,28 @@ export default function MessaggiPage() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title={t("confirm.templateTitle")}
+        description={t("confirm.templateDesc")}
+        confirmText={t("confirm.templateAction")}
+        cancelText={t("confirm.cancel")}
+        variant="destructive"
+        onConfirm={confirmDeleteTemplate}
+      />
+
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        onOpenChange={setBulkConfirmOpen}
+        title={t("confirm.bulkEmailTitle")}
+        description={t("confirm.bulkEmailDesc", { n: bulkPreview?.total ?? 0 })}
+        confirmText={t("confirm.bulkEmailAction", { n: bulkPreview?.total ?? 0 })}
+        cancelText={t("confirm.cancel")}
+        variant="default"
+        onConfirm={executeBulkSend}
+      />
     </div>
   );
 }

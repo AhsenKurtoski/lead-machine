@@ -236,3 +236,20 @@ model EmailLog {
   @@index([status])
   @@index([sentAt])
 }
+
+// --- Chiavi API per integrazioni esterne (es. website builder, script, automazioni) ---
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String    // es. "Website Builder", "Integrazione Esterna"
+  keyHash     String    @unique // hash SHA-256 della chiave completa
+  keyPrefix   String    // es. "lm_live_ab1234..." (primi caratteri visibili)
+  permissions String    @default("read,write") // "read", "read,write", "admin"
+  enabled     Boolean   @default(true)
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([keyHash])
+  @@index([enabled])
+}
+
