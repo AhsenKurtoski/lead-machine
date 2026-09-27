@@ -81,6 +81,7 @@ next-env.d.ts
 /.kilo
 
 /test-key.txt
+/commit-msg.txt
 /temp_*.json
 /audit-*.png
 

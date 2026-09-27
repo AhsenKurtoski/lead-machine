@@ -7,6 +7,7 @@ export const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, x-api-key",
 };
+export const corsHeaders = CORS_HEADERS;
 
 export function hashApiKey(key: string): string {
   return createHash("sha256").update(key.trim()).digest("hex");
@@ -19,6 +20,10 @@ export function generateRawApiKey(): { rawKey: string; keyPrefix: string; keyHas
   const keyPrefix = rawKey.slice(0, 16) + "...";
   const keyHash = hashApiKey(rawKey);
   return { rawKey, keyPrefix, keyHash };
+}
+
+export function generateApiKey(_name?: string): { rawKey: string; keyPrefix: string; keyHash: string } {
+  return generateRawApiKey();
 }
 
 // Applica un budget di tempo massimo a una promise: se scade, si rifiuta
