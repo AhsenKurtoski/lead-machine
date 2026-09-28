@@ -57,10 +57,13 @@ Everything is built-in — no plugins to buy:
 ### 🔌 Public API for external projects (`/api/v1/*`)
 - Generate an **API key** from *Impostazioni → API Key & Integrazioni esterne* and connect Lead Machine to a website builder, a script or any other tool.
 - Keys are stored **hashed (SHA-256)**; the secret is shown exactly once. Each key can be suspended or revoked with one click.
+- **Four access profiles** — full integration, business search, read only, insert only — plus a custom combination. Permissions are *really enforced* on every call: a key without the `search` permission gets a `403` with `requiredScope` in the body, it is not a decorative label.
 - Authenticate with `x-api-key: lm_live_…` or `Authorization: Bearer lm_live_…`. `CORS` is enabled, so it works from any browser domain or port.
 - Endpoints: `GET /api/v1/leads` (filter by city, category, website presence, score), `GET /api/v1/leads/{id}`, `POST /api/v1/leads` (create), `POST /api/v1/search` (live OpenStreetMap search), `POST /api/v1/demo/generate` (AI website for a lead).
 - Requests are never left hanging: every source has a time budget and the response carries a `warnings` array explaining what was unavailable.
+- Rate limits are counted **per key** (not per IP), so several projects never block each other, and return `429` with `Retry-After`.
 - Full reference: [API.md](./API.md#20-public-api-for-external-projects-api-v1).
+- End-to-end check: `npm run smoke:api` (31 assertions covering profiles, scopes, auth, CORS and 404s).
 
 ### 📞 Multi-channel CRM
 - Unified timeline with **calls, emails, WhatsApp, meetings, research notes, follow-ups**.

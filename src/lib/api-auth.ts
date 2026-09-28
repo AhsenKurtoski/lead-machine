@@ -45,8 +45,76 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): 
   });
 }
 
+// ============================================================
+// Scope (permessi) delle API key.
+// Ogni endpoint /api/v1/* richiede uno scope preciso: il permesso
+// dichiarato sulla chiave viene APPLICATO davvero, non solo salvato.
+// ============================================================
+
+export const API_SCOPES = ["read", "write", "search", "ai"] as const;
+export type ApiScope = (typeof API_SCOPES)[number];
+
+// Profili professionali predefiniti (usati anche dalla UI).
+export const SCOPE_PRESETS: { id: string; scopes: ApiScope[]; all?: boolean }[] = [
+  { id: "full", scopes: ["read", "write", "search", "ai"], all: true },
+  { id: "search", scopes: ["read", "search"] },
+  { id: "readonly", scopes: ["read"] },
+  { id: "writeonly", scopes: ["write"] },
+];
+
+// Normalizza una stringa di permessi in un elenco di scope validi.
+// Accetta anche "*" e "admin" come sinonimi di accesso completo.
+export function parseScopes(permissions: string | null | undefined): ApiScope[] {
+  const raw = (permissions ?? "").toLowerCase().trim();
+  if (!raw) return ["read"];
+  if (raw === "*" || raw === "all" || raw === "admin") return [...API_SCOPES];
+  const set = new Set<ApiScope>();
+  for (const part of raw.split(",")) {
+    const p = part.trim();
+    if ((API_SCOPES as readonly string[]).includes(p)) set.add(p as ApiScope);
+    // Compatibilita' con le chiavi storiche "read,write"
+    if (p === "*") API_SCOPES.forEach((s) => set.add(s));
+  }
+  return Array.from(set);
+}
+
+// Serializza per il salvataggio: ordine stabile e nessun duplicato.
+export function serializeScopes(scopes: ApiScope[]): string {
+  return API_SCOPES.filter((s) => scopes.includes(s)).join(",");
+}
+
+// Restituisce una risposta 403 se la chiave non ha lo scope richiesto.
+export function requireScope(
+  scopes: ApiScope[],
+  needed: ApiScope
+): { ok: true } | { ok: false; response: Response } {
+  if (scopes.includes(needed)) return { ok: true };
+  const response = new NextResponse(
+    JSON.stringify({
+      ok: false,
+      error:
+        "Questa API Key non ha il permesso '" +
+        needed +
+        "'. Permessi attuali: [" +
+        (scopes.length ? scopes.join(", ") : "nessuno") +
+        "]. Genera una chiave con il profilo adatto in Impostazioni > API Key.",
+      requiredScope: needed,
+      currentScopes: scopes,
+    }),
+    {
+      status: 403,
+      headers: {
+        ...CORS_HEADERS,
+        "Content-Type": "application/json",
+        "X-Required-Scope": needed,
+      },
+    }
+  );
+  return { ok: false, response };
+}
+
 export type AuthResult =
-  | { ok: true; apiKey: { id: string; name: string; permissions: string } }
+  | { ok: true; apiKey: { id: string; name: string; permissions: string; scopes: ApiScope[] } }
   | { ok: false; error: string; status: number };
 
 export async function validateApiKey(req: Request): Promise<AuthResult> {
@@ -102,6 +170,7 @@ export async function validateApiKey(req: Request): Promise<AuthResult> {
       id: apiKey.id,
       name: apiKey.name,
       permissions: apiKey.permissions,
+      scopes: parseScopes(apiKey.permissions),
     },
   };
 }

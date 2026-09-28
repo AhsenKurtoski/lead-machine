@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateRawApiKey } from "@/lib/api-auth";
+import { generateRawApiKey, parseScopes, serializeScopes } from "@/lib/api-auth";
 import { asString, rateLimitedResponse } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +35,16 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const name = asString(body.name, 100)?.trim() || "Nuova Integrazione";
-    const permissions = asString(body.permissions, 50)?.trim() || "read,write";
+    // Gli scope vengono validati: valori sconosciuti sono ignorati.
+    // Profilo predefinito = accesso completo (nessuna restrizione a sorpresa).
+    const requested = asString(body.permissions, 100)?.trim();
+    const scopes = requested ? parseScopes(requested) : parseScopes("*");
+    if (scopes.length === 0) {
+      return NextResponse.json(
+        { ok: false, error: "Nessun permesso valido richiesto. Valori ammessi: read, write, search, ai." },
+        { status: 400 }
+      );
+    }
 
     const { rawKey, keyPrefix, keyHash } = generateRawApiKey();
 
@@ -44,7 +53,7 @@ export async function POST(req: Request) {
         name,
         keyHash,
         keyPrefix,
-        permissions,
+        permissions: serializeScopes(scopes),
         enabled: true,
       },
       select: {

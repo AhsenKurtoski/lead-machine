@@ -21,6 +21,7 @@ import {
   Trash2,
   Power,
   Code2,
+  ShieldCheck,
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -83,6 +84,36 @@ type ApiKeyRow = {
   lastUsedAt: string | null;
   createdAt: string;
 };
+
+// Profili di accesso professionali: ogni profilo mappa su scope reali
+// applicati lato server (read, write, search, ai).
+const KEY_PRESETS = [
+  { id: "full", scopes: ["read", "write", "search", "ai"] },
+  { id: "search", scopes: ["read", "search"] },
+  { id: "readonly", scopes: ["read"] },
+  { id: "writeonly", scopes: ["write"] },
+] as const;
+
+const ALL_SCOPES = ["read", "write", "search", "ai"] as const;
+
+const SCOPE_LABEL_KEY: Record<string, string> = {
+  read: "api.scopeRead",
+  write: "api.scopeWrite",
+  search: "api.scopeSearch",
+  ai: "api.scopeAi",
+};
+
+function parseScopesList(permissions: string | null | undefined): string[] {
+  const raw = (permissions ?? "").toLowerCase();
+  if (raw === "*" || raw === "all" || raw === "admin") return [...ALL_SCOPES];
+  return ALL_SCOPES.filter((s) => raw.split(",").map((p) => p.trim()).includes(s));
+}
+
+function presetForScopes(scopes: string[]): string {
+  const sorted = [...scopes].sort().join(",");
+  const found = KEY_PRESETS.find((p) => [...p.scopes].sort().join(",") === sorted);
+  return found ? found.id : "custom";
+}
 
 function formatDateTime(iso: string | null, t: (key: string) => string): string {
   if (!iso) return t("api.neverUsed");
@@ -169,6 +200,11 @@ export default function ImpostazioniPage() {
   const [revealedKey, setRevealedKey] = React.useState<string | null>(null);
   const [revokeId, setRevokeId] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [presetId, setPresetId] = React.useState<string>("full");
+  const [customScopes, setCustomScopes] = React.useState<string[]>(["read", "write", "search", "ai"]);
+  const [editingScopesId, setEditingScopesId] = React.useState<string | null>(null);
+  const [editScopes, setEditScopes] = React.useState<string[]>([]);
+  const [savingScopes, setSavingScopes] = React.useState(false);
 
   const loadKeys = React.useCallback(async () => {
     setKeysLoading(true);
@@ -193,13 +229,27 @@ export default function ImpostazioniPage() {
   }, [loadKeys]);
 
   async function createApiKey() {
+    const preset = KEY_PRESETS.find((p) => p.id === presetId);
+    const scopes = preset ? [...preset.scopes] : customScopes;
+    if (scopes.length === 0) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("api.noScopesError"),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setGeneratingKey(true);
     setRevealedKey(null);
     try {
       const res = await fetch("/api/keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newKeyName.trim() || "Integrazione esterna" }),
+        body: JSON.stringify({
+          name: newKeyName.trim() || "Integrazione esterna",
+          permissions: scopes.join(","),
+        }),
       });
       const data = await res.json();
       if (data.ok && data.rawKey) {
@@ -248,6 +298,60 @@ export default function ImpostazioniPage() {
         variant: "destructive",
       });
     }
+  }
+
+  function startEditScopes(k: ApiKeyRow) {
+    setEditingScopesId(k.id);
+    setEditScopes(parseScopesList(k.permissions));
+  }
+
+  function toggleEditScope(scope: string) {
+    setEditScopes((prev) =>
+      prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
+    );
+  }
+
+  async function saveScopes() {
+    if (!editingScopesId) return;
+    if (editScopes.length === 0) {
+      toast({
+        title: t("toast.errorTitle"),
+        description: t("api.noScopesError"),
+        variant: "destructive",
+      });
+      return;
+    }
+    setSavingScopes(true);
+    try {
+      const res = await fetch("/api/keys/" + editingScopesId, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ permissions: editScopes.join(",") }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        toast({
+          title: t("api.scopesSavedTitle"),
+          description: t("api.scopesSavedDesc"),
+          variant: "success",
+        });
+        setEditingScopesId(null);
+        loadKeys();
+      } else {
+        toast({
+          title: t("toast.errorTitle"),
+          description: data.error || t("toast.networkDesc"),
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: t("toast.networkTitle"),
+        description: t("toast.networkDesc"),
+        variant: "destructive",
+      });
+    }
+    setSavingScopes(false);
   }
 
   async function confirmRevokeKey() {
@@ -605,24 +709,98 @@ export default function ImpostazioniPage() {
           </div>
 
           {/* Generazione nuova chiave */}
-          <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-4 sm:flex-row sm:items-end">
-            <div className="flex-1 space-y-1.5">
-              <Label htmlFor="api-key-name">{t("api.keyName")}</Label>
-              <Input
-                id="api-key-name"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
-                placeholder={t("api.keyNamePlaceholder")}
-              />
+          <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div className="flex-1 space-y-1.5">
+                <Label htmlFor="api-key-name">{t("api.keyName")}</Label>
+                <Input
+                  id="api-key-name"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  placeholder={t("api.keyNamePlaceholder")}
+                />
+              </div>
+              <Button onClick={createApiKey} disabled={generatingKey}>
+                {generatingKey ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="mr-2 h-4 w-4" />
+                )}
+                {t("api.generate")}
+              </Button>
             </div>
-            <Button onClick={createApiKey} disabled={generatingKey}>
-              {generatingKey ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Plus className="mr-2 h-4 w-4" />
-              )}
-              {t("api.generate")}
-            </Button>
+
+            {/* Profilo di accesso */}
+            <div className="space-y-2 border-t pt-4">
+              <p className="text-sm font-medium">{t("api.scopeSectionTitle")}</p>
+              <p className="text-xs text-muted-foreground">{t("api.scopeSectionHint")}</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[...KEY_PRESETS, { id: "custom", scopes: [] }].map((p) => {
+                  const active = presetId === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPresetId(p.id)}
+                      aria-pressed={active}
+                      className={
+                        "rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring " +
+                        (active
+                          ? "border-primary bg-primary/10"
+                          : "border-input bg-background hover:bg-accent")
+                      }
+                    >
+                      <span className="block text-sm font-medium">
+                        {t(
+                          p.id === "full"
+                            ? "api.presetFull"
+                            : p.id === "search"
+                              ? "api.presetSearch"
+                              : p.id === "readonly"
+                                ? "api.presetReadonly"
+                                : p.id === "writeonly"
+                                  ? "api.presetWriteonly"
+                                  : "api.presetCustom"
+                        )}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {t(
+                          p.id === "full"
+                            ? "api.presetFullDesc"
+                            : p.id === "search"
+                              ? "api.presetSearchDesc"
+                              : p.id === "readonly"
+                                ? "api.presetReadonlyDesc"
+                                : p.id === "writeonly"
+                                  ? "api.presetWriteonlyDesc"
+                                  : "api.presetCustomDesc"
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {presetId === "custom" ? (
+                <div className="grid gap-2 border-t pt-3 sm:grid-cols-2">
+                  {ALL_SCOPES.map((s) => (
+                    <label key={s} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={customScopes.includes(s)}
+                        onChange={(e) =>
+                          setCustomScopes((prev) =>
+                            e.target.checked ? [...prev, s] : prev.filter((x) => x !== s)
+                          )
+                        }
+                        className="h-4 w-4 rounded border-input"
+                      />
+                      {t(SCOPE_LABEL_KEY[s])}
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           {/* Chiave appena generata */}
@@ -654,43 +832,106 @@ export default function ImpostazioniPage() {
             </p>
           ) : (
             <div className="space-y-3">
-              {apiKeys.map((k) => (
-                <div
-                  key={k.id}
-                  className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{k.name}</span>
-                      <span
-                        className={
-                          "rounded-full px-2 py-0.5 text-xs font-medium " +
-                          (k.enabled
-                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                            : "bg-zinc-500/15 text-zinc-500")
-                        }
-                      >
-                        {k.enabled ? t("api.active") : t("api.suspended")}
-                      </span>
+              {apiKeys.map((k) => {
+                const scopes = parseScopesList(k.permissions);
+                const preset = presetForScopes(scopes);
+                const presetLabel = t(
+                  preset === "full"
+                    ? "api.presetFull"
+                    : preset === "search"
+                      ? "api.presetSearch"
+                      : preset === "readonly"
+                        ? "api.presetReadonly"
+                        : preset === "writeonly"
+                          ? "api.presetWriteonly"
+                          : "api.presetCustom"
+                );
+                const isEditing = editingScopesId === k.id;
+                return (
+                  <div key={k.id} className="space-y-3 rounded-lg border p-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium">{k.name}</span>
+                          <span
+                            className={
+                              "rounded-full px-2 py-0.5 text-xs font-medium " +
+                              (k.enabled
+                                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                : "bg-zinc-500/15 text-zinc-500")
+                            }
+                          >
+                            {k.enabled ? t("api.active") : t("api.suspended")}
+                          </span>
+                          <span className="rounded-full bg-indigo-500/15 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                            {presetLabel}
+                          </span>
+                        </div>
+                        <code className="block font-mono text-xs text-muted-foreground">{k.keyPrefix}</code>
+                        <p className="text-xs text-muted-foreground">
+                          {t("api.permissionsLabel")}:{" "}
+                          {scopes.length ? scopes.map((s) => t(SCOPE_LABEL_KEY[s])).join(" · ") : "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("api.created")}: {formatDateTime(k.createdAt, t)} · {t("api.lastUsed")}:{" "}
+                          {k.lastUsedAt ? formatDateTime(k.lastUsedAt, t) : t("api.neverUsed")}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" onClick={() => startEditScopes(k)}>
+                          <ShieldCheck className="mr-2 h-4 w-4" />
+                          {t("api.editScopes")}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => toggleApiKey(k.id, !k.enabled)}>
+                          <Power className="mr-2 h-4 w-4" />
+                          {k.enabled ? t("api.suspend") : t("api.reactivate")}
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => setRevokeId(k.id)}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {t("api.revoke")}
+                        </Button>
+                      </div>
                     </div>
-                    <code className="block font-mono text-xs text-muted-foreground">{k.keyPrefix}</code>
-                    <p className="text-xs text-muted-foreground">
-                      {t("api.created")}: {formatDateTime(k.createdAt, t)} · {t("api.lastUsed")}:{" "}
-                      {k.lastUsedAt ? formatDateTime(k.lastUsedAt, t) : t("api.neverUsed")}
-                    </p>
+
+                    {isEditing ? (
+                      <div className="space-y-3 rounded-md border bg-muted/30 p-3">
+                        <p className="text-xs font-medium">{t("api.scopeSectionTitle")}</p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {ALL_SCOPES.map((s) => (
+                            <label key={s} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={editScopes.includes(s)}
+                                onChange={() => toggleEditScope(s)}
+                                className="h-4 w-4 rounded border-input"
+                              />
+                              {t(SCOPE_LABEL_KEY[s])}
+                            </label>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={saveScopes} disabled={savingScopes}>
+                            {savingScopes ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Check className="mr-2 h-4 w-4" />
+                            )}
+                            {t("api.saveScopes")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingScopesId(null)}
+                            disabled={savingScopes}
+                          >
+                            {t("confirm.cancel")}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => toggleApiKey(k.id, !k.enabled)}>
-                      <Power className="mr-2 h-4 w-4" />
-                      {k.enabled ? t("api.suspend") : t("api.reactivate")}
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => setRevokeId(k.id)}>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {t("api.revoke")}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

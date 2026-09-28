@@ -507,9 +507,9 @@ POST /api/keys          { "name": "My Website Builder" }
 
 | Admin endpoint | Method | Purpose |
 |---|---|---|
-| `/api/keys` | `GET` | List keys (prefix, status, created, last used — never the secret) |
+| `/api/keys` | `GET` | List keys (prefix, status, scopes, created, last used — never the secret) |
 | `/api/keys` | `POST` | Create a new key |
-| `/api/keys/{id}` | `PATCH` | Enable / suspend a key (`{ "enabled": false }`) |
+| `/api/keys/{id}` | `PATCH` | Suspend / reactivate (`enabled`), rename (`name`) or change scopes (`permissions`) |
 | `/api/keys/{id}` | `DELETE` | Revoke permanently |
 
 ### 20.2 Authentication
@@ -524,11 +524,80 @@ Authorization: Bearer lm_live_…
 | Status | Meaning |
 |---|---|
 | `401` | Missing, malformed, unknown or revoked key |
-| `403` | Key exists but is suspended |
+| `403` | Key exists but is suspended, **or the key lacks the required scope** |
+| `404` | The requested lead / key id does not exist |
 
 Every successful call updates `lastUsedAt` on the key record.
 
-### 20.3 CORS
+### 20.3 Scopes (per-key permissions)
+
+Each key carries a comma-separated scope list that is **really enforced on every
+call** — it is not decorative. Values: `read`, `write`, `search`, `ai`.
+
+| Endpoint | Required scope |
+|---|---|
+| `GET /api/v1/leads` | `read` |
+| `GET /api/v1/leads/{id}` | `read` |
+| `POST /api/v1/leads` | `write` |
+| `POST /api/v1/search` | `search` |
+| `POST /api/v1/demo/generate` | `ai` |
+
+If the scope is missing the API answers `403` with a machine-readable body:
+
+```json
+{
+  "ok": false,
+  "error": "Questa API Key non ha il permesso 'search'. Permessi attuali: [read]. …",
+  "requiredScope": "search",
+  "currentScopes": ["read"]
+}
+```
+
+The `X-Required-Scope` response header carries the same value.
+
+#### Ready-made profiles
+
+| Profile | `permissions` | Use case |
+|---|---|---|
+| Full integration | `read,write,search,ai` | Default for a website builder that needs everything |
+| Business search | `read,search` | Finds businesses and reads saved leads, cannot modify anything |
+| Read only | `read` | Dashboards and reporting, zero write access |
+| Insert only | `write` | A form that only creates leads |
+
+Create a key with a profile:
+
+```bash
+curl -X POST http://localhost:3000/api/keys \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Website Builder","permissions":"read,search"}'
+```
+
+Change the scopes of an existing key (takes effect immediately, no re-issue):
+
+```bash
+curl -X PATCH http://localhost:3000/api/keys/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"permissions":"read,search,ai"}'
+```
+
+`PATCH` also accepts `{"enabled": false}` to suspend a key and `{"name": "…"}` to
+rename it. Unknown scope values are rejected with `400`; the raw string is never
+stored.
+
+### 20.4 Rate limits
+
+Budgets are counted **per API key**, so several projects can share an IP without
+blocking each other. Exceeding a budget returns `429` with `Retry-After` and
+`X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Reset`.
+
+| Scope | Requests |
+|---|---|
+| `v1:leads:read` | 300 / min |
+| `v1:leads:write` | 60 / min |
+| `v1:search` | 30 / min |
+| `v1:demo:generate` | 15 / min |
+
+### 20.5 CORS
 
 All `/api/v1/*` routes answer preflight `OPTIONS` requests and send:
 
@@ -540,7 +609,7 @@ Access-Control-Allow-Headers: Content-Type, Authorization, x-api-key
 
 So they can be called straight from a browser on another domain or port.
 
-### 20.4 Endpoints
+### 20.6 Endpoints
 
 #### `GET /api/v1/leads` — read saved leads
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { validateApiKey, CORS_HEADERS, rateLimitApiKey } from "@/lib/api-auth";
+import { validateApiKey, CORS_HEADERS, rateLimitApiKey, requireScope } from "@/lib/api-auth";
 import {
   asString,
   asNumber,
@@ -22,6 +22,8 @@ export async function GET(req: Request) {
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });
   }
+  const scope = requireScope(auth.apiKey.scopes, "read");
+  if (!scope.ok) return scope.response;
   const limited = await rateLimitApiKey(auth.apiKey.id, "v1:leads:read", 300, 60_000);
   if (limited) return limited;
 
@@ -118,6 +120,8 @@ export async function POST(req: Request) {
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });
   }
+  const scope = requireScope(auth.apiKey.scopes, "write");
+  if (!scope.ok) return scope.response;
   const limited = await rateLimitApiKey(auth.apiKey.id, "v1:leads:write", 60, 60_000);
   if (limited) return limited;
 

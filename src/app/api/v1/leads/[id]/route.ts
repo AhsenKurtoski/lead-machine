@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { validateApiKey, CORS_HEADERS, rateLimitApiKey } from "@/lib/api-auth";
+import { validateApiKey, CORS_HEADERS, rateLimitApiKey, requireScope } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });
   }
+  const scope = requireScope(auth.apiKey.scopes, "read");
+  if (!scope.ok) return scope.response;
   const limited = await rateLimitApiKey(auth.apiKey.id, "v1:leads:read", 300, 60_000);
   if (limited) return limited;
 

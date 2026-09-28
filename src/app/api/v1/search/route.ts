@@ -3,7 +3,7 @@ import { runOverpassSearch, type OsmCandidate } from "@/lib/overpass";
 import { runGeoapifySearch, geoapifyEnabled } from "@/lib/geoapify";
 import { scoreCandidate } from "@/lib/scoring";
 import { getCategoryById } from "@/lib/categories";
-import { validateApiKey, CORS_HEADERS, withTimeout, rateLimitApiKey } from "@/lib/api-auth";
+import { validateApiKey, CORS_HEADERS, withTimeout, rateLimitApiKey, requireScope } from "@/lib/api-auth";
 import { asString, asInt, asArray } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +33,8 @@ export async function POST(req: Request) {
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });
   }
+  const scope = requireScope(auth.apiKey.scopes, "search");
+  if (!scope.ok) return scope.response;
   const limited = await rateLimitApiKey(auth.apiKey.id, "v1:search", 30, 60_000);
   if (limited) return limited;
 

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 import { generateDemoHtml } from "@/lib/demo-generate";
-import { validateApiKey, CORS_HEADERS, rateLimitApiKey } from "@/lib/api-auth";
+import { validateApiKey, CORS_HEADERS, rateLimitApiKey, requireScope } from "@/lib/api-auth";
 import { asString, asBoolean } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +18,8 @@ export async function POST(req: Request) {
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });
   }
+  const scope = requireScope(auth.apiKey.scopes, "ai");
+  if (!scope.ok) return scope.response;
   // La generazione AI costa quota: limitiamo stretto per evitare abusi.
   const limited = await rateLimitApiKey(auth.apiKey.id, "v1:demo:generate", 15, 60_000);
   if (limited) return limited;
