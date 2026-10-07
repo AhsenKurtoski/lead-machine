@@ -24,6 +24,26 @@
 
 ---
 
+<div align="center">
+
+![Lead Machine — demo del prodotto](docs/assets/lead-machine-demo.gif)
+
+</div>
+
+## 📸 Screenshots
+
+| Dashboard | Ricerca lead | CRM |
+|---|---|---|
+| ![Dashboard](screenshots/dashboard-desktop.png) | ![Ricerca lead](screenshots/ricerca-desktop.png) | ![CRM](screenshots/crm-desktop.png) |
+
+| Mappa | Preventivi | Impostazioni |
+|---|---|---|
+| ![Mappa](screenshots/mappa-desktop.png) | ![Preventivi](screenshots/preventivi-desktop.png) | ![Impostazioni](screenshots/impostazioni-desktop.png) |
+
+> Tutti gli screenshot sono generati dal codice reale: `npm run screenshots` (PNG desktop + mobile) e `node scripts/demo-gif.mjs` (GIF). Le versioni mobile sono in `screenshots/`.
+
+---
+
 ## Why Lead Machine?
 
 Freelancers and small web agencies waste dozens of hours per year on **subscription tools** just to find, contact, and follow up with local prospects. The typical stack costs €50–€200/mo and locks your data inside a SaaS.
@@ -310,6 +330,7 @@ lead-machine/
 ├── website/              # 🌐 Marketing website + live demo (see website/README.md)
 ├── .env.example
 ├── CONTRIBUTING.md
+├── CHANGELOG.md
 ├── SECURITY.md
 ├── CODE_OF_CONDUCT.md
 ├── API.md
