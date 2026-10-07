@@ -16,9 +16,9 @@
 [![License: MIT](https://img.shields.io/github/license/lead-machine/lead-machine?color=0969da)](./LICENSE)
 
 ---
-**👨‍💻 An Axsen-Studio Creation**
+**👨‍💻 An Ahsen-Studio Creation**
 *The perfect blend of human vision and AI execution.*
-**Idea & Vision:** Axsen Kurtoski (teenager developer & visionary)
+**Idea & Vision:** Ahsen Kurtoski (teenager developer & visionary)
 **AI Execution:** Built flawlessly by Artificial Intelligence
 </div>
 
@@ -64,6 +64,34 @@ Everything is built-in — no plugins to buy:
 - Rate limits are counted **per key** (not per IP), so several projects never block each other, and return `429` with `Retry-After`.
 - Full reference: [API.md](./API.md#20-public-api-for-external-projects-api-v1).
 - End-to-end check: `npm run smoke:api` (31 assertions covering profiles, scopes, auth, CORS and 404s).
+
+<details>
+<summary><b>🔑 How to get an API key — step by step (humans & AI agents)</b></summary>
+
+**What you need**: a running instance (`npm install && npm run setup && npm run dev`) and nothing else. AI endpoints additionally need a free provider key in `.env` (`GEMINI_API_KEY` or `GROQ_API_KEY`).
+
+1. Open **Impostazioni → API Key & Integrazioni esterne** at <http://localhost:3000/impostazioni>.
+2. Pick a profile — *full integration* (`read,write,search,ai`), *business search* (`read,search`), *read only* (`read`), *insert only* (`write`) — or a custom scope set.
+3. Name the key and click **Crea chiave**. The secret `lm_live_…` is shown **once**; only its SHA-256 hash is stored.
+4. Call the API with either header:
+
+```bash
+curl http://localhost:3000/api/v1/leads?take=1 -H "x-api-key: lm_live_…"
+# oppure: -H "Authorization: Bearer lm_live_…"
+```
+
+5. Prefer automation? Create the key from the command line:
+
+```bash
+curl -X POST http://localhost:3000/api/keys \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My AI Agent","permissions":"read,search"}'
+# → { "ok": true, "apiKey": { … }, "rawKey": "lm_live_…" }
+```
+
+Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `currentScopes` when a scope is missing, `429` with `Retry-After` on rate limits. Full contract (scopes, limits, CORS, error codes): [API.md → § 20](./API.md#20-public-api-for-external-projects-api-v1).
+
+</details>
 
 ### 📞 Multi-channel CRM
 - Unified timeline with **calls, emails, WhatsApp, meetings, research notes, follow-ups**.
@@ -132,7 +160,7 @@ See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure
 
 This repo also contains the **public marketing website** for Lead Machine in the [`website/`](./website/) folder:
 
-- Landing, Features, Pricing, BYOK & Privacy, Transparency, Deploy pages — fully translated in **7 languages** (next-intl).
+- Landing, Features, BYOK & Privacy, Transparency, Deploy pages — fully translated in **7 languages** (next-intl).
 - A **live in-browser demo** (`/demo`) that searches **real businesses on OpenStreetMap** (Nominatim + Overpass), scores leads 0–100, and generates cold emails / call scripts with the visitor's **own Gemini/Groq keys** (AES-256-GCM + PBKDF2 encrypted in `localStorage`, never sent to any server).
 - **10 free AI credits per visitor** powered by the serverless route `/api/demo-ai` (set `DEMO_AI_KEY` to enable; without it the demo falls back to BYOK automatically).
 - **SEO ready**: per-locale `sitemap.xml`, `robots.txt`, Open Graph image, canonical + hreflang alternates — statically pre-rendered pages.
@@ -414,8 +442,8 @@ See [LICENSE](./LICENSE) for the exact legal text.
 
 ## ❤️ Acknowledgments & Credits
 
-**An Axsen-Studio Creation**
-- 🧠 **Idea & Vision:** Axsen Kurtoski, a passionate teenager developer.
+**An Ahsen-Studio Creation**
+- 🧠 **Idea & Vision:** Ahsen Kurtoski, a passionate teenager developer.
 - 🤖 **Development & Execution:** Built by Artificial Intelligence (OpenCode / Antigravity).
 - 🤝 **The Mission:** Proving that with the right AI tools and a great human vision, anyone can build enterprise-grade software.
 

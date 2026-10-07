@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     }
 
     const settings = await getSettings();
-    const brandName = settings.brand_name || "Axsen-Studio";
+    const brandName = settings.brand_name || "Ahsen-Studio";
     const brandOwner = settings.brand_owner || "";
     const bookingEmail = settings.formsubmit_email || settings.brand_email || lead.email || "";
 

@@ -6,6 +6,81 @@ All API routes live under `/api/*` and serve the single-user app that runs on `l
 
 ---
 
+## 🔑 API keys: how to get one and what you need
+
+> **TL;DR (humans & AI agents)**: start the app → create a key in **Impostazioni → API Key & Integrazioni esterne** (or `POST /api/keys`) → call `/api/v1/*` with `x-api-key: lm_live_…`. The secret is shown **once**; only its SHA-256 hash is stored. Each key carries scopes (`read`, `write`, `search`, `ai`) that are enforced on every endpoint.
+
+### What you need
+
+| Requirement | Details |
+|---|---|
+| **Running instance** | Node.js `18.17+` (20 LTS recommended) · `npm install` · `npm run setup` (creates + seeds the SQLite DB) · `npm run dev` (dev) or `npm run build && npm start` (prod) |
+| **Base URL** | `http://localhost:3000` by default. Behind a reverse proxy set `NEXT_PUBLIC_BASE_URL` in `.env`. |
+| **API key** | One `lm_live_…` key per integration. Create it in the UI (below) or with `POST /api/keys`. |
+| **Scopes** | Pick the narrowest profile for your use case — see [20.3](#203-scopes-per-key-permissions). |
+| **AI features (optional)** | At least one provider key in `.env`: `GEMINI_API_KEY` ([Google AI Studio](https://aistudio.google.com/) → *Get API key*) or `GROQ_API_KEY` ([Groq Console](https://console.groq.com/keys) → *Create API Key*). Without them every non-AI endpoint still works; `POST /api/v1/demo/generate` answers `503 No AI provider configured`. |
+
+### Get a key — UI path (30 seconds)
+
+1. Start the app: `npm install && npm run setup && npm run dev` → <http://localhost:3000>.
+2. Open **Impostazioni → API Key & Integrazioni esterne**.
+3. Choose a **profile** (full integration / business search / read only / insert only / custom scopes) and give the key a name.
+4. Click **Crea chiave**: the secret `lm_live_…` is displayed **exactly once** — copy it now. Later calls only show the `lm_live_ab12…` prefix.
+5. Done. Suspend, edit scopes or revoke the key from the same panel at any time.
+
+### Get a key — programmatic path (for scripts and AI agents)
+
+```bash
+curl -X POST http://localhost:3000/api/keys \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My AI Agent","permissions":"read,search"}'
+```
+
+**Response (201)**
+
+```json
+{
+  "ok": true,
+  "apiKey": { "id": "clx…", "name": "My AI Agent", "keyPrefix": "lm_live_ab12", "permissions": "read,search", "enabled": true },
+  "rawKey": "lm_live_3f9c…"
+}
+```
+
+`rawKey` exists only in this response. Store it in your secret manager immediately.
+
+### Verify a key
+
+```bash
+curl -s http://localhost:3000/api/v1/leads?take=1 \
+  -H "x-api-key: lm_live_…"
+```
+
+`200` = the key works. `401` = missing/unknown key · `403` = suspended or missing scope (the body says which one) · `429` = rate limited (see `Retry-After`).
+
+### Using the key
+
+- Headers: `x-api-key: lm_live_…` **or** `Authorization: Bearer lm_live_…`.
+- Content type: `application/json` for POST/PATCH bodies.
+- Endpoints: `GET /api/v1/leads`, `GET /api/v1/leads/{id}`, `POST /api/v1/leads`, `POST /api/v1/search`, `POST /api/v1/demo/generate` — details in [20.6](#206-endpoints).
+- CORS is open (`*`): the key also works from browser apps on any domain.
+
+### Machine-readable contract (for AI agents)
+
+| Situation | Status | Body / headers |
+|---|---|---|
+| Success | `200` / `201` | JSON resource |
+| Missing or invalid key | `401` | `{ "ok": false, "error": "…" }` |
+| Suspended key | `403` | `{ "ok": false, "error": "…" }` |
+| Missing scope | `403` | `{ "ok": false, "error": "…", "requiredScope": "search", "currentScopes": ["read"] }` + `X-Required-Scope` response header |
+| Unknown scope on create/patch | `400` | error message, nothing is stored |
+| Not found | `404` | `{ "ok": false, "error": "…" }` |
+| Rate limited | `429` | `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` |
+| Slow or unavailable source | `200` | `"warnings": ["…"]` alongside partial results |
+
+Budgets are counted **per API key** (not per IP): parallel integrations never block each other.
+
+---
+
 ## Conventions
 
 - All dates are ISO-8601 strings (`"2026-01-15T09:30:00.000Z"`) unless noted.

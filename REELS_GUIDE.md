@@ -49,7 +49,7 @@ Si chiama Lead Machine:
 📄 Genera preventivi e fatture PDF in 7 lingue
 🔒 I tuoi dati restano sul tuo computer
 
-Sono Axsen Kurtoski e credo che il software debba aiutare le persone, non svuotargli il portafoglio.
+Sono Ahsen Kurtoski e credo che il software debba aiutare le persone, non svuotargli il portafoglio.
 Il progetto è 100% Open Source. 
 
 🔗 Link in BIO per provarlo gratis (sito demo) o scaricare il codice!
