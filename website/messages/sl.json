@@ -249,7 +249,7 @@
         "title": "Prenosnik (Priporočeno)",
         "badge": "Najboljše za posameznike",
         "steps": [
-          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "git clone https://github.com/AhsenKurtoski/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → odprite http://localhost:3000"
         ],
@@ -556,7 +556,7 @@
       "title": "Vaše zaupanje, naša arhitektura",
       "body": "Ta predstavitev v celoti deluje v vašem brskalniku. Ključi so šifrirani na strani odjemalca z AES-256-GCM (PBKDF2, 100 tisoč ponovitev) in shranjeni samo v vašem localStorage. Nam ne zaupate? Prenesite celotno aplikacijo in jo zaženite na svojem računalniku.",
       "selfHost": "Lastno gostovanje z GitHub",
-      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+      "clone": "git clone https://github.com/AhsenKurtoski/lead-machine.git"
     }
   },
   "showcase": {

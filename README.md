@@ -13,7 +13,7 @@
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000?logo=shadcnui&logoColor=fff)](#)
 [![Prisma + SQLite](https://img.shields.io/badge/Prisma-SQLite-2d3748?logo=prisma)](#)
 [![i18n — 7 languages](https://img.shields.io/badge/i18n-7_langs-7c3aed)](#)
-[![License: MIT](https://img.shields.io/github/license/lead-machine/lead-machine?color=0969da)](./LICENSE)
+[![License: MIT](https://img.shields.io/github/license/AhsenKurtoski/lead-machine?color=0969da)](./LICENSE)
 
 ---
 **👨‍💻 An Ahsen-Studio Creation**
@@ -204,7 +204,7 @@ Other optional prerequisites:
 
 ```bash
 # Clone
-git clone https://github.com/lead-machine/lead-machine.git
+git clone https://github.com/AhsenKurtoski/lead-machine.git
 cd lead-machine
 
 # Install dependencies
@@ -404,7 +404,7 @@ More issues? Open a **Bug report** with your Node / OS / browser + a minimal rep
 - How to add / improve translations,
 - PR checklist and commit conventions.
 
-Good first issues are labeled [🐣 good first issue](https://github.com/lead-machine/lead-machine/labels/good%20first%20issue).
+Good first issues are labeled [🐣 good first issue](https://github.com/AhsenKurtoski/lead-machine/labels/good%20first%20issue).
 
 ### Translating
 

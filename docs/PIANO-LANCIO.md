@@ -56,7 +56,7 @@
 |---|---|---|
 | **Sicurezza** | `next@14.2.15` vulnerabile (DoS su Server Actions + info exposure, advisory critical); `nodemailer` high | 🔴 Blocca |
 | **Deploy** | Produzione indietro di 4 commit; dominio custom non collegato; `NEXT_PUBLIC_SITE_URL` non impostato | 🔴 Blocca |
-| **Docs** | `README.md` e `package.json` dicono `github.com/lead-machine/lead-machine` ma il repo reale è `AxsenXzc/lead-machine` → **il `git clone` del README non funziona**; badge licenza rotto | 🔴 Blocca |
+| **Docs** | ~~URL repo sbagliati (`github.com/lead-machine/lead-machine`)~~ → ✅ **Risolto**: tutti gli URL puntano a `github.com/AhsenKurtoski/lead-machine` (la repo è stata spostata sotto l'org `AhsenKurtoski`) | ✅ Fatto |
 | **Contatti** | `security@lead-machine.dev` (README/SECURITY) vs `axsen_kurtoski@financier.com` (form): due indirizzi diversi, il primo probabilmente inesistente | 🟠 Importante |
 | **UX/UI** | Footer con social placeholder (`twitter.com/leadmachine_dev`, `linkedin.com/company/leadmachine`) che probabilmente 404 | 🟠 Importante |
 | **SEO** | hreflang/canonical su dominio non servito; manca Search Console + OG image verificata | 🟠 Importante |
@@ -74,7 +74,7 @@
 | 0.1 | Aggiornare `next` all'ultimo 14.2.x patchato (root + `website/`), `npm audit fix` per il resto, ripetere `npm run qa` + build | 1 h |
 | 0.2 | Rifare il deploy Vercel da `main` e impostare `NEXT_PUBLIC_SITE_URL` sul dominio reale | 20 min |
 | 0.3 | Collegare e verificare il dominio custom (es. `leadmachine.dev`) su Vercel + inviare sitemap a Search Console | 1 h |
-| 0.4 | Correggere gli URL del repo in README/`package.json`/badge → `AxsenXzc/lead-machine` (o spostare il repo sotto l'org `lead-machine`) | 20 min |
+| 0.4 | ✅ **Fatto** — URL repo uniformati a `github.com/AhsenKurtoski/lead-machine` (README, package.json, badge, CONTRIBUTING, DEPLOY, sito, messaggi 7 lingue) | — |
 | 0.5 | Unificare i contatti: decidere l'email di sicurezza ufficiale e allineare README, SECURITY.md e form | 30 min |
 | 0.6 | Verificare/rimuovere i social placeholder del footer | 15 min |
 | 0.7 | Committare (o scartare) il WIP di `impostazioni/page.tsx` + `npm run smoke:api` | 30 min |

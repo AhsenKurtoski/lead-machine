@@ -249,7 +249,7 @@
         "title": "Ordinateur portable (Recommandé)",
         "badge": "Idéal pour les particuliers",
         "steps": [
-          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "git clone https://github.com/AhsenKurtoski/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → ouvrez http://localhost:3000"
         ],
@@ -556,7 +556,7 @@
       "title": "Votre confiance, notre architecture",
       "body": "Cette démo fonctionne entièrement dans votre navigateur. Les clés sont chiffrées côté client avec AES-256-GCM (PBKDF2, 100 000 itérations) et stockées uniquement dans votre localStorage. Vous ne nous faites pas confiance ? Téléchargez l'application complète et exécutez-la sur votre machine.",
       "selfHost": "Self-hébergement depuis GitHub",
-      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+      "clone": "git clone https://github.com/AhsenKurtoski/lead-machine.git"
     }
   },
   "showcase": {

@@ -5,13 +5,13 @@
   "description": "Open-source local lead generation platform — find, score and contact nearby businesses for free. 100% self-hosted, SQLite + Next.js.",
   "license": "MIT",
   "author": "Ahsen Kurtoski & Lead Machine Contributors",
-  "homepage": "https://github.com/lead-machine/lead-machine#readme",
+  "homepage": "https://github.com/AhsenKurtoski/lead-machine#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lead-machine/lead-machine.git"
+    "url": "git+https://github.com/AhsenKurtoski/lead-machine.git"
   },
   "bugs": {
-    "url": "https://github.com/lead-machine/lead-machine/issues"
+    "url": "https://github.com/AhsenKurtoski/lead-machine/issues"
   },
   "keywords": [
     "lead-generation",

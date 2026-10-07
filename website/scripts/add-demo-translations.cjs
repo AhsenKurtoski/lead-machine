@@ -55,7 +55,7 @@ const demo = {
       title: "Your trust, our architecture",
       body: "This demo runs entirely in your browser. Keys are encrypted client-side with AES-256-GCM (PBKDF2, 100k iterations) and stored only in your localStorage. Don't trust us? Download the full app and run it on your machine.",
       selfHost: "Self-host from GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   it: {
@@ -109,7 +109,7 @@ const demo = {
       title: "La tua fiducia, la nostra architettura",
       body: "Questa demo gira interamente nel tuo browser. Le chiavi sono cifrate lato client con AES-256-GCM (PBKDF2, 100k iterazioni) e salvate solo nel tuo localStorage. Non ti fidi? Scarica l'app completa e installala sulla tua macchina.",
       selfHost: "Self-host da GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   de: {
@@ -163,7 +163,7 @@ const demo = {
       title: "Ihr Vertrauen, unsere Architektur",
       body: "Diese Demo läuft vollständig in Ihrem Browser. Keys werden clientseitig mit AES-256-GCM (PBKDF2, 100k Iterationen) verschlüsselt und nur in Ihrem localStorage gespeichert. Vertrauen Sie uns nicht? Laden Sie die vollständige App herunter und führen Sie sie auf Ihrem Rechner aus.",
       selfHost: "Self-Hosting von GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   fr: {
@@ -217,7 +217,7 @@ const demo = {
       title: "Votre confiance, notre architecture",
       body: "Cette démo fonctionne entièrement dans votre navigateur. Les clés sont chiffrées côté client avec AES-256-GCM (PBKDF2, 100 000 itérations) et stockées uniquement dans votre localStorage. Vous ne nous faites pas confiance ? Téléchargez l'application complète et exécutez-la sur votre machine.",
       selfHost: "Self-hébergement depuis GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   es: {
@@ -271,7 +271,7 @@ const demo = {
       title: "Tu confianza, nuestra arquitectura",
       body: "Esta demo funciona completamente en tu navegador. Las claves se cifran en el cliente con AES-256-GCM (PBKDF2, 100 000 iteraciones) y se guardan solo en tu localStorage. ¿No confías en nosotros? Descarga la app completa y ejecútala en tu máquina.",
       selfHost: "Self-host desde GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   pt: {
@@ -325,7 +325,7 @@ const demo = {
       title: "Sua confiança, nossa arquitetura",
       body: "Esta demo roda inteiramente no seu navegador. As chaves são criptografadas no cliente com AES-256-GCM (PBKDF2, 100 mil iterações) e armazenadas apenas no seu localStorage. Não confia em nós? Baixe o app completo e rode na sua máquina.",
       selfHost: "Self-host pelo GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
   sl: {
@@ -379,7 +379,7 @@ const demo = {
       title: "Vaše zaupanje, naša arhitektura",
       body: "Ta predstavitev v celoti deluje v vašem brskalniku. Ključi so šifrirani na strani odjemalca z AES-256-GCM (PBKDF2, 100 tisoč ponovitev) in shranjeni samo v vašem localStorage. Nam ne zaupate? Prenesite celotno aplikacijo in jo zaženite na svojem računalniku.",
       selfHost: "Lastno gostovanje z GitHub",
-      clone: "git clone https://github.com/lead-machine/lead-machine.git",
+      clone: "git clone https://github.com/AhsenKurtoski/lead-machine.git",
     },
   },
 };

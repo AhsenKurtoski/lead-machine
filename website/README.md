@@ -189,7 +189,7 @@ Copy `.env.example` → `.env.local` (only needed for deployment / custom brandi
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3001` | Canonical site URL (sitemap, robots, metadata). |
 | `NEXT_PUBLIC_APP_NAME` | `Lead Machine` | Brand name in UI. |
-| `NEXT_PUBLIC_GITHUB_REPO` | `https://github.com/AxsenXzc/lead-machine` | GitHub URL used for all "star / self-host / clone" buttons. |
+| `NEXT_PUBLIC_GITHUB_REPO` | `https://github.com/AhsenKurtoski/lead-machine` | GitHub URL used for all "star / self-host / clone" buttons. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | `axsen_kurtoski@financier.com` | Contact email. |
 | `DEMO_AI_KEY` | *(empty)* | **Server-only** Gemini API key that powers the 10 free demo credits. Empty → demo falls back to BYOK. |
 

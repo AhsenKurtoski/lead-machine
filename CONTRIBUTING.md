@@ -16,7 +16,7 @@ This project adopts the **Contributor Covenant 2.1** (see [CODE_OF_CONDUCT.md](.
 
 Anything in this non-exhaustive list is welcome:
 
-- **Bug fixes** — see [issues](https://github.com/lead-machine/lead-machine/issues) with the label `bug`.
+- **Bug fixes** — see [issues](https://github.com/AhsenKurtoski/lead-machine/issues) with the label `bug`.
 - **Security fixes** — please *do not* open a public issue. See [SECURITY.md](./SECURITY.md).
 - **i18n / translations** — new languages or improvements to existing ones (it, de, fr, sl, en, es, pt).
 - **Accessibility** — we target **WCAG 2.1 AA**. Any improvement toward that goal is highly valued.
@@ -32,7 +32,7 @@ Anything in this non-exhaustive list is welcome:
 
 ```bash
 # 1. Clone
-git clone https://github.com/lead-machine/lead-machine.git
+git clone https://github.com/AhsenKurtoski/lead-machine.git
 cd lead-machine
 
 # 2. Install (Node 18.17+ or 20 LTS recommended)

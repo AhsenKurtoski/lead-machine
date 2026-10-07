@@ -249,7 +249,7 @@
         "title": "Laptop (Recommended)",
         "badge": "Best for individuals",
         "steps": [
-          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "git clone https://github.com/AhsenKurtoski/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → open http://localhost:3000"
         ],
@@ -556,7 +556,7 @@
       "title": "Your trust, our architecture",
       "body": "This demo runs entirely in your browser. Keys are encrypted client-side with AES-256-GCM (PBKDF2, 100k iterations) and stored only in your localStorage. Don't trust us? Download the full app and run it on your machine.",
       "selfHost": "Self-host from GitHub",
-      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+      "clone": "git clone https://github.com/AhsenKurtoski/lead-machine.git"
     }
   },
   "showcase": {

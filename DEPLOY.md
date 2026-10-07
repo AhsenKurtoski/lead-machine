@@ -62,7 +62,7 @@ apt update && apt install -y caddy
 sudo -iu lead
 
 cd /home/lead
-git clone https://github.com/lead-machine/lead-machine.git app
+git clone https://github.com/AhsenKurtoski/lead-machine.git app
 cd app
 
 npm install --production=false   # devDependencies needed for prisma generate + build

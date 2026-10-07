@@ -115,6 +115,18 @@ function presetForScopes(scopes: string[]): string {
   return found ? found.id : "custom";
 }
 
+// URL base dell'API mostrato negli esempi.
+// Priorita': URL del browser (sempre corretto, anche con tunnel/dominio/VPS),
+// poi NEXT_PUBLIC_BASE_URL, infine localhost.
+function resolveApiBase(): string {
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+  const env = process.env.NEXT_PUBLIC_BASE_URL;
+  if (env) return env.replace(/\/+$/, "");
+  return "http://localhost:3000";
+}
+
 function formatDateTime(iso: string | null, t: (key: string) => string): string {
   if (!iso) return t("api.neverUsed");
   try {
@@ -132,6 +144,7 @@ function formatDateTime(iso: string | null, t: (key: string) => string): string 
 
 function API_USAGE_EXAMPLES() {
   const { t } = useLocale();
+  const base = resolveApiBase();
   return (
     <details className="rounded-lg border bg-muted/20 p-4">
       <summary className="cursor-pointer text-sm font-medium">
@@ -141,7 +154,7 @@ function API_USAGE_EXAMPLES() {
         <div>
           <p className="mb-1 font-medium">{t("api.example1")}</p>
           <pre className="overflow-x-auto rounded-md bg-background p-3 font-mono text-[11px] leading-relaxed">
-{`fetch("http://localhost:3000/api/v1/leads?hasWebsite=false&city=Feltre", {
+{`fetch("${base}/api/v1/leads?hasWebsite=false&city=Feltre", {
   headers: { "x-api-key": "LA_TUA_CHIAVE" }
 })
   .then((r) => r.json())
@@ -151,7 +164,7 @@ function API_USAGE_EXAMPLES() {
         <div>
           <p className="mb-1 font-medium">{t("api.example2")}</p>
           <pre className="overflow-x-auto rounded-md bg-background p-3 font-mono text-[11px] leading-relaxed">
-{`fetch("http://localhost:3000/api/v1/search", {
+{`fetch("${base}/api/v1/search", {
   method: "POST",
   headers: { "Content-Type": "application/json", "x-api-key": "LA_TUA_CHIAVE" },
   body: JSON.stringify({ categories: ["ristorante"], searchCity: "Feltre", radius: 5000 })
@@ -163,7 +176,7 @@ function API_USAGE_EXAMPLES() {
         <div>
           <p className="mb-1 font-medium">{t("api.example3")}</p>
           <pre className="overflow-x-auto rounded-md bg-background p-3 font-mono text-[11px] leading-relaxed">
-{`fetch("http://localhost:3000/api/v1/demo/generate", {
+{`fetch("${base}/api/v1/demo/generate", {
   method: "POST",
   headers: { "Content-Type": "application/json", "x-api-key": "LA_TUA_CHIAVE" },
   body: JSON.stringify({ leadId: "ID_DEL_LEAD" })

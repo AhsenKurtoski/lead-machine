@@ -10,7 +10,7 @@ const OVERPASS_MIRRORS = [
 ] as const;
 
 const UA =
-  "LeadMachineDemo/1.0 (+https://github.com/AxsenXzc/lead-machine)";
+  "LeadMachineDemo/1.0 (+https://github.com/AhsenKurtoski/lead-machine)";
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const CACHE_MAX = 100;

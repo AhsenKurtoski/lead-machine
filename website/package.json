@@ -5,10 +5,10 @@
   "description": "Marketing website for Lead Machine — open-source lead generation CRM for freelancers & agencies. 7 languages, BYOK encryption, Apple-level UI.",
   "license": "MIT",
   "author": "Ahsen Kurtoski & Lead Machine Contributors",
-  "homepage": "https://github.com/lead-machine/lead-machine-website#readme",
+  "homepage": "https://github.com/AhsenKurtoski/lead-machine/tree/main/website#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lead-machine/lead-machine-website.git"
+    "url": "git+https://github.com/AhsenKurtoski/lead-machine/tree/main/website.git"
   },
   "keywords": [
     "lead-generation",

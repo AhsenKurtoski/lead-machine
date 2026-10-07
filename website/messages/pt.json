@@ -249,7 +249,7 @@
         "title": "Portátil (Recomendado)",
         "badge": "Melhor para indivíduos",
         "steps": [
-          "git clone https://github.com/AxsenXzc/lead-machine.git",
+          "git clone https://github.com/AhsenKurtoski/lead-machine.git",
           "cd lead-machine && npm install && npm run setup",
           "npm run dev → abra http://localhost:3000"
         ],
@@ -556,7 +556,7 @@
       "title": "Sua confiança, nossa arquitetura",
       "body": "Esta demo roda inteiramente no seu navegador. As chaves são criptografadas no cliente com AES-256-GCM (PBKDF2, 100 mil iterações) e armazenadas apenas no seu localStorage. Não confia em nós? Baixe o app completo e rode na sua máquina.",
       "selfHost": "Self-host pelo GitHub",
-      "clone": "git clone https://github.com/AxsenXzc/lead-machine.git"
+      "clone": "git clone https://github.com/AhsenKurtoski/lead-machine.git"
     }
   },
   "showcase": {
