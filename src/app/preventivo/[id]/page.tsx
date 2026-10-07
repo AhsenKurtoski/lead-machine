@@ -11,7 +11,8 @@ import { QuoteSendActions } from "@/components/quote-send-actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function PreventivoPage({ params }: { params: { id: string } }) {
+export default async function PreventivoPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const quote = await prisma.quote.findUnique({
     where: { id: params.id },
     include: { lead: true },

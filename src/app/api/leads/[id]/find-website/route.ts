@@ -37,9 +37,9 @@ function parseJsonLoose(text: string): Record<string, unknown> | null {
   }
 }
 
-export async function POST(_req: Request, context: { params: { id: string } }) {
+export async function POST(_req: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const id = context.params.id;
+    const id = (await context.params).id;
     const lead = await prisma.lead.findUnique({ where: { id } });
     if (!lead) {
       return NextResponse.json({ ok: false, error: "Lead non trovato" }, { status: 404 });

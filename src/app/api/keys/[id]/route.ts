@@ -6,7 +6,8 @@ import { parseScopes, serializeScopes } from "@/lib/api-auth";
 export const dynamic = "force-dynamic";
 
 // PATCH /api/keys/[id] -> aggiorna stato (enabled) e/o permessi (scopes)
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const body = await req.json().catch(() => ({}));
     const data: { enabled?: boolean; permissions?: string; name?: string } = {};
@@ -66,7 +67,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 // DELETE /api/keys/[id] -> revoca/cancella definitivamente la chiave
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const existing = await prisma.apiKey.findUnique({
       where: { id: params.id },

@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 // POST /api/leads/[id]/enrich -> verifica lo stato reale del sito del lead
-export async function POST(_req: NextRequest, context: { params: { id: string } }) {
-  const id = context.params.id;
+export async function POST(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const id = (await context.params).id;
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) {
     return NextResponse.json({ ok: false, error: "Lead non trovato" }, { status: 404 });

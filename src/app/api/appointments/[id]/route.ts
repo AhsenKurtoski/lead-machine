@@ -2,7 +2,7 @@ import { rateLimitedResponse, asString, asInt, asBoolean, asArray, asNumber } fr
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "calendar:item", 80, 60000);
   if (rl) return rl;
   const body = await req.json().catch(() => null);
@@ -19,13 +19,13 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
   if (startsAt) data.startsAt = new Date(startsAt);
   if (body.endsAt !== undefined) data.endsAt = body.endsAt ? new Date(body.endsAt) : null;
   if (done !== undefined) data.done = done;
-  const appointment = await prisma.appointment.update({ where: { id: context.params.id }, data });
+  const appointment = await prisma.appointment.update({ where: { id: (await context.params).id }, data });
   return NextResponse.json({ appointment });
 }
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "calendar:item", 80, 60000);
   if (rl) return rl;
-  await prisma.appointment.delete({ where: { id: context.params.id } });
+  await prisma.appointment.delete({ where: { id: (await context.params).id } });
   return NextResponse.json({ ok: true });
 }

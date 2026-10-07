@@ -32,11 +32,12 @@ function namespaceFor(page: string): string | null {
   return null;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string; page: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string; page: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const ns = namespaceFor(params.page);
   if (!ns) return { title: "Not Found" };
   const t = await getTranslations({ locale: params.locale });
@@ -44,11 +45,12 @@ export async function generateMetadata({
   return { title: raw.title, description: raw.subtitle };
 }
 
-export default async function DynamicPage({
-  params,
-}: {
-  params: { locale: string; page: string };
-}) {
+export default async function DynamicPage(
+  props: {
+    params: Promise<{ locale: string; page: string }>;
+  }
+) {
+  const params = await props.params;
   const locale = params.locale as Locale;
   const { page } = params;
 

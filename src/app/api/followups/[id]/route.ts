@@ -2,7 +2,7 @@ import { rateLimitedResponse, asString, asInt, asBoolean, asArray, asNumber } fr
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "calendar:item", 80, 60000);
   if (rl) return rl;
   const body = await req.json().catch(() => null);
@@ -19,13 +19,13 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
   if (channel !== undefined) data.channel = channel || null;
   if (dueDate) data.dueDate = new Date(dueDate);
   if (done !== undefined) data.done = done;
-  const followUp = await prisma.followUp.update({ where: { id: context.params.id }, data });
+  const followUp = await prisma.followUp.update({ where: { id: (await context.params).id }, data });
   return NextResponse.json({ followUp });
 }
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "calendar:item", 80, 60000);
   if (rl) return rl;
-  await prisma.followUp.delete({ where: { id: context.params.id } });
+  await prisma.followUp.delete({ where: { id: (await context.params).id } });
   return NextResponse.json({ ok: true });
 }

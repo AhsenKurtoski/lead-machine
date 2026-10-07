@@ -2,16 +2,16 @@ import { rateLimitedResponse, asString, asInt, asBoolean, asArray, asNumber } fr
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(_req: NextRequest, context: { params: { id: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const quote = await prisma.quote.findUnique({
-    where: { id: context.params.id },
+    where: { id: (await context.params).id },
     include: { lead: true },
   });
   if (!quote) return NextResponse.json({ error: "non trovato" }, { status: 404 });
   return NextResponse.json({ quote });
 }
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "quotes:item", 60, 60000);
   if (rl) return rl;
   const body = await req.json().catch(() => null);
@@ -36,13 +36,13 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
   if (body.validUntil !== undefined) {
     data.validUntil = body.validUntil ? new Date(body.validUntil) : null;
   }
-  const quote = await prisma.quote.update({ where: { id: context.params.id }, data });
+  const quote = await prisma.quote.update({ where: { id: (await context.params).id }, data });
   return NextResponse.json({ quote });
 }
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "quotes:item", 60, 60000);
   if (rl) return rl;
-  await prisma.quote.delete({ where: { id: context.params.id } });
+  await prisma.quote.delete({ where: { id: (await context.params).id } });
   return NextResponse.json({ ok: true });
 }

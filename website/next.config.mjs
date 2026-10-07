@@ -1,12 +1,18 @@
 /** @type {import('next').NextConfig} */
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+// La root del workspace è fissata alla root del sito (monorepo con 2 lockfile).
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  outputFileTracingRoot: projectRoot,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

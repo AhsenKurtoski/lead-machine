@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export async function PATCH(req: Request, context: { params: { id: string } }) {
+export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "templates:item", 80, 60000);
   if (rl) return rl;
   const body = await req.json().catch(() => ({}));
@@ -22,15 +22,15 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
   if (bodyText !== undefined && bodyText !== null) data.body = bodyText;
   if (isDefault !== undefined) data.isDefault = isDefault;
   const template = await prisma.messageTemplate.update({
-    where: { id: context.params.id },
+    where: { id: (await context.params).id },
     data,
   });
   return NextResponse.json({ ok: true, template });
 }
 
-export async function DELETE(req: Request, context: { params: { id: string } }) {
+export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "templates:item", 80, 60000);
   if (rl) return rl;
-  await prisma.messageTemplate.delete({ where: { id: context.params.id } });
+  await prisma.messageTemplate.delete({ where: { id: (await context.params).id } });
   return NextResponse.json({ ok: true });
 }

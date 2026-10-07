@@ -9,7 +9,8 @@ export async function OPTIONS() {
 }
 
 // GET /api/v1/leads/[id] -> Dettaglio completo con eventuale sito demo salvato
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = await validateApiKey(req);
   if (!auth.ok) {
     return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status, headers: CORS_HEADERS });

@@ -10,7 +10,8 @@ import { PrintButton } from "@/components/print-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function RicevutaPage({ params }: { params: { id: string } }) {
+export default async function RicevutaPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const quote = await prisma.quote.findUnique({
     where: { id: params.id },
     include: { lead: true },

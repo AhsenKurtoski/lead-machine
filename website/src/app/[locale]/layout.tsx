@@ -15,14 +15,15 @@ export function generateStaticParams() {
 
 interface Props {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   if (!isValidLocale(params.locale)) notFound();
   const l = params.locale as Locale;
   const label = localeLabels[l];
@@ -55,7 +56,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocaleLayout({ children, params }: Props) {
+export default async function LocaleLayout(props: Props) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   if (!isValidLocale(params.locale)) notFound();
   const locale = params.locale as Locale;
 

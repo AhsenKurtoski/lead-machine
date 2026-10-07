@@ -8,7 +8,8 @@ import { generateDemoHtml } from "@/lib/demo-generate";
 
 export const dynamic = "force-dynamic";
 
-export default async function DemoPage({ params }: { params: { id: string } }) {
+export default async function DemoPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const lead = await prisma.lead.findUnique({ where: { id: params.id } });
   if (!lead) notFound();
 

@@ -15,7 +15,8 @@ const LABELS: Record<string, string> = {
 
 // PATCH /api/email/logs/[id]  body: { status?, hasReply? }
 // Aggiorna lo stato dell'email e tiene allineato lo stato del lead.
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const body = await req.json().catch(() => ({}));
   const log = await prisma.emailLog.findUnique({ where: { id: params.id } });
   if (!log) {
@@ -78,7 +79,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 // DELETE /api/email/logs/[id]  - rimuove la voce dal registro email.
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await prisma.emailLog.delete({ where: { id: params.id } }).catch(() => null);
   return NextResponse.json({ ok: true });
 }

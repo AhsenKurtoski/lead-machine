@@ -12,9 +12,9 @@ const leadInclude = {
 
 const ALLOWED_STATUSES = Object.keys(STATUS_LABELS);
 
-export async function GET(_req: NextRequest, context: { params: { id: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const lead = await prisma.lead.findUnique({
-    where: { id: context.params.id },
+    where: { id: (await context.params).id },
     include: leadInclude,
   });
   if (!lead) {
@@ -23,11 +23,11 @@ export async function GET(_req: NextRequest, context: { params: { id: string } }
   return NextResponse.json({ ok: true, lead });
 }
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "leads:item", 180, 60000);
   if (rl) return rl;
 
-  const id = context.params.id;
+  const id = (await context.params).id;
   const body = await req.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ ok: false, error: "body mancante" }, { status: 400 });
@@ -152,10 +152,10 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
   return NextResponse.json({ ok: true, lead });
 }
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "leads:item", 60, 60000);
   if (rl) return rl;
 
-  await prisma.lead.delete({ where: { id: context.params.id } });
+  await prisma.lead.delete({ where: { id: (await context.params).id } });
   return NextResponse.json({ ok: true });
 }
