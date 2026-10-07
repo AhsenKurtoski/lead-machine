@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Audit settimanale delle dipendenze (lunedì 08:00 UTC)
+    - cron: "0 8 * * 1"
 
 jobs:
   app:
