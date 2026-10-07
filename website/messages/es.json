@@ -178,7 +178,7 @@
       "license": "Licencia MIT"
     },
     "faq": {
-      "title": "FAQ Precios",
+      "title": "Preguntas frecuentes",
       "q1": "Espera — ¿es realmente gratis? ¿Ninguna trampa oculta?",
       "a1": "Sí. Lead Machine es software open-source con licencia MIT. Puedes descargarlo, ejecutarlo, modificarlo, vender derivados, todo gratis, para siempre. El proyecto es mantenido por voluntarios que lo usan diariamente.",
       "q2": "¿Por qué no cobráis suscripciones como todos los demás?",
@@ -286,7 +286,7 @@
       "subtitle": "Política de privacidad totalmente conforme a GDPR y CCPA.",
       "controller": {
         "title": "1. Responsable del Tratamiento",
-        "body": "El responsable del tratamiento de este sitio web es:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\nPara asuntos relacionados con la presente Política de Privacidad, puede contactar con el Responsable en cualquier momento en el email anterior."
+        "body": "El responsable del tratamiento de este sitio web es:\nAhsen-Studio\nEmail: axsen_kurtoski@financier.com\nPara asuntos relacionados con la presente Política de Privacidad, puede contactar con el Responsable en cualquier momento en el email anterior."
       },
       "collected": {
         "title": "2. Categorías de Datos Recopilados",
@@ -362,7 +362,7 @@
       },
       "contacts": {
         "title": "9. Información de Contacto",
-        "body": "Para consultas legales, envíe comunicación registrada a:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\n\nPara vulnerabilidades de seguridad, ver SECURITY.md y envíe email a axsen_kurtoski@financier.com (PGP disponible bajo solicitud)."
+        "body": "Para consultas legales, envíe comunicación registrada a:\nAhsen-Studio\nEmail: axsen_kurtoski@financier.com\n\nPara vulnerabilidades de seguridad, ver SECURITY.md y envíe email a axsen_kurtoski@financier.com (PGP disponible bajo solicitud)."
       }
     },
     "cookies": {
@@ -411,7 +411,7 @@
     "imprint": {
       "title": "Aviso Legal / Impressum (Art. 7 Abs. 1 TMG & D. Lgs. 70/2003)",
       "subtitle": "Requerido por la ley italiana y alemana para cada sitio web comercial.",
-      "body": "Editor / Responsable del Tratamiento / Verantwortlicher nach § 5 TMG:\n\nAxsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nResponsable del contenido de este sitio web (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAxsen-Studio — axsen_kurtoski@financier.com\n\nNota de responsabilidad: a pesar del control cuidadoso de los contenidos, no asumimos ninguna responsabilidad por el contenido de los enlaces externos. Los operadores de las páginas enlazadas son exclusivamente responsables de su contenido."
+      "body": "Editor / Responsable del Tratamiento / Verantwortlicher nach § 5 TMG:\n\nAhsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nResponsable del contenido de este sitio web (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAhsen-Studio (Ahsen Kurtoski) — axsen_kurtoski@financier.com\n\nNota de responsabilidad: a pesar del control cuidadoso de los contenidos, no asumimos ninguna responsabilidad por el contenido de los enlaces externos. Los operadores de las páginas enlazadas son exclusivamente responsables de su contenido."
     },
     "dpa": {
       "title": "Acuerdo de Tratamiento de Datos (DPA / AVV Art. 28 GDPR)",
@@ -468,7 +468,7 @@
     "docs": {
       "title": "Documentación",
       "subtitle": "Todo lo necesario para instalar, configurar y dominar Lead Machine.",
-      "body": "Guías paso a paso para la instalación local, despliegue en VPS, claves BYOK, proveedores de IA (Gemini y Groq), SMTP y el pipeline de presupuestos. La documentación completa vive en la carpeta /docs del repositorio y en el README."
+      "body": "Guías paso a paso para la instalación local, el despliegue en VPS, las claves BYOK, los proveedores de IA (Gemini y Groq), SMTP y el flujo de presupuestos.\n\n🔑 Cómo obtener una API Key (para integraciones externas y agentes de IA):\n1) Inicia la app: npm install, npm run setup, npm run dev.\n2) Abre Ajustes → API Key & Integraciones externas.\n3) Elige un perfil (integración completa, solo búsqueda, solo lectura, solo inserción) y ponle nombre a la clave.\n4) Copia la clave lm_live_… que se muestra una sola vez: en la base de datos solo se guarda su hash SHA-256.\n5) Úsala enseguida con el header x-api-key: lm_live_… (o Authorization: Bearer lm_live_…) en los endpoints /api/v1/*.\n\nLo que necesitan las funciones de IA: al menos una clave de proveedor gratuita en el archivo .env — GEMINI_API_KEY (Google AI Studio) o GROQ_API_KEY (Groq Console). El resto de las API funcionan sin claves de IA.\n\nReferencia completa, ejemplos curl/JS, scopes, rate limits y códigos de error: API.md en el repositorio."
     },
     "blog": {
       "title": "Blog",
@@ -498,7 +498,7 @@
     "about": {
       "title": "Acerca de",
       "subtitle": "Por qué existe Lead Machine.",
-      "body": "Somos freelancers cansados de pagar por herramientas que encierran nuestros datos en la nube. Lead Machine es nuestra respuesta: un stack profesional de generación de leads gratuito, privado y abierto. Desarrollado en abierto, usado a diario por sus propios mantenedores."
+      "body": "Somos freelancers cansados de pagar por herramientas que encierran nuestros datos en la nube. Lead Machine es nuestra respuesta: un stack profesional de generación de leads gratuito, privado y abierto. Desarrollado en abierto, usado a diario por sus propios mantenedores. Lead Machine está concebido y creado por Ahsen Kurtoski (Ahsen-Studio)."
     }
   },
   "demo": {
@@ -569,6 +569,7 @@
     "muteVideo": "Silenciar"
   },
   "footer": {
+    "creator": "Concebido y creado por Ahsen Kurtoski — Ahsen-Studio.",
     "product": "Producto",
     "resources": "Recursos",
     "legal": "Legal"

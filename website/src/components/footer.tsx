@@ -17,7 +17,6 @@ const LEGAL_KEYS = [
 
 const PRODUCT_KEYS = [
   "features",
-  "pricing",
   "byok",
   "transparency",
   "deploy",
@@ -198,11 +197,14 @@ export function Footer() {
         <Separator className="my-10" />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-muted-foreground">
-          <p className="flex items-center gap-1.5">
+          <p className="flex flex-wrap items-center gap-1.5">
             © {year} Lead Machine Contributors.{" "}
             {t("meta.license") || "Released under MIT License."}
             <span className="inline-flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-rose-500 fill-rose-500" /> &nbsp;for freelancers worldwide.
+            </span>
+            <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
+              {t("footer.creator")}
             </span>
           </p>
           <p>

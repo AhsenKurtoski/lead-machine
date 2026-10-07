@@ -4,7 +4,6 @@ import { locales, defaultLocale } from "@/i18n/config";
 const routes = [
   "",
   "/features",
-  "/pricing",
   "/byok-lifetime",
   "/transparency",
   "/deploy",

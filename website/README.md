@@ -42,8 +42,8 @@
 
 This folder (`website/`) contains the public-facing marketing website of Lead Machine:
 
-- **Landing page** with hero, features, pricing, BYOK & privacy, transparency, deploy, FAQ and CTA sections.
-- **Product pages**: Features, Pricing, BYOK & Privacy (lifetime), Transparency, Deploy.
+- **Landing page** with hero, features, BYOK & privacy, transparency, deploy, FAQ and CTA sections.
+- **Product pages**: Features, BYOK & Privacy (lifetime), Transparency, Deploy.
 - **Live Demo** (`/demo`): a real, working product demo that runs entirely in the visitor's browser.
 - **Legal pages** (privacy, terms, cookies, imprint, DPA, security), **forms** (demo request, partnership, bug report, waitlist) and **resource pages** (docs, blog, changelog, roadmap, contributors, status, about).
 - **7 languages**: English, Italian, German, French, Slovenian, Spanish, Portuguese — with automatic locale detection and redirects (`/` → `/en`, `/DE` → `/de`, …).
@@ -123,9 +123,8 @@ Responses:
 
 | Route (per locale) | Kind | Description |
 |---|---|---|
-| `/` | Landing | Hero + features + showcase + pricing + BYOK + transparency + deploy + FAQ + CTA |
+| `/` | Landing | Hero + features + showcase + BYOK + transparency + deploy + FAQ + CTA |
 | `/features` | Static | Feature deep-dive with tabs |
-| `/pricing` | Static | BYOK lifetime €0 vs Open-Source free + comparison table |
 | `/byok-lifetime` | Static | Bring-Your-Own-Key / lifetime licensing details |
 | `/transparency` | Static | Data, cookies, open source, security, financial transparency |
 | `/deploy` | Static | Local / VPS / serverless install commands (copy buttons) |
@@ -134,7 +133,7 @@ Responses:
 | `/privacy`, `/terms`, `/cookies`, `/imprint`, `/dpa`, `/security` | Static | Legal pages |
 | `/demo-request`, `/partnership`, `/report-issue`, `/waitlist` | Static | Contact forms |
 
-All pages are pre-rendered statically (SSG) for every locale — 174 static pages in total. The `/[locale]/[page]` dynamic route uses `generateStaticParams` with `dynamicParams = false`, so unknown URLs return a 404.
+All pages are pre-rendered statically (SSG) for every locale — 162 static pages in total. The `/[locale]/[page]` dynamic route uses `generateStaticParams` with `dynamicParams = false`, so unknown URLs return a 404.
 
 ---
 
@@ -210,7 +209,7 @@ website/
 └── src/
     ├── middleware.ts        # next-intl locale redirect (REQUIRED here, not at root)
     ├── app/
-    │   ├── [locale]/        # page.tsx, features, pricing, byok-lifetime,
+    │   ├── [locale]/        # page.tsx, features, byok-lifetime,
     │   │                    # transparency, deploy, demo, [page] (legal/forms/resources)
     │   ├── api/demo-ai/route.ts   # free-credits AI proxy
     │   ├── sitemap.ts       # per-locale sitemap
@@ -218,7 +217,7 @@ website/
     │   └── layout.tsx       # root layout (fonts, theme, metadata)
     ├── components/
     │   ├── demo/            # demo-app, lead search, results, AI panel, trust bar
-    │   ├── sections/        # hero, features, showcase, pricing, byok, transparency,
+    │   ├── sections/        # hero, features, showcase, byok, transparency,
     │   │                    # deploy, faq, cta, reveal, section-header
     │   └── ui/              # shadcn/ui primitives
     ├── i18n/                # next-intl config, request, navigation
@@ -259,9 +258,9 @@ Yes — see [Translations](#-translations).
 
 ---
 
-### 👨‍💻 An Axsen-Studio Creation
+### 👨‍💻 An Ahsen-Studio Creation
 This project is the result of a powerful collaboration:
-- **Vision & Idea by:** Axsen Kurtoski (teenager developer & visionary)
+- **Vision & Idea by:** Ahsen Kurtoski (teenager developer & visionary)
 - **Built by:** Artificial Intelligence (OpenCode / Antigravity)
 
 Made with ❤️ for freelancers worldwide. Open-source under [MIT](../LICENSE).

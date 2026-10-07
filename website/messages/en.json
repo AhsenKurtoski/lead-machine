@@ -178,7 +178,7 @@
       "license": "MIT license"
     },
     "faq": {
-      "title": "Pricing FAQ",
+      "title": "Frequently Asked Questions",
       "q1": "Wait — it's really free? No hidden catch?",
       "a1": "Yes. Lead Machine is MIT-licensed open source. You can download it, run it, modify it, sell derivatives, all for free, forever. The project is maintained by volunteers who use it daily.",
       "q2": "Why don't you charge subscriptions like everyone else?",
@@ -286,7 +286,7 @@
       "subtitle": "Full GDPR & CCPA compliant privacy policy.",
       "controller": {
         "title": "1. Data Controller",
-        "body": "The data controller for this website is:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\nFor matters relating to this Privacy Policy, you may contact the Controller at any time at the email above."
+        "body": "The data controller for this website is:\nAhsen-Studio\nEmail: axsen_kurtoski@financier.com\nFor matters relating to this Privacy Policy, you may contact the Controller at any time at the email above."
       },
       "collected": {
         "title": "2. Categories of Data Collected",
@@ -362,7 +362,7 @@
       },
       "contacts": {
         "title": "9. Contact Information",
-        "body": "For legal inquiries, send registered communication to:\nAxsen-Studio\nEmail: axsen_kurtoski@financier.com\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
+        "body": "For legal inquiries, send registered communication to:\nAhsen-Studio\nEmail: axsen_kurtoski@financier.com\n\nFor security vulnerabilities, see SECURITY.md and email axsen_kurtoski@financier.com (PGP available on request)."
       }
     },
     "cookies": {
@@ -411,7 +411,7 @@
     "imprint": {
       "title": "Imprint / Impressum (Art. 7 Abs. 1 TMG & D. Lgs. 70/2003)",
       "subtitle": "Required by Italian and German law for every commercial website.",
-      "body": "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nAxsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAxsen-Studio — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
+      "body": "Publisher / Data Controller / Verantwortlicher nach § 5 TMG:\n\nAhsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nResponsible for the content of this website (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAhsen-Studio (Ahsen Kurtoski) — axsen_kurtoski@financier.com\n\nLiability note: despite careful content control, we assume no liability for the content of external links. The operators of the linked pages are solely responsible for their content."
     },
     "dpa": {
       "title": "Data Processing Agreement (DPA / AVV Art. 28 GDPR)",
@@ -468,7 +468,7 @@
     "docs": {
       "title": "Documentation",
       "subtitle": "Everything you need to install, configure and master Lead Machine.",
-      "body": "Step-by-step guides for local setup, VPS deployment, BYOK keys, AI providers (Gemini & Groq), SMTP and the quote pipeline. The full documentation lives in the repository's /docs folder and the README."
+      "body": "Step-by-step guides for local install, VPS deploy, BYOK keys, AI providers (Gemini and Groq), SMTP and the quote pipeline.\n\n🔑 How to get an API key (for external integrations and AI agents):\n1) Start the app: npm install, npm run setup, npm run dev.\n2) Open Settings → API Key & External Integrations.\n3) Pick a profile (full integration, business search, read only, insert only) and name the key.\n4) Copy the lm_live_… key shown only once: only its SHA-256 hash is stored.\n5) Use it right away with the x-api-key: lm_live_… header (or Authorization: Bearer lm_live_…) on the /api/v1/* endpoints.\n\nWhat the AI features need: at least one free provider key in the .env file — GEMINI_API_KEY (Google AI Studio) or GROQ_API_KEY (Groq Console). Every other API works without AI keys.\n\nFull reference, curl/JS examples, scopes, rate limits and error codes: API.md in the repository."
     },
     "blog": {
       "title": "Blog",
@@ -498,7 +498,7 @@
     "about": {
       "title": "About",
       "subtitle": "Why Lead Machine exists.",
-      "body": "We are freelancers who got tired of paying for tools that lock our data in the cloud. Lead Machine is our answer: a professional lead-generation stack that is free, private and open. It is developed in the open, used daily by its own maintainers."
+      "body": "We are freelancers who got tired of paying for tools that lock our data in the cloud. Lead Machine is our answer: a professional lead-generation stack that is free, private and open. It is developed in the open, used daily by its own maintainers. Lead Machine is conceived and created by Ahsen Kurtoski (Ahsen-Studio)."
     }
   },
   "demo": {
@@ -569,6 +569,7 @@
     "muteVideo": "Mute"
   },
   "footer": {
+    "creator": "Conceived and created by Ahsen Kurtoski — Ahsen-Studio.",
     "product": "Product",
     "resources": "Resources",
     "legal": "Legal"

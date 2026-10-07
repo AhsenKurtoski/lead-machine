@@ -4,7 +4,6 @@ import type { Locale } from "@/i18n/config";
 import { Hero } from "@/components/sections/hero";
 import { FeaturesTabs } from "@/components/sections/features";
 import { Showcase } from "@/components/sections/showcase";
-import { Pricing } from "@/components/sections/pricing";
 import { ByokTabs } from "@/components/sections/byok";
 import { TransparencySection } from "@/components/sections/transparency";
 import { DeploySection } from "@/components/sections/deploy";
@@ -46,7 +45,6 @@ export default async function HomePage({
       <Hero />
       <FeaturesTabs />
       <Showcase locale={locale} />
-      <Pricing locale={locale} />
       <ByokTabs />
       <TransparencySection />
       <DeploySection />

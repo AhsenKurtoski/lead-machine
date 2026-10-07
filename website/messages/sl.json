@@ -178,7 +178,7 @@
       "license": "Licenca MIT"
     },
     "faq": {
-      "title": "Pogosta vprašanja o cenik",
+      "title": "Pogosta vprašanja",
       "q1": "Počakajte — je to resnično brezplačno? Nobenega skritega pasti?",
       "a1": "Da. Lead Machine je odprtokodna programska oprema z licenco MIT. Lahko jo prenesete, zaženete, spremenite, prodajate izvedene izdelke, vse brezplačno, za vedno. Projekt vzdržujejo prostovoljci, ki ga uporabljajo vsak dan.",
       "q2": "Zakaj ne zaračunavate naročnin kot vsi ostali?",
@@ -286,7 +286,7 @@
       "subtitle": "Polna politika zasebnosti skladna z GDPR in CCPA.",
       "controller": {
         "title": "1. Upravljavec z osebnimi podatki",
-        "body": "Upravljavec z osebnimi podatki za to spletno stran je:\nAxsen-Studio\nE-pošta: axsen_kurtoski@financier.com\nZa zadeve, povezane s to Politiko zasebnosti, lahko upravljavca kadarkoli kontaktirate na gornjem e-poštnem naslovu."
+        "body": "Upravljavec z osebnimi podatki za to spletno stran je:\nAhsen-Studio\nE-pošta: axsen_kurtoski@financier.com\nZa zadeve, povezane s to Politiko zasebnosti, lahko upravljavca kadarkoli kontaktirate na gornjem e-poštnem naslovu."
       },
       "collected": {
         "title": "2. Kategorije zbranih podatkov",
@@ -411,7 +411,7 @@
     "imprint": {
       "title": "Natisak / Impressum (Art. 7 Abs. 1 TMG & D. Lgs. 70/2003)",
       "subtitle": "Zahtevano italijanskim in nemškim zakonom za vsako komercialno spletno stran.",
-      "body": "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nAxsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAxsen-Studio — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
+      "body": "Izdajatelj / Upravljavec z osebnimi podatki / Verantwortlicher nach § 5 TMG:\n\nAhsen-Studio\n\n\nEmail: axsen_kurtoski@financier.com\n\nOdgovoren za vsebino te spletne strani (§ 55 Abs. 2 RStV / Art. 56 bis Codice delle Comunicazioni Elettroniche):\nAhsen-Studio (Ahsen Kurtoski) — axsen_kurtoski@financier.com\n\nOpozorilo o odgovornosti: kljub natančni nadzoru vsebine ne prevzemamo odgovornosti za vsebino zunanjih povezav. Za vsebino povezanih strani so izključno odgovorni njihovi upravitelji."
     },
     "dpa": {
       "title": "Sporazum o obdelavi osebnih podatkov (DPA / AVV Art. 28 GDPR)",
@@ -468,7 +468,7 @@
     "docs": {
       "title": "Dokumentacija",
       "subtitle": "Vse, kar potrebujete za namestitev, nastavitev in obvladovanje Lead Machine.",
-      "body": "Vodniki po korakih za lokalno namestitev, namestitev na VPS, BYOK ključe, AI ponudnike (Gemini in Groq), SMTP in ponudbeni tok. Celotna dokumentacija je v mapi /docs repozitorija in v README."
+      "body": "Podrobni vodniki za lokalno namestitev, deploy na VPS, ključe BYOK, AI ponudnike (Gemini in Groq), SMTP in postopek ponudb.\n\n🔑 Kako do API ključa (za zunanje integracije in AI agente):\n1) Zaženi aplikacijo: npm install, npm run setup, npm run dev.\n2) Odpri Nastavitve → API ključi in zunanje integracije.\n3) Izberi profil (polna integracija, samo iskanje, samo branje, samo vstavljanje) in poimenuj ključ.\n4) Kopiraj ključ lm_live_…, prikazan samo enkrat: v bazi je shranjen le njegov SHA-256 hash.\n5) Takoj ga uporabi z glavo x-api-key: lm_live_… (ali Authorization: Bearer lm_live_…) na /api/v1/* končnih točkah.\n\nKaj potrebujejo AI funkcije: vsaj en brezplačni ključ ponudnika v datoteki .env — GEMINI_API_KEY (Google AI Studio) ali GROQ_API_KEY (Groq Console). Vse ostale API delujejo tudi brez AI ključev.\n\nCelotna referenca, primeri curl/JS, scope-i, rate limiti in kode napak: API.md v repozitoriju."
     },
     "blog": {
       "title": "Blog",
@@ -498,7 +498,7 @@
     "about": {
       "title": "O projektu",
       "subtitle": "Zakaj obstaja Lead Machine.",
-      "body": "Smo samostojni podjetniki, naveličani plačevanja orodij, ki naše podatke zapirajo v oblak. Lead Machine je naš odgovor: profesionalni sklop za pridobivanje strank, brezplačen, zaseben in odprt. Razvit javno, vsak dan ga uporabljajo njegovi vzdrževalci."
+      "body": "Smo samostojni podjetniki, naveličani plačevanja orodij, ki naše podatke zapirajo v oblak. Lead Machine je naš odgovor: profesionalni sklop za pridobivanje strank, brezplačen, zaseben in odprt. Razvit javno, vsak dan ga uporabljajo njegovi vzdrževalci. Lead Machine zasnuje in ustvarja Ahsen Kurtoski (Ahsen-Studio)."
     }
   },
   "demo": {
@@ -569,6 +569,7 @@
     "muteVideo": "Utišaj zvok"
   },
   "footer": {
+    "creator": "Zasnoval in ustvaril Ahsen Kurtoski — Ahsen-Studio.",
     "product": "Izdelek",
     "resources": "Viri",
     "legal": "Pravno"

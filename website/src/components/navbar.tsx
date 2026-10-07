@@ -16,7 +16,6 @@ type NavItem = { key: string; href: string; primary?: boolean; external?: boolea
 
 const PRIMARY: NavItem[] = [
   { key: "nav.features", href: "/features" },
-  { key: "nav.pricing", href: "/pricing" },
   { key: "nav.byok", href: "/byok-lifetime" },
   { key: "nav.transparency", href: "/transparency" },
   { key: "nav.deploy", href: "/deploy" },
