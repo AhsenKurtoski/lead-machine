@@ -49,24 +49,6 @@ jobs:
       - name: Smoke test API key (31 assert)
         run: SMOKE_BASE=http://localhost:3111 npm run smoke:api
 
-  website:
-    name: Sito — lint, typecheck, build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: website
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: website/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
-
   audit:
     name: Audit dipendenze (settimanale)
     if: github.event_name == 'schedule'

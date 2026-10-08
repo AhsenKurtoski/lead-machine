@@ -67,7 +67,9 @@ export async function POST(req: Request) {
     // 1) OpenStreetMap / Overpass (fonte sempre disponibile, gratuita)
     try {
       results = await withTimeout(
-        runOverpassSearch(categories, lat, lng, radiusM, contactEmail),
+        // Il budget passa anche a runOverpassSearch: la catena mirror si ferma
+        // da sola con un errore chiaro prima che scatti il timeout esterno.
+        runOverpassSearch(categories, lat, lng, radiusM, contactEmail, budgetMs),
         budgetMs,
         "OpenStreetMap"
       );

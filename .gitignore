@@ -87,3 +87,9 @@ next-env.d.ts
 
 /C
 
+
+# Il sito marketing non fa parte di questo repository (progetto separato)
+/website/
+
+# Metadata locale dell'ambiente Freebuff
+/.freebuff/

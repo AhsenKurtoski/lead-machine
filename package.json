@@ -48,6 +48,7 @@
     "i18n:check": "node scripts/check-i18n.mjs",
     "i18n:merge": "node scripts/merge-i18n.mjs",
     "smoke:api": "node scripts/smoke-api.mjs",
+    "smoke:geo": "node scripts/smoke-geo.mjs",
     "qa": "npm run typecheck && npm run lint && npm run i18n:check",
     "setup": "prisma db push && tsx prisma/seed.ts",
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",

@@ -1,7 +1,0 @@
-export const GITHUB_REPO =
-  process.env.NEXT_PUBLIC_GITHUB_REPO || "https://github.com/AhsenKurtoski/lead-machine";
-
-export const GITHUB_CLONE = `git clone ${GITHUB_REPO}.git`;
-
-export const SUPPORT_EMAIL =
-  process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "axsen_kurtoski@financier.com";

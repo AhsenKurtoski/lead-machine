@@ -22,12 +22,19 @@ export type OsmCandidate = {
 };
 
 // Piu endpoint pubblici gratuiti: se uno e sovraccarico (504) si prova il successivo.
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass.private.coffee/api/interpreter",
-  "https://overpass.osm.ch/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+// Verificati in produzione (ottobre 2026):
+// - overpass-api.de: copertura MONDIALE, risponde in 1-6s con Accept: application/json
+//   e User-Agent identificante (risponde 406 agli UA da browser, per questo lo
+//   identifichiamo sempre come LeadMachine + contatto).
+// - maps.mail.ru: copertura mondiale, spesso 504 ma ogni tanto regge: secondo in lista.
+// - overpass.osm.ch: velocissimo (<1s) ma copre SOLO la Svizzera: puo' dichiarare
+//   "0 risultati" anche per citta' italiane piene di attivita', quindi non puo'
+//   confermare un risultato vuoto (vedi global in execQueryWithRetry).
+// Rimossi kumi.systems, private.coffee, osm.jp, openstreetmap.ru: non rispondono piu'.
+const OVERPASS_ENDPOINTS: { url: string; global: boolean }[] = [
+  { url: "https://overpass-api.de/api/interpreter", global: true },
+  { url: "https://maps.mail.ru/osm/tools/overpass/api/interpreter", global: true },
+  { url: "https://overpass.osm.ch/api/interpreter", global: false },
 ];
 
 // Errore Overpass con flag "transient": true se vale la pena riprovare (504, timeout...).
@@ -78,16 +85,32 @@ export function buildOverpassQuery(
       ? (categoryIds.map(getCategoryById).filter(Boolean) as Category[])
       : CATEGORIES;
 
-  const lines: string[] = [];
+  // Raggruppiamo i selector per chiave e usiamo un filtro regex sui valori:
+  // uno statement spaziale per chiave (non per coppia) e' molto piu' rapido
+  // perche' Overpass usa l'indice spaziale una volta sola. Il vincolo (around:)
+  // viene PRIMA dei tag: nella forma inversa le query andavano in timeout lato server.
+  const valuesByKey = new Map<string, Set<string>>();
   for (const cat of cats) {
     for (const [key, value] of cat.selectors) {
-      lines.push(
-        `  nwr["${key}"="${value}"]["name"](around:${radiusM},${lat},${lng});`
-      );
+      if (!valuesByKey.has(key)) valuesByKey.set(key, new Set());
+      valuesByKey.get(key)!.add(value);
     }
   }
 
-  return `[out:json][timeout:60];\n(\n${lines.join("\n")}\n);\nout center tags;`;
+  const lines: string[] = [];
+  for (const [key, values] of valuesByKey) {
+    const alternation = [...values].map(escapeOverpassRegex).join("|");
+    lines.push(
+      `  nwr(around:${radiusM},${lat},${lng})["name"]["${escapeOverpassRegex(key)}"~"^(${alternation})$"];`
+    );
+  }
+
+  return `[out:json][timeout:20];\n(\n${lines.join("\n")}\n);\nout center tags;`;
+}
+
+// Escape dei caratteri speciali delle regex Overpass (valori e chiavi dei tag)
+function escapeOverpassRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function firstTag(tags: Record<string, string>, keys: string[]): string | undefined {
@@ -169,25 +192,49 @@ async function rawFetch(
       const transient = TRANSIENT_STATUS.includes(res.status);
       throw new OverpassError("Overpass " + res.status, transient, res.status);
     }
-    const json = (await res.json()) as { elements?: OverpassElement[] };
+    // Alcuni mirror rispondono 200 con pagine HTML/XML di errore (overload,
+    // gateway): non e' un errore della query ma un guasto del mirror, quindi
+    // lo classifichiamo come temporaneo e passiamo al mirror successivo.
+    const text = await res.text();
+    let json: { elements?: OverpassElement[]; remark?: string };
+    try {
+      json = JSON.parse(text);
+    } catch {
+      throw new OverpassError("Overpass: risposta non JSON dal mirror", true, res.status);
+    }
+    // "remark" compare quando il server interrompe la query (es. "runtime error:
+    // Query timed out"): i dati restituiti sono assenti o parziali, quindi
+    // trattiamo la risposta come errore temporaneo e proviamo gli altri mirror.
+    if (json.remark) {
+      throw new OverpassError("Overpass: " + json.remark, true, res.status);
+    }
     return json.elements ?? [];
   } finally {
     clearTimeout(timer);
   }
 }
 
-// Una richiesta Overpass: prova in POST e, se il mirror rifiuta il metodo (405/406), ritenta in GET.
+// Una richiesta Overpass: prova in POST e, se il mirror lo rifiuta o fallisce
+// in fretta, riprova in GET. Serve per mirror come maps.mail.ru che rispondono
+// 504 al POST ma 200 al GET, e per quelli che accettano solo GET (405/406).
 async function fetchOverpass(
   endpoint: string,
   query: string,
   contactEmail: string,
   timeoutMs: number
 ): Promise<OverpassElement[]> {
+  const started = Date.now();
   try {
     return await rawFetch(endpoint, query, contactEmail, timeoutMs, false);
   } catch (err) {
-    if (err instanceof OverpassError && (err.status === 405 || err.status === 406)) {
-      // Alcuni mirror accettano solo GET: riprova sullo stesso endpoint in GET.
+    const status = err instanceof OverpassError ? err.status : 0;
+    const methodRejected = status === 405 || status === 406;
+    // Fallimento RAPIDO = la richiesta e' stata scartata prima di eseguire la
+    // query (metodo rifiutato, gateway): il GET spesso funziona. Se invece il
+    // POST ha consumato tutto il timeout il mirror e' sovraccarico e un secondo
+    // tentativo non aiuterebbe, quindi risparmiamo il tempo.
+    const failedFast = Date.now() - started < 3000 && isTransient(err);
+    if (methodRejected || failedFast) {
       return await rawFetch(endpoint, query, contactEmail, timeoutMs, true);
     }
     throw err;
@@ -196,22 +243,43 @@ async function fetchOverpass(
 
 // Esegue una query provando piu endpoint in piu giri, con backoff crescente
 // sui guasti temporanei (504/timeout). Su errori NON temporanei (es. 400) si ferma subito.
+// Ogni tentativo rispetta la deadline: non si inizia una richiesta che non potrebbe
+// finire in tempo, cosi il budget del chiamante non viene mai sforato.
 async function execQueryWithRetry(
   query: string,
   contactEmail: string,
-  rounds = 2
+  rounds = 2,
+  deadline = Date.now() + 45_000
 ): Promise<OverpassElement[]> {
   let lastError: unknown = null;
   for (let round = 0; round < rounds; round++) {
+    // Un risultato vuoto "confermato" solo da un mirror con copertura parziale
+    // (es. osm.ch = solo Svizzera) non basta: vogliamo l'ok di almeno un mirror
+    // con copertura mondiale prima di dichiarare che non ci sono risultati.
+    let emptyConfirmedByGlobal = false;
     for (const endpoint of OVERPASS_ENDPOINTS) {
+      const remaining = deadline - Date.now();
+      // Tempo quasi esaurito: meglio fermarsi con un errore chiaro che far
+      // scattare il timeout del chiamante in mezzo a una richiesta.
+      if (remaining < 3_000) {
+        throw lastError ?? new OverpassError("Overpass: tempo di ricerca esaurito", true, 0);
+      }
       try {
-        return await fetchOverpass(endpoint, query, contactEmail, 65000);
+        const elements = await fetchOverpass(
+          endpoint.url,
+          query,
+          contactEmail,
+          Math.min(25_000, remaining - 500)
+        );
+        if (elements.length > 0) return elements;
+        if (endpoint.global) emptyConfirmedByGlobal = true;
       } catch (err) {
         lastError = err;
         if (!isTransient(err)) throw err;
-        await sleep(700 + round * 1200);
+        await sleep(Math.min(700 + round * 1200, Math.max(0, deadline - Date.now() - 3_000)));
       }
     }
+    if (emptyConfirmedByGlobal) return [];
   }
   throw lastError ?? new Error("Overpass non raggiungibile");
 }
@@ -221,12 +289,19 @@ export async function runOverpassSearch(
   lat: number,
   lng: number,
   radiusM: number,
-  contactEmail: string
+  contactEmail: string,
+  budgetMs = 45_000
 ): Promise<OsmCandidate[]> {
+  // Deadline interna con margine sul budget del chiamante: rispondiamo con un
+  // errore chiaro PRIMA che scatti il suo timeout, senza lasciare richieste a meta'.
+  const deadline = Date.now() + Math.max(5_000, budgetMs - 1_500);
+
   // 1) Tentativo con query unica (tutte le categorie insieme): piu veloce.
   try {
     const query = buildOverpassQuery(categoryIds, lat, lng, radiusM);
-    const elements = await execQueryWithRetry(query, contactEmail, 2);
+    // Un solo giro di mirror per la query completa: se e' troppo pesante per il
+    // server, risparmiamo il tempo dei retry e passiamo subito ai gruppi piccoli.
+    const elements = await execQueryWithRetry(query, contactEmail, 1, deadline);
     return parseElements(elements);
   } catch (err) {
     // Se l'errore non e temporaneo (es. query errata), inutile insistere.
@@ -242,9 +317,13 @@ export async function runOverpassSearch(
   let okCount = 0;
   let lastErr: unknown = null;
   for (const group of groups) {
+    if (deadline - Date.now() < 3_000) {
+      lastErr = lastErr ?? new OverpassError("Overpass: tempo di ricerca esaurito", true, 0);
+      break;
+    }
     try {
       const query = buildOverpassQuery(group, lat, lng, radiusM);
-      const elements = await execQueryWithRetry(query, contactEmail, 2);
+      const elements = await execQueryWithRetry(query, contactEmail, 2, deadline);
       merged.push(...elements);
       okCount++;
     } catch (e) {

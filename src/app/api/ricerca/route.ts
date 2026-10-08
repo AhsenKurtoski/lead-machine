@@ -78,9 +78,12 @@ export async function POST(req: Request) {
       break;
     }
     try {
+      const osmBudget = budgetLeft();
       const part = await withTimeout(
-        runOverpassSearch(categories, center.lat, center.lng, radius, contactEmail),
-        budgetLeft(),
+        // Il budget passa anche a runOverpassSearch: la catena mirror si ferma
+        // da sola prima che scatti il timeout esterno.
+        runOverpassSearch(categories, center.lat, center.lng, radius, contactEmail, osmBudget),
+        osmBudget,
         "OpenStreetMap"
       );
       osm = osm.concat(part);

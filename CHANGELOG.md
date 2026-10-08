@@ -3,6 +3,15 @@
 Tutte le modifiche rilevanti di Lead Machine.
 Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e il versionamento è [SemVer](https://semver.org/lang/it/).
 
+## [Unreleased]
+
+### Cambiato
+- Il sito marketing e la demo live non fanno più parte di questo repository: qui c'è solo **Lead Machine, l'app**. Il sito resta disponibile come progetto separato.
+
+### Corretto
+- Catena dei mirror Overpass più robusta: le risposte non-JSON (pagine di errore XML/HTML con status 200) non bloccano più la ricerca, e il fallback in GET scatta anche quando un mirror rifiuta velocemente il POST (es. maps.mail.ru risponde 504 al POST ma 200 al GET).
+- La ricerca Overpass rispetta ora il budget di tempo del chiamante con una deadline interna: finisce con un errore chiaro invece di lasciare richieste pendenti e far scattare il timeout esterno (`timedOut`).
+
 ## [1.0.0] - 2026-10-07
 
 Prima release pubblica di Lead Machine 🎉

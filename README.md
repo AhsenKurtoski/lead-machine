@@ -63,7 +63,7 @@ Freelancers and small web agencies waste dozens of hours per year on **subscript
 Everything is built-in — no plugins to buy:
 
 ### 🔎 Research & Prospecting
-- **Geographic search**: query OpenStreetMap (Overpass) by category + radius + city.
+- **Geographic search**: query **OpenStreetMap (Overpass)** by category + radius + city, with automatic failover across public mirrors. Optional **second source: Geoapify** (free tier) — results from both sources are merged and deduplicated.
 - **Deduplication engine** with 3 layers (OSM ID, then `name+city`, then fuzzy) to avoid polluting your CRM.
 - **Website crawler**: given a lead, find its homepage and extract email / phone / socials.
 - **Screenshot pipeline** (Playwright): one-click homepage preview so you know what to fix before calling.
@@ -83,7 +83,7 @@ Everything is built-in — no plugins to buy:
 - Requests are never left hanging: every source has a time budget and the response carries a `warnings` array explaining what was unavailable.
 - Rate limits are counted **per key** (not per IP), so several projects never block each other, and return `429` with `Retry-After`.
 - Full reference: [API.md](./API.md#20-public-api-for-external-projects-api-v1).
-- End-to-end check: `npm run smoke:api` (31 assertions covering profiles, scopes, auth, CORS and 404s).
+- End-to-end checks: `npm run smoke:api` (31 assertions covering profiles, scopes, auth, CORS and 404s) and `npm run smoke:geo` (live OpenStreetMap + Geoapify search against a running instance, `SMOKE_BASE=http://localhost:3111`).
 
 <details>
 <summary><b>🔑 How to get an API key — step by step (humans & AI agents)</b></summary>
@@ -176,17 +176,12 @@ See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure
 
 ---
 
-## 🌐 Marketing website
+## 🌐 Website & live demo
 
-This repo also contains the **public marketing website** for Lead Machine in the [`website/`](./website/) folder:
+This repository contains **only Lead Machine, the app**. The public marketing site and the in-browser demo are maintained as a separate project.
 
-- Landing, Features, BYOK & Privacy, Transparency, Deploy pages — fully translated in **7 languages** (next-intl).
-- A **live in-browser demo** (`/demo`) that searches **real businesses on OpenStreetMap** (Nominatim + Overpass), scores leads 0–100, and generates cold emails / call scripts with the visitor's **own Gemini/Groq keys** (AES-256-GCM + PBKDF2 encrypted in `localStorage`, never sent to any server).
-- **10 free AI credits per visitor** powered by the serverless route `/api/demo-ai` (set `DEMO_AI_KEY` to enable; without it the demo falls back to BYOK automatically).
-- **SEO ready**: per-locale `sitemap.xml`, `robots.txt`, Open Graph image, canonical + hreflang alternates — statically pre-rendered pages.
-- One-command deploy to **Vercel** (root directory: `website`).
-
-📖 Full documentation, architecture, env vars and demo internals → **[`website/README.md`](./website/README.md)**
+- 🌍 **Live demo**: <https://website-mocha-one-59.vercel.app> — real OpenStreetMap search, AI lead scoring, cold-email generation in your browser.
+- 💻 **This repo**: everything you need to self-host Lead Machine (app + docs + CI).
 
 ---
 
@@ -269,6 +264,8 @@ Edit `.env` (created from `.env.example`). The **only required** variable is a d
 | `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` | Canonical public URL (used in emails, ics, deep links). |
 | `GEMINI_API_KEY` | *(empty)* | Optional. Google AI Studio key. |
 | `GROQ_API_KEY` | *(empty)* | Optional. Groq key. If both are set, Groq is tried first, then Gemini on failure. |
+| `GEOAPIFY_API_KEY` | *(empty)* | Optional. Second geographic source (free tier at <https://myprojects.geoapify.com/>). |
+| `OSM_CONTACT_EMAIL` | `anonimo@example.com` | Contact sent to the Overpass API fair-use policy (identifies your queries). |
 | `SMTP_HOST` | *(empty)* | Optional. SMTP hostname (e.g. `smtp.gmail.com`). |
 | `SMTP_PORT` | `587` | `587` (STARTTLS) or `465` (implicit TLS). |
 | `SMTP_USER` | *(empty)* | SMTP username (often your email). |
@@ -327,7 +324,6 @@ lead-machine/
 │   ├── app/              # App Router: pages + /api/* routes
 │   ├── components/       # UI: app-shell, charts, forms, cards, locale-switcher, theme-toggle…
 │   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, quotes, security, i18n)
-├── website/              # 🌐 Marketing website + live demo (see website/README.md)
 ├── .env.example
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
