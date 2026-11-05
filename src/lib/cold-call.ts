@@ -42,10 +42,12 @@ function brand(settings: Record<string, string>): string {
 function leadName(lead: ColdCallLead): string {
   return (lead.name || "").trim() || "l'attivita";
 }
-function catCity(lead: ColdCallLead): { cat: string; city: string } {
+function catCity(lead: ColdCallLead, settings: Record<string, string>): { cat: string; city: string } {
   return {
     cat: (lead.subcategory || lead.category || "attivita").toLowerCase(),
-    city: lead.city || "Feltre",
+    // Nessuna citta finta: se il lead non ha una citta usiamo quella scelta
+    // dall'utente in onboarding; se manca anche quella, la frase resta valida.
+    city: (lead.city || settings.search_city || "").trim(),
   };
 }
 
@@ -65,7 +67,9 @@ export function buildColdCallScript(
   settings: Record<string, string>,
 ): ColdCallScript {
   const name = leadName(lead);
-  const { cat, city } = catCity(lead);
+  const { cat, city } = catCity(lead, settings);
+  const inCity = city ? " a " + city : " qui in zona";
+  const diCity = city ? " di " + city + " e zona" : " della zona";
   const me = caller(settings);
   const ag = brand(settings);
   const myPhone = settings.brand_phone || "";
@@ -85,7 +89,7 @@ export function buildColdCallScript(
     ? {
         title: "2. Il motivo della chiamata (il gancio)",
         lines: [
-          "Ho visto la vostra attivita qui a " + city + " e ho dato un'occhiata al vostro sito.",
+          "Ho visto la vostra attivita" + inCity + " e ho dato un'occhiata al vostro sito.",
           "Mi occupo di siti per le attivita della zona e ho notato un paio di cose che, sistemate, vi potrebbero portare piu clienti dal telefono e da Google.",
           "Volevo proporvi un piccolo restyling per renderlo piu moderno e veloce, soprattutto da cellulare.",
         ],
@@ -94,7 +98,7 @@ export function buildColdCallScript(
         title: "2. Il motivo della chiamata (il gancio)",
         lines: [
           "Ho cercato " + name + " online e ho visto che non avete (o quasi) un sito vostro.",
-          "Mi occupo di siti per le attivita di " + city + " e zona. Oggi chi non vi trova su Google spesso sceglie un concorrente che ha il sito.",
+          "Mi occupo di siti per le attivita" + diCity + ". Oggi chi non vi trova su Google spesso sceglie un concorrente che ha il sito.",
           "Per farvi capire cosa intendo, vi ho gia preparato GRATIS un'anteprima di sito su misura per " + name + ": volevo mostrarvela.",
         ],
       };

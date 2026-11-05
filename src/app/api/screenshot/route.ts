@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { captureWebsite } from "@/lib/screenshot";
-import { rateLimitedResponse, asString, asInt, asBoolean, asArray } from "@/lib/security";
+import { rateLimitedResponse, asString } from "@/lib/security";
+import { assertPublicHttpUrl } from "@/lib/url-safety";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +14,6 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null);
   const leadId = asString(body?.leadId, 100) || "";
-  const url = asString(body?.url, 2000) || "";
 
   if (!leadId) {
     return NextResponse.json({ ok: false, error: "leadId obbligatorio" }, { status: 400 });
@@ -27,7 +27,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Questo lead non ha un sito web." }, { status: 400 });
   }
 
-  const result = await captureWebsite(url || lead.website, leadId);
+  // Non accettiamo un URL arbitrario dal client: lo screenshot deve riguardare
+  // il sito salvato sul lead. Altrimenti la route diventa un browser SSRF.
+  try {
+    await assertPublicHttpUrl(lead.website);
+  } catch (err) {
+    return NextResponse.json(
+      { ok: false, error: err instanceof Error ? err.message : "URL del sito non valido" },
+      { status: 400 }
+    );
+  }
+
+  const result = await captureWebsite(lead.website, leadId);
   if (!result.ok) {
     return NextResponse.json(result, { status: result.needsInstall ? 501 : 500 });
   }

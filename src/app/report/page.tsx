@@ -7,6 +7,10 @@ import { variantFor, VARIANT_LABELS, type Variant } from "@/lib/ab";
 import { PrintButton } from "@/components/print-button";
 import { Users, MessageSquareText, PhoneCall, CalendarDays, Trophy, TrendingUp } from "lucide-react";
 
+export const metadata = {
+  title: "Report",
+  alternates: { canonical: "/report" },
+};
 export const dynamic = "force-dynamic";
 
 async function getReport() {
@@ -75,7 +79,7 @@ export default async function ReportPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Report settimanale</h1>
           <p className="text-muted-foreground">
-            Attivita dal {formatDate(r.since)} a oggi - zona Feltre / provincia di Belluno
+            Attivita dal {formatDate(r.since)} a oggi - zona di ricerca / provincia di Belluno
           </p>
         </div>
         <PrintButton />

@@ -1,6 +1,6 @@
 # 🚀 Lead Machine — Piano d'azione pre-lancio
 
-> Stato: audit completato il 07/10/2026 · Repo `AxsenXzc/lead-machine` · Sito su Vercel (progetto `website`)
+> Stato: audit completato il 07/10/2026 · Repo `AhsenKurtoski/lead-machine` · Sito su Vercel (progetto `website`)
 > Autore: **Ahsen Kurtoski** — Idea & Vision · Sviluppo: Artificial Intelligence
 
 ---
@@ -11,12 +11,12 @@
 |---|---|
 | Rimozione pagina `/pricing` + sezione "Prezzi" dalla home, link nav/footer e sitemap (sito marketing) | ✅ Fatto |
 | Titolo FAQ "FAQ Prezzi" → "Domande frequenti" in tutte le 7 lingue | ✅ Fatto |
-| Rinomina **"Axsen Kurtoski" → "Ahsen Kurtoski"** (README, REELS_GUIDE, website/README) | ✅ Fatto |
+| Nome del brand uniformato a **Ahsen Kurtoski** (README, REELS_GUIDE, website/README) | ✅ Fatto |
 | Nome aggiunto dove mancava: `LICENSE` (copyright), `package.json` e `website/package.json` (author) | ✅ Fatto |
 | Fix lint sito (conflitto ESLint root/website: aggiunto `"root": true`) | ✅ Fatto |
 | Verifiche: typecheck + lint (root e sito) · i18n 7/7 · build sito (162 pagine statiche) · browser test | ✅ Tutto verde |
 
-**Invarianti rispettate** (come da scelte condivise): l'app (listino, preventivi, fatture) resta intatta; username GitHub `AxsenXzc` ed email `axsen_kurtoski@financier.com` restano invariati perché sono riferimenti funzionanti. Il brand display è stato uniformato ad **Ahsen-Studio** (come richiesto), con il credito "ideato e creato da Ahsen Kurtoski" aggiunto in footer, pagina Chi Siamo e imprint legale.
+**Invarianti rispettate** (come da scelte condivise): l'app (ricerca, CRM, verifiche dei dati, ricevute) resta funzionante e non usa più città o brand personali scritti nel codice: li imposta l'utente al primo avvio. Username GitHub `AhsenKurtoski` ed email `hello@lead-machine.dev` sono i riferimenti canonici del progetto; il brand mostrato dal sito marketing è un dato di configurazione, con il credito "ideato e creato da Ahsen Kurtoski" in footer, pagina Chi Siamo e imprint legale.
 
 ---
 
@@ -31,7 +31,7 @@
 | Lavoro locale non committato | `src/app/impostazioni/page.tsx` (esempi API con URL dinamico) — da decidere se committare |
 | i18n **app** (`src/lib/i18n-dictionaries.ts`) | ✅ 245 chiavi × 7 lingue (it, de, fr, sl, en, es, pt) — parità 100% (`npm run i18n:check`) |
 | i18n **sito** (`website/messages/*.json`) | ✅ 386 chiavi × 7 lingue — parità 100% (JSON validi) |
-| QA automatico | ✅ `npm run qa` verde (typecheck, lint, i18n) |
+| QA automatico | ✅ `npm run qa` verde (test unitari, typecheck, lint, i18n) |
 | Build sito | ✅ `next build` OK — 162 pagine statiche, First Load JS ~87 kB |
 | Documentazione | ✅ README, API.md, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, DEPLOY, REELS_GUIDE, LICENSE (MIT) |
 | Sicurezza repo | ✅ `.env` e DB **non** tracciati; chiavi API hashate SHA-256; `npm run smoke:api` (31 assert) |
@@ -57,7 +57,7 @@
 | **Sicurezza** | `next@14.2.15` vulnerabile (DoS su Server Actions + info exposure, advisory critical); `nodemailer` high | 🔴 Blocca |
 | **Deploy** | Produzione indietro di 4 commit; dominio custom non collegato; `NEXT_PUBLIC_SITE_URL` non impostato | 🔴 Blocca |
 | **Docs** | ~~URL repo sbagliati (`github.com/lead-machine/lead-machine`)~~ → ✅ **Risolto**: tutti gli URL puntano a `github.com/AhsenKurtoski/lead-machine` (la repo è stata spostata sotto l'org `AhsenKurtoski`) | ✅ Fatto |
-| **Contatti** | `security@lead-machine.dev` (README/SECURITY) vs `axsen_kurtoski@financier.com` (form): due indirizzi diversi, il primo probabilmente inesistente | 🟠 Importante |
+| **Contatti** | `security@lead-machine.dev` (README/SECURITY) vs `hello@lead-machine.dev` (form): due indirizzi diversi, il primo probabilmente inesistente | 🟠 Importante |
 | **UX/UI** | Footer con social placeholder (`twitter.com/leadmachine_dev`, `linkedin.com/company/leadmachine`) che probabilmente 404 | 🟠 Importante |
 | **SEO** | hreflang/canonical su dominio non servito; manca Search Console + OG image verificata | 🟠 Importante |
 | **Repo** | Niente CI, issue templates, CHANGELOG, release, topics, social preview | 🟠 Importante |
@@ -90,7 +90,7 @@
 | 1.4 | `CHANGELOG.md` (Keep a Changelog) + topics + description + social preview 1280×640 sul repo | 1 h |
 | 1.5 | Audit a11y (axe) + Lighthouse mobile su home/demo: target ≥ 95 perf, 0 violazioni critiche | 2 h |
 | 1.6 | Rimuovere/verificare `opencode-omniroute-auth`; pulire chiavi i18n orfane del sito | 1 h |
-| 1.7 | Test manuale end-to-end del flusso guadagno: ricerca lead → contatto → preventivo → PDF, su 2 browser | 2 h |
+| 1.7 | Test manuale end-to-end del flusso guadagno: ricerca lead → verifica dei dati → contatto → ricevuta di pagamento, su 2 browser | 2 h |
 
 ### 🟢 Fase 2 — Post-lancio
 
@@ -130,7 +130,7 @@
 1. **Davide contro Golia** — "i freelance pagano fino a €200/mese di tool: l'ho reso tutto gratuito e open source". Già pronto in REELS_GUIDE.md.
 2. **Privacy & BYOK** — SQLite locale, chiavi API crittografate nel browser, zero telemetria: posiziona contro gli SaaS "data-hungry".
 3. **Storia umana** — teenager + AI che costruiscono un prodotto enterprise-grade: perfetto per HN/PH/TikTok, genera identificazione.
-4. **Multilingua reale** — 7 lingue native (non solo UI: valute, date, IVA, PDF): leva per le community EU (DE, FR, SL, ES, PT).
+4. **Multilingua reale** — 7 lingue per l'interfaccia e formattazione nativa di valute e date; alcuni contenuti di dominio e testi generati restano in italiano: leva per le community EU (DE, FR, SL, ES, PT).
 
 **Distribuzione a 2 settimane**
 - **Giorno 0**: GitHub release + Show HN + Reddit (r/selfhosted).

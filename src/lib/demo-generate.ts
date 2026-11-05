@@ -26,7 +26,7 @@ export type DemoLeadLike = {
 export type DemoGenResult = { html: string; provider: string };
 
 export const DEMO_SYSTEM_PROMPT =
-  "Sei un web designer e front-end developer di livello altissimo (top 1%), specializzato in siti vetrina premium per piccole attivita locali italiane. " +
+  "Sei un web designer e front-end developer di livello altissimo (top 1%), specializzato in siti vetrina premium per piccole attivita locali. " +
   "I tuoi siti sembrano realizzati da un'agenzia da migliaia di euro: design moderno 2025, micro-interazioni in CSS, sezioni complete e curate nei dettagli. " +
   "Ogni sito che crei e DIVERSO dagli altri: cambi layout, palette, tipografia e composizione in base all'attivita, senza mai riutilizzare lo stesso schema. " +
   "Produci codice HTML pulito, semanticamente corretto, accessibile e completamente funzionante. Scrivi sempre in italiano corretto con gli accenti giusti. " +
@@ -54,6 +54,7 @@ export function buildDemoPrompt(
   brandOwner: string,
   bookingEmail: string,
   customPrompt: string,
+  countryCode = "IT",
 ): string {
   const phone = lead.mobile || lead.phone || "";
   const wa = lead.whatsapp ? "https://wa.me/" + lead.whatsapp : "";
@@ -64,7 +65,7 @@ export function buildDemoPrompt(
     "Anteprima dimostrativa - proposta da " + brandName + (brandOwner ? " (" + brandOwner + ")" : "");
   const formAction = bookingEmail ? "https://formsubmit.co/" + bookingEmail : "";
   const mapQ = encodeURIComponent(
-    ((lead.addressFull ? lead.addressFull + " " : "") + (lead.city || "Feltre")) || lead.name || "Feltre"
+    ((lead.addressFull ? lead.addressFull + " " : "") + (lead.city || "")) || lead.name || ""
   );
   const variant = LAYOUT_VARIANTS[hashString(lead.id || lead.name || "x") % LAYOUT_VARIANTS.length];
 
@@ -74,7 +75,7 @@ export function buildDemoPrompt(
     "DATI REALI (usa SOLO questi, non inventare contatti o indirizzi):",
     "- Nome attivita: " + (lead.name || "-"),
     "- Categoria: " + (lead.subcategory || lead.category || "-"),
-    "- Citta: " + (lead.city || "Feltre"),
+    "- Citta: " + (lead.city || "non disponibile"),
     "- Indirizzo: " + (lead.addressFull || "non disponibile"),
     "- Telefono: " + (phone || "non disponibile"),
     "- Link WhatsApp: " + (wa || "non disponibile"),
@@ -113,7 +114,7 @@ export function buildDemoPrompt(
     "2) SEZIONE FAQ: 4-5 domande frequenti pertinenti alla categoria, realizzate con elementi <details>/<summary> (accordion che funziona SENZA JavaScript).",
     "3) MAPPA GOOGLE INTEGRATA: un <iframe> con src='https://www.google.com/maps?q=" + mapQ + "&output=embed' (senza API key), larghezza piena, altezza ~300px, angoli arrotondati e loading='lazy'.",
     "4) ORARI DI APERTURA in una piccola tabella/lista (orari verosimili, indicativi) PIU un PULSANTE WHATSAPP FLOTTANTE fisso in basso a destra (position:fixed) con il link wa.me fornito. Ometti il pulsante se WhatsApp non e disponibile.",
-    "5) SEO + DATI STRUTTURATI: nel <head> inserisci <title> ottimizzato, <meta name='description'>, meta Open Graph (og:title, og:description, og:type=website) e uno <script type='application/ld+json'> con schema LocalBusiness (name, telephone, email, address con addressLocality e addressCountry='IT'). Aggiungi scroll fluido con 'html scroll-behavior:smooth' e un piccolo pulsante 'Torna su' (link ad #home)."
+    "5) SEO + DATI STRUTTURATI: nel <head> inserisci <title> ottimizzato, <meta name='description'>, meta Open Graph (og:title, og:description, og:type=website) e uno <script type='application/ld+json'> con schema LocalBusiness (name, telephone, email, address con addressLocality e addressCountry='" + countryCode + "'). Aggiungi scroll fluido con 'html scroll-behavior:smooth' e un piccolo pulsante 'Torna su' (link ad #home)."
   );
 
   if (formAction) {
@@ -161,8 +162,9 @@ export async function generateDemoHtml(
   brandOwner: string,
   bookingEmail: string,
   customPrompt: string,
+  countryCode = "IT",
 ): Promise<DemoGenResult | null> {
-  const prompt = buildDemoPrompt(lead, brandName, brandOwner, bookingEmail, customPrompt);
+  const prompt = buildDemoPrompt(lead, brandName, brandOwner, bookingEmail, customPrompt, countryCode);
   for (let attempt = 0; attempt < 2; attempt++) {
     const result = await generateText({
       system: DEMO_SYSTEM_PROMPT,

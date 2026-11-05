@@ -28,6 +28,7 @@ import {
   Users,
   Download,
   Upload,
+  ShieldCheck,
 } from "lucide-react";
 
 const STATUSES = Object.keys(STATUS_LABELS);
@@ -58,6 +59,7 @@ export default function CrmPage() {
   const [categoryFilter, setCategoryFilter] = React.useState("");
   const [onlyNoWeb, setOnlyNoWeb] = React.useState(false);
   const [bulkStatus, setBulkStatus] = React.useState("");
+  const [verifying, setVerifying] = React.useState<{ done: number; total: number } | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -112,6 +114,69 @@ export default function CrmPage() {
       body: JSON.stringify({ ids: Array.from(selected), action: "status", status: bulkStatus }),
     });
     setBulkStatus("");
+    load();
+  }
+
+  // Verifica dei dati in blocco. Ogni blocco di 20 fa controlli REALI (record
+  // MX del dominio, richiesta HTTP al sito), quindi si aspetta la risposta del
+  // server prima di mandare il blocco successivo. Se il server chiede di
+  // rallentare (429) si rispetta il tempo indicato invece di insistere.
+  const VERIFY_BATCH = 20;
+
+  async function verifyMany(ids: string[]) {
+    if (ids.length === 0 || verifying) return;
+    setVerifying({ done: 0, total: ids.length });
+    let checkedLeads = 0;
+    let verifiedFields = 0;
+    let problems = 0;
+    let failed = 0;
+
+    for (let i = 0; i < ids.length; i += VERIFY_BATCH) {
+      const chunk = ids.slice(i, i + VERIFY_BATCH);
+      for (let attempt = 0; ; attempt++) {
+        let res: Response;
+        try {
+          res = await fetch("/api/leads/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ leadIds: chunk }),
+          });
+        } catch {
+          failed += chunk.length;
+          break;
+        }
+        if (res.status === 429 && attempt < 3) {
+          const seconds = Math.min(90, Number(res.headers.get("Retry-After") ?? 20) || 20);
+          await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+          continue;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+          failed += chunk.length;
+          break;
+        }
+        checkedLeads += data.done ?? chunk.length;
+        verifiedFields += data.verified ?? 0;
+        problems += data.problems ?? 0;
+        break;
+      }
+      setVerifying({ done: Math.min(i + VERIFY_BATCH, ids.length), total: ids.length });
+    }
+
+    setVerifying(null);
+    toast({
+      title: "Verifica completata",
+      description:
+        "Controllati " +
+        checkedLeads +
+        " lead: " +
+        verifiedFields +
+        " dati verificati, " +
+        problems +
+        " da controllare." +
+        (failed ? " " + failed + " non verificati (rete occupata): riprova." : ""),
+      variant: failed ? "destructive" : "success",
+    });
     load();
   }
 
@@ -222,6 +287,21 @@ export default function CrmPage() {
           <Download className="mr-1 h-4 w-4" />
           Esporta CSV
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => verifyMany(leads.map((l) => l.id))}
+          disabled={loading || verifying !== null || leads.length === 0}
+        >
+          {verifying ? (
+            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+          ) : (
+            <ShieldCheck className="mr-1 h-4 w-4" />
+          )}
+          {verifying
+            ? "Verifica " + verifying.done + "/" + verifying.total + "..."
+            : "Verifica tutta la coda (" + leads.length + ")"}
+        </Button>
       </div>
       <div className="flex items-center justify-between">
         <div>
@@ -275,6 +355,19 @@ export default function CrmPage() {
           </select>
           <Button size="sm" onClick={bulkApply} disabled={!bulkStatus}>
             Applica
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => verifyMany(Array.from(selected))}
+            disabled={verifying !== null}
+          >
+            {verifying ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ShieldCheck className="h-4 w-4" />
+            )}
+            Verifica selezionati
           </Button>
           <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
             <Trash2 className="h-4 w-4" /> Elimina

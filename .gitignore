@@ -50,6 +50,8 @@ next-env.d.ts
 /prisma/dev.db
 /prisma/dev.db-wal
 /prisma/dev.db-shm
+# backup locali del database (es. dev.db.backup-20261009-154435)
+/prisma/*.db.backup-*
 /prisma/migrations/**/migration_lock.toml.bak
 
 # backups, local email fallback, runtime scratch

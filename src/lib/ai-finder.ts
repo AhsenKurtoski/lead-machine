@@ -60,10 +60,10 @@ export async function runAiFinderSearch(
   const cats = categoryLabels.length > 0 ? categoryLabels.join(", ") : "qualsiasi attivita commerciale o di servizi";
 
   const prompt = [
-    "Sei un assistente che trova attivita commerciali locali REALI in Italia usando la ricerca Google.",
+    "Sei un assistente che trova attivita commerciali locali REALI usando la ricerca Google.",
     "Obiettivo: elenca attivita che con buona probabilita NON hanno ancora un sito web proprio (spesso piccole realta presenti solo su Google Maps, Pagine Gialle o social).",
     "",
-    "Zona di ricerca: entro circa " + radiusKm + " km da " + cityName + " (coordinate " + lat.toFixed(4) + ", " + lng.toFixed(4) + "), provincia di Belluno, Veneto.",
+    "Zona di ricerca: entro circa " + radiusKm + " km da " + cityName + " (coordinate " + lat.toFixed(4) + ", " + lng.toFixed(4) + "). Usa la zona indicata senza assumere una provincia o regione fissa.",
     "Categorie di interesse: " + cats + ".",
     "",
     "Regole:",

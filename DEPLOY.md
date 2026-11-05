@@ -15,7 +15,7 @@ Lead Machine is a standard Next.js app. It runs great:
 - [ ] You ran `npm run build` locally successfully.
 - [ ] You have backed up `prisma/dev.db` (if it has real leads).
 - [ ] Your `.env` is filled in: at minimum `DATABASE_URL`, and ideally `NEXT_PUBLIC_BASE_URL=https://<your-domain>`.
-- [ ] You have a plan for authentication. The app is single-user / no-login by design; exposing it without auth means **anyone with your URL can read/write every lead, quote and setting**.
+- [ ] `APP_PASSWORD` is set to a strong value of at least 8 characters. The app is single-user, not no-login: without this variable every protected page and API fails closed with `503`.
 - [ ] You understand that SQLite is a **single file** — horizontal scaling with multiple processes (Next.js standalone mode with `NUM_WORKERS > 1`) can cause locking issues. For concurrency >1, switch to Postgres (section 4).
 
 ---
@@ -70,6 +70,8 @@ npm install --production=false   # devDependencies needed for prisma generate + 
 cp .env.example .env
 # edit DATABASE_URL=file:./prod.db  (or keep file:./dev.db — name doesn't matter)
 # set NEXT_PUBLIC_BASE_URL=https://your-domain.example.com
+# set APP_PASSWORD to a strong value of at least 8 characters (required)
+# set TRUST_PROXY=1 when Caddy/Nginx is the only way in
 # set SMTP_* and GEMINI_API_KEY / GROQ_API_KEY if you need them
 
 # Initialize DB + seed
@@ -120,7 +122,7 @@ systemctl status lead-machine     # should be "active (running)"
 journalctl -fu lead-machine       # live logs
 ```
 
-### 2.4 Caddyfile (HTTPS + Basic Auth in front of the app)
+### 2.4 Caddyfile (HTTPS + optional Basic Auth in front of the app login)
 
 **As root**, replace `/etc/caddy/Caddyfile` with:
 
@@ -315,7 +317,7 @@ If you really want this on Vercel or similar serverless platforms:
    };
    export default nextConfig;
    ```
-4. Add basic auth via Vercel password protection project setting or a middleware.
+4. Set `APP_PASSWORD` in the project environment and keep Vercel/Cloudflare Access or Basic Auth as an optional second layer.
 5. Deploy. First deploy will seed an empty DB — run the settings page once, or run `prisma db push && npm run db:seed` locally pointing to the same remote Postgres URL.
 
 Performance and cold-start latency will be worse than a $4 VPS, but it works.
@@ -324,34 +326,15 @@ Performance and cold-start latency will be worse than a $4 VPS, but it works.
 
 ## 7. Healthcheck / uptime monitoring
 
-Add a healthcheck endpoint-free trick: monitor `/` with uptime-kuma / UptimeRobot / BetterStack. The homepage redirects to `/dashboard` but still returns HTTP 200 to the redirect.
-
-If you want an explicit JSON healthcheck, add this one-liner to your `src/app/api/health/route.ts` (it's not in the repo by default to keep surface area low):
-
-```ts
-// src/app/api/health/route.ts
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-export async function GET() {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    return NextResponse.json({ ok: true, ts: Date.now() }, { status: 200 });
-  } catch (e) {
-    return NextResponse.json(
-      { ok: false, error: (e as Error).message },
-      { status: 503 }
-    );
-  }
-}
-```
+`GET /api/health` is public and returns `{ ok: true, service: "lead-machine", time }` with `200`. It is a liveness check only: it does not query the database, so pair it with an application-level check if you need readiness. It is exempt from login so a monitor can use it without storing the app password.
 
 ---
 
 ## 8. Hardening cheat-sheet
 
-- [ ] Put auth in front (Caddy basicauth, Vercel password, OIDC via Authela, etc.)
-- [ ] Set `NEXT_PUBLIC_BASE_URL` to the HTTPS URL.
+- [ ] Set `APP_PASSWORD` (min 8 chars) and use `npm run start:public` only behind the proxy.
+- [ ] Optionally add Caddy basicauth / Vercel password / OIDC as a second layer.
+- [ ] Set `NEXT_PUBLIC_BASE_URL` to the HTTPS URL and `TRUST_PROXY=1` behind your own proxy.
 - [ ] Firewall only allows 22 / 80 / 443.
 - [ ] Daily encrypted offsite backups of the DB.
 - [ ] Weekly system upgrades (enable `unattended-upgrades` on Debian/Ubuntu).

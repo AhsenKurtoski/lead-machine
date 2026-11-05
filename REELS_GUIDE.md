@@ -26,9 +26,9 @@ Ecco lo script esatto e la regia per un video di 45-60 secondi progettato per l'
 * **Testo a schermo:** L'AI SCRIVE AL POSTO TUO 🤖✍️
 
 ### FASE 4: La Completezza (0:30 - 0:45)
-* **Video:** Clicchi su WhatsApp, poi passi alla generazione del preventivo PDF in 1 click.
-* **Tu dici:** "Puoi scrivergli su WhatsApp con un click, e quando accettano, ti genera il preventivo in PDF formattato in 7 lingue diverse. Tutto in automatico."
-* **Testo a schermo:** PREVENTIVI PDF IN 1 CLICK 📄✨
+* **Video:** Clicchi su WhatsApp, poi apri il pannello "Verifica dati" del lead e infine registri la ricevuta di pagamento in 1 click.
+* **Tu dici:** "Puoi scrivergli su WhatsApp con un click, l'app ti dice quali dati sono verificati prima di chiamare e, quando ti pagano, registri la ricevuta in un click. Tutto in automatico."
+* **Testo a schermo:** DATI VERIFICATI + RICEVUTE IN 1 CLICK ✅✨
 
 ### FASE 5: La Call to Action (Call to Action) (0:45 - 0:60)
 * **Video:** Torni tu in primo piano. Mostri la pagina GitHub o il sito demo.
@@ -46,7 +46,8 @@ Ho scoperto che i freelance pagano fino a 200€ al mese per software di Lead Ge
 Si chiama Lead Machine:
 📍 Trova i clienti locali dalla mappa
 🤖 L'AI ti scrive i messaggi e le email per contattarli
-📄 Genera preventivi e fatture PDF in 7 lingue
+✅ Verifica telefono, email e sito prima di contattare
+🧾 Registra la ricevuta in un click quando ti pagano
 🔒 I tuoi dati restano sul tuo computer
 
 Sono Ahsen Kurtoski e credo che il software debba aiutare le persone, non svuotargli il portafoglio.

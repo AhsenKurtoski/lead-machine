@@ -42,7 +42,14 @@ export async function POST(req: Request) {
 
     let gen;
     try {
-      gen = await generateDemoHtml(lead, brandName, brandOwner, bookingEmail, promptToUse);
+      gen = await generateDemoHtml(
+        lead,
+        brandName,
+        brandOwner,
+        bookingEmail,
+        promptToUse,
+        (settings.business_country || "IT").toUpperCase()
+      );
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (customPrompt.trim()) {

@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     const me = settings.brand_owner || settings.brand_name || "il venditore";
     const ag = settings.brand_name || "la web agency";
     const cat = (lead.subcategory || lead.category || "attivita").toLowerCase();
-    const city = lead.city || "Feltre";
+    const city = lead.city || settings.search_city || "zona non specificata";
 
     const system =
       "Sei un esperto di vendita telefonica e telemarketing per piccole web agency italiane. " +

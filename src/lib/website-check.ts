@@ -4,6 +4,8 @@
 // indizi di ottimizzazione mobile. Solo lato server.
 // ============================================================
 
+import { fetchPublicHtml } from "@/lib/url-safety";
+
 export type WebsiteCheck = {
   status: "assente" | "ok" | "lento" | "vecchio" | "non_responsive";
   reachable: boolean;
@@ -28,15 +30,12 @@ export async function checkWebsite(rawUrl: string | null): Promise<WebsiteCheck>
   let url = rawUrl.trim();
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12000);
   const started = Date.now();
 
   try {
-    const res = await fetch(url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
+    const res = await fetchPublicHtml(url, {
+      timeoutMs: 12000,
+      maxBytes: 256_000,
       headers: { "User-Agent": "LeadMachineBot/1.0 (verifica stato sito)" },
     });
     const responseMs = Date.now() - started;
@@ -52,12 +51,7 @@ export async function checkWebsite(rawUrl: string | null): Promise<WebsiteCheck>
       };
     }
 
-    let html = "";
-    try {
-      html = await res.text();
-    } catch {
-      html = "";
-    }
+    const html = res.text;
     const responsive = /<meta[^>]+name=["']?viewport/i.test(html);
 
     if (responseMs > 3500) {
@@ -99,7 +93,5 @@ export async function checkWebsite(rawUrl: string | null): Promise<WebsiteCheck>
       responsive: null,
       detail: "Impossibile raggiungere il sito (" + msg + ").",
     };
-  } finally {
-    clearTimeout(timer);
   }
 }

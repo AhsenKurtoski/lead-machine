@@ -2,16 +2,20 @@ import * as React from "react";
 import { getSettings } from "@/lib/settings";
 import { Globe, Rocket, Search, MessageCircle, Sparkles, CheckCircle2, Mail, Phone } from "lucide-react";
 
+export const metadata = {
+  title: "Portfolio",
+  alternates: { canonical: "/portfolio" },
+};
 export const dynamic = "force-dynamic";
 
 export default async function PortfolioPage() {
   const s = await getSettings();
-  const brand = s.brand_name || "Ahsen-Studio";
+  const brand = s.brand_name || "La Tua Web Agency";
   const tagline = s.brand_tagline || "Siti web professionali per le attivita locali";
   const owner = s.brand_owner || "";
   const phone = s.brand_phone || "";
   const email = s.brand_email || s.formsubmit_email || "";
-  const city = s.search_city || "Feltre";
+  const cityLabel = (s.search_city || "").trim();
 
   const services = [
     { icon: Globe, title: "Sito web premium", text: "Siti moderni, veloci e ottimizzati per mobile, su misura per la tua attivita." },
@@ -35,7 +39,11 @@ export default async function PortfolioPage() {
         </div>
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{brand}</h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{tagline}</p>
-        <p className="mt-2 text-sm text-muted-foreground">Web agency per attivita locali a {city} e in provincia di Belluno</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {cityLabel
+            ? "Web agency per attivita locali a " + cityLabel + " e dintorni"
+            : "Web agency per attivita locali nella tua zona"}
+        </p>
         {phone ? (
           <a
             href={"https://wa.me/" + phone.replace(/[^0-9]/g, "")}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { rateLimitedResponse, asString, asInt, asBoolean, asArray } from "@/lib/security";
+import { rateLimitedResponse, asString, asArray } from "@/lib/security";
+import { STATUS_LABELS } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -24,26 +25,40 @@ export async function POST(req: Request) {
   }
 
   if (action === "delete") {
-    // La cancellazione propaga su attivita, follow-up, preventivi, ecc. (relazioni a cascata).
+    // La cancellazione propaga su attivita, follow-up, ricevute, ecc. (relazioni a cascata).
     const result = await prisma.lead.deleteMany({ where: { id: { in: ids } } });
     return NextResponse.json({ ok: true, deleted: result.count });
   }
 
   if (action === "status") {
     const status = asString(body?.status, 30) ?? "";
-    if (!status) {
-      return NextResponse.json({ ok: false, error: "Stato mancante" }, { status: 400 });
+    if (!status || !Object.keys(STATUS_LABELS).includes(status)) {
+      return NextResponse.json({ ok: false, error: "Stato non valido" }, { status: 400 });
     }
-    const result = await prisma.lead.updateMany({
+
+    // Considera solo ID esistenti: evita FK fallite nel diario.
+    const existing = await prisma.lead.findMany({
       where: { id: { in: ids } },
-      data: { status },
+      select: { id: true },
     });
-    // Registra il cambio di stato nel diario di ogni lead.
-    for (const leadId of ids) {
-      await prisma.activity.create({
-        data: { leadId, type: "stato", description: "Stato cambiato in " + status },
-      });
+    const validIds = existing.map((row) => row.id);
+    if (validIds.length === 0) {
+      return NextResponse.json({ ok: true, updated: 0 });
     }
+
+    const [result] = await prisma.$transaction([
+      prisma.lead.updateMany({
+        where: { id: { in: validIds } },
+        data: { status },
+      }),
+      prisma.activity.createMany({
+        data: validIds.map((leadId) => ({
+          leadId,
+          type: "stato",
+          description: "Stato cambiato in " + status,
+        })),
+      }),
+    ]);
     return NextResponse.json({ ok: true, updated: result.count });
   }
 

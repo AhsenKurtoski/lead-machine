@@ -3,6 +3,8 @@
 // dal file .env come ripiego, cosi puoi configurare tutto dalla UI.
 
 import nodemailer from "nodemailer";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { getSettings } from "@/lib/settings";
 
 function clean(v: string | undefined | null): string {
@@ -55,15 +57,42 @@ export type SendEmailInput = {
 
 export async function sendEmail(
   input: SendEmailInput,
-): Promise<{ ok: true; messageId: string; provider: string }> {
+): Promise<{ ok: true; messageId: string; provider: string; file?: string }> {
   const c = await getSmtpConfig();
-  if (!c.host || !c.user || !c.pass) {
-    throw new Error(
-      "Invio email non configurato. Vai in Impostazioni > Email e inserisci server, utente e password (per Gmail una Password per le app).",
-    );
-  }
   if (!input.to) {
     throw new Error("Manca l'indirizzo email del destinatario.");
+  }
+
+  // Fallback sicuro: senza SMTP scriviamo un file .eml in ./tmp/emails.
+  // Cosi demo, sviluppo e test non richiedono credenziali e non inviano nulla.
+  if (!c.host || !c.user || !c.pass) {
+    const transporter = nodemailer.createTransport({
+      streamTransport: true,
+      buffer: true,
+      newline: "unix",
+    });
+    const info = await transporter.sendMail({
+      from: c.from || c.user || "Lead Machine <noreply@localhost>",
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+      attachments: input.attachments,
+    });
+    const raw = Buffer.isBuffer(info.message)
+      ? info.message
+      : Buffer.from(String(info.message ?? ""));
+    const dir = path.join(process.cwd(), "tmp", "emails");
+    await mkdir(dir, { recursive: true });
+    const filename = new Date().toISOString().replace(/[:.]/g, "-") + "-" + Math.random().toString(36).slice(2, 8) + ".eml";
+    const filePath = path.join(dir, filename);
+    await writeFile(filePath, raw);
+    return {
+      ok: true,
+      messageId: String(info.messageId ?? filename),
+      provider: "local-fs",
+      file: path.relative(process.cwd(), filePath),
+    };
   }
 
   const secure = c.port === 465;

@@ -4,11 +4,17 @@ import { validateApiKey, CORS_HEADERS, rateLimitApiKey, requireScope } from "@/l
 import {
   asString,
   asNumber,
+  asInt,
   asBoolean,
-  asArray,
   asNonEmptyString,
+  isValidEmail,
+  isLikelyUrl,
+  normalizeUrl,
   sanitizePlainText,
 } from "@/lib/security";
+import { STATUS_LABELS } from "@/lib/utils";
+
+const ALLOWED_STATUSES = Object.keys(STATUS_LABELS);
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +39,25 @@ export async function GET(req: Request) {
   const status = url.searchParams.get("status")?.trim();
   const onlyNoWeb = url.searchParams.get("onlyNoWeb") === "1" || url.searchParams.get("hasWebsite") === "false";
   const onlyWithWeb = url.searchParams.get("hasWebsite") === "true";
-  const minScore = Number(url.searchParams.get("minScore") || 0);
-  const limit = Math.min(Math.max(1, Number(url.searchParams.get("limit") || 100)), 500);
-  const offset = Math.max(0, Number(url.searchParams.get("offset") || 0));
+  const minScoreRaw = url.searchParams.get("minScore");
+  const minScore = minScoreRaw === null || minScoreRaw === "" ? 0 : asInt(minScoreRaw, 0, 100);
+  const limitRaw = url.searchParams.get("limit");
+  const limit = limitRaw === null || limitRaw === "" ? 100 : asInt(limitRaw, 1, 500);
+  const offsetRaw = url.searchParams.get("offset");
+  const offset = offsetRaw === null || offsetRaw === "" ? 0 : asInt(offsetRaw, 0, 1_000_000);
+
+  if (minScore === null || limit === null || offset === null) {
+    return NextResponse.json(
+      { ok: false, error: "Parametri non validi: limit 1-500, offset >= 0, minScore 0-100." },
+      { status: 400, headers: CORS_HEADERS }
+    );
+  }
+  if (status && !ALLOWED_STATUSES.includes(status)) {
+    return NextResponse.json(
+      { ok: false, error: "Stato non valido." },
+      { status: 400, headers: CORS_HEADERS }
+    );
+  }
 
   const where: Record<string, unknown> = {};
 
@@ -132,7 +154,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Il nome dell'attività è obbligatorio" }, { status: 400, headers: CORS_HEADERS });
     }
 
-    const city = asString(body.city, 100) || "Feltre";
+    // Citta facoltativa: se il client non la manda, resta null invece di
+    // inventare una citta dell'utente.
+    const city = asString(body.city, 100);
+    const email = asString(body.email, 254);
+    if (email && email.trim() && !isValidEmail(email)) {
+      return NextResponse.json({ ok: false, error: "Email non valida" }, { status: 400, headers: CORS_HEADERS });
+    }
+    const websiteRaw = asString(body.website, 2048);
+    if (websiteRaw && websiteRaw.trim() && !isLikelyUrl(websiteRaw)) {
+      return NextResponse.json({ ok: false, error: "URL sito non valido" }, { status: 400, headers: CORS_HEADERS });
+    }
+    const website = websiteRaw ? normalizeUrl(websiteRaw) : null;
+    const status = asString(body.status, 50) || "NUOVO";
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return NextResponse.json({ ok: false, error: "Stato non valido" }, { status: 400, headers: CORS_HEADERS });
+    }
     const lead = await prisma.lead.create({
       data: {
         name,
@@ -140,10 +177,10 @@ export async function POST(req: Request) {
         subcategory: asString(body.subcategory, 150),
         phone: asString(body.phone, 50),
         whatsapp: asString(body.whatsapp, 50),
-        email: asString(body.email, 254),
-        hasWebsite: asBoolean(body.hasWebsite) ?? Boolean(body.website),
-        website: asString(body.website, 2048),
-        websiteStatus: asString(body.websiteStatus, 40) ?? (body.website ? "ok" : "assente"),
+        email,
+        hasWebsite: asBoolean(body.hasWebsite) ?? Boolean(website),
+        website,
+        websiteStatus: asString(body.websiteStatus, 40) ?? (website ? "da_verificare" : "assente"),
         addressFull: asString(body.addressFull, 500),
         city,
         postalCode: asString(body.postalCode, 20),
@@ -152,7 +189,7 @@ export async function POST(req: Request) {
         priorityScore: asNumber(body.priorityScore, 0, 100) ?? 50,
         priorityReason: sanitizePlainText(body.priorityReason, 1000),
         source: asString(body.source, 50) || "api_external",
-        status: asString(body.status, 50) || "NUOVO",
+        status,
         activities: {
           create: {
             type: "sistema",

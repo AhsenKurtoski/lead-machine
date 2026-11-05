@@ -12,16 +12,15 @@ import {
   MessageSquareText,
   MessageCircle,
   PhoneCall,
-  FileText,
   Settings,
   ScrollText,
   BookOpen,
   Receipt,
-  Calculator,
-  Tag,
   Menu,
   X,
+  LogOut,
   BarChart3,
+  Target,
   Rocket,
   Inbox,
   Mail,
@@ -34,6 +33,7 @@ import { NotificationsBell } from "@/components/notifications-bell";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useLocale } from "@/components/locale-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { AUTHOR } from "@/lib/author";
 
 
 type NavItem = { href: string; labelKey: string; icon: React.ComponentType<{ className?: string }> };
@@ -49,24 +49,65 @@ const NAV: NavItem[] = [
   { href: "/cold-call", labelKey: "nav.coldCall", icon: PhoneCall },
   { href: "/calendario", labelKey: "nav.calendar", icon: CalendarDays },
   { href: "/report", labelKey: "nav.reports", icon: BarChart3 },
-  { href: "/preventivi", labelKey: "nav.quotes", icon: FileText },
-  { href: "/listino", labelKey: "nav.pricelist", icon: Tag },
   { href: "/ricevuta", labelKey: "nav.receipts", icon: Receipt },
-  { href: "/fisco", labelKey: "nav.fiscal", icon: Calculator },
+  { href: "/opportunita", labelKey: "nav.opportunities", icon: Target },
   { href: "/attivita", labelKey: "nav.activities", icon: ScrollText },
   { href: "/portfolio", labelKey: "nav.portfolio", icon: Rocket },
   { href: "/guida", labelKey: "nav.guide", icon: BookOpen },
+  { href: "/health", labelKey: "nav.health", icon: ShieldCheck },
   { href: "/impostazioni", labelKey: "nav.settings", icon: Settings },
 ];
+
+// Chiave e intervallo minimo dello sweep dei controlli rinviati: si prova una
+// volta per sessione, non a ogni pagina.
+const RETRY_SWEEP_KEY = "lead-machine-retry-sweep";
+const RETRY_SWEEP_EVERY_MS = 10 * 60_000;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const [searchRadiusM, setSearchRadiusM] = React.useState(5000);
 
-  // Pagine "a tutta pagina" senza sidebar: sito demo e preventivo stampabile.
+  // Il raggio configurato e' nel database, non nel layout: una query nel root
+  // layout renderebbe statico/dinamico l'intero albero e potrebbe rompere il
+  // build in CI senza database. Lo leggiamo dal client una volta sola.
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const value = Number(data?.settings?.search_radius_m);
+        if (!cancelled && Number.isFinite(value) && value > 0) setSearchRadiusM(value);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    window.location.href = "/login";
+  }
+
+  // I controlli di verifica rinviati per un errore di rete si riprovano da soli:
+  // all'apertura dell'app si chiede al server di processare la coda scaduta.
+  // E' un lavoro di sottofondo: nessun errore puo' bloccare la pagina.
+  React.useEffect(() => {
+    try {
+      const last = Number(window.sessionStorage.getItem(RETRY_SWEEP_KEY) || 0);
+      if (Number.isFinite(last) && Date.now() - last < RETRY_SWEEP_EVERY_MS) return;
+      window.sessionStorage.setItem(RETRY_SWEEP_KEY, String(Date.now()));
+    } catch {
+      // Senza sessionStorage (o con lo storage bloccato) si prova comunque.
+    }
+    void fetch("/api/leads/verify/retry", { method: "POST" }).catch(() => {});
+  }, []);
+
+  // Pagine "a tutta pagina" senza sidebar: sito demo, ricevuta stampabile, portfolio.
   if (
+    pathname === "/login" ||
     pathname?.startsWith("/demo/") ||
-    pathname?.startsWith("/preventivo/") ||
     pathname?.startsWith("/ricevuta/") ||
     pathname?.startsWith("/portfolio")
   ) {
@@ -80,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className="hidden md:flex w-64 flex-col border-r bg-card/50 backdrop-blur"
         aria-label="Main navigation"
       >
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} searchRadiusM={searchRadiusM} />
       </aside>
 
       {/* Sidebar mobile (drawer) */}
@@ -96,7 +137,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             role="navigation"
             aria-label="Mobile navigation"
           >
-            <SidebarContent pathname={pathname} onNavigate={() => setOpen(false)} />
+            <SidebarContent pathname={pathname} searchRadiusM={searchRadiusM} onNavigate={() => setOpen(false)} />
           </aside>
         </div>
       )}
@@ -122,6 +163,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <LocaleSwitcher />
           <NotificationsBell />
           <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={logout}
+            aria-label="Esci"
+            title="Esci"
+          >
+            <LogOut className="h-5 w-5" aria-hidden="true" />
+          </Button>
         </header>
         <main
           id="main-content"
@@ -140,9 +190,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function SidebarContent({
   pathname,
+  searchRadiusM,
   onNavigate,
 }: {
   pathname: string;
+  searchRadiusM: number;
   onNavigate?: () => void;
 }) {
   const { t, config } = useLocale();
@@ -186,7 +238,21 @@ function SidebarContent({
           {t("app.zone")}: {config.flag} {config.nativeName}
         </p>
         <p>
-          {t("app.radius")} 5 {config.distanceUnit} · {t("app.free")}
+          {t("app.radius")} {Math.max(1, Math.round(searchRadiusM / 1000))} {config.distanceUnit} ·{" "}
+          {t("app.free")}
+        </p>
+        {/* Il credito sta nella barra laterale, cioe' in ogni pagina: chi apre
+            l'app vede subito chi l'ha creata. Il link e' il profilo pubblico
+            dell'autore (lo stesso dei dati strutturati e delle keywords). */}
+        <p className="pt-1">
+          <a
+            href={AUTHOR.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-dotted underline-offset-2 transition-colors hover:text-foreground"
+          >
+            {t("app.creator")}
+          </a>
         </p>
       </div>
     </>

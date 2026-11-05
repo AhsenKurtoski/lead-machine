@@ -4,33 +4,16 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LocaleProvider } from "@/components/locale-provider";
 import { AppShell } from "@/components/app-shell";
+import { buildSiteMetadata, buildStructuredData } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Lead Machine",
-    template: "%s · Lead Machine",
-  },
-  description: "Open-source local lead generation platform — find, score and contact nearby businesses for free.",
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  openGraph: {
-    title: "Lead Machine",
-    description: "Open-source local lead generation platform — find, score and contact nearby businesses for free.",
-    type: "website",
-    locale: "it_IT",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Lead Machine",
-    description: "Open-source local lead generation platform — find, score and contact nearby businesses for free.",
-  },
-  manifest: undefined,
-};
+// Metadata e dati strutturati stanno in src/lib/seo.ts (keywords, autore,
+// titoli, canonical, openGraph): cosi i test li verificano davvero e non
+// possono sparire per sbaglio.
+export const metadata: Metadata = buildSiteMetadata();
+
+const structuredData = buildStructuredData();
 
 export default function RootLayout({
   children,
@@ -38,6 +21,10 @@ export default function RootLayout({
   return (
     <html lang="it-IT" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

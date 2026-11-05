@@ -16,10 +16,21 @@ export type MapLead = {
   hasSocial: boolean;
 };
 
-const CENTER: [number, number] = [
-  Number(process.env.NEXT_PUBLIC_SEARCH_LAT ?? "46.0172"),
-  Number(process.env.NEXT_PUBLIC_SEARCH_LNG ?? "11.91"),
-];
+// Override di deploy (facoltativo): nessuna citta scritta nel codice.
+const ENV_CENTER: [number, number] | null = (() => {
+  const lat = Number(process.env.NEXT_PUBLIC_SEARCH_LAT);
+  const lng = Number(process.env.NEXT_PUBLIC_SEARCH_LNG);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+})();
+
+// Centro della mappa: la media dei lead geolocalizzati. Se non ce ne sono,
+// usiamo l'override di deploy e in ultima istanza il centro Italia.
+function centerFor(leads: MapLead[]): [number, number] {
+  if (leads.length === 0) return ENV_CENTER ?? [42.5, 12.5];
+  const lat = leads.reduce((sum, l) => sum + l.lat, 0) / leads.length;
+  const lng = leads.reduce((sum, l) => sum + l.lng, 0) / leads.length;
+  return [lat, lng];
+}
 
 // URL dei tile OpenStreetMap. I segnaposto s/z/x/y sono richiesti da Leaflet.
 const OSM_TILE_URL =
@@ -33,9 +44,10 @@ export function colorForScore(score: number): string {
 }
 
 export default function LeadsMap({ leads }: { leads: MapLead[] }) {
+  const center = centerFor(leads);
   return (
     <MapContainer
-      center={CENTER}
+      center={center}
       zoom={13}
       scrollWheelZoom
       className="h-[600px] w-full rounded-xl z-0"

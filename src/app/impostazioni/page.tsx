@@ -22,6 +22,8 @@ import {
   Power,
   Code2,
   ShieldCheck,
+  AlertTriangle,
+  Globe,
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "@/components/ui/use-toast";
@@ -35,7 +37,7 @@ const FIELDS: { key: string; label: string; placeholder: string; hint?: string }
   { key: "formsubmit_email", label: "Email prenotazioni sito demo (FormSubmit)", placeholder: "tu@esempio.it", hint: "Dove arrivano le richieste dei moduli di prenotazione nei siti demo. Gratis, senza carta: la prima volta FormSubmit invia una email di conferma da approvare." },
   { key: "brand_tagline", label: "Slogan (tagline)", placeholder: "Premium Digital Agency" },
   { key: "brand_logo", label: "URL logo (lascia /logo.png)", placeholder: "/logo.png" },
-  { key: "search_city", label: "Citta di ricerca predefinita", placeholder: "Feltre" },
+  { key: "search_city", label: "Citta di ricerca predefinita", placeholder: "es. Milano" },
 ];
 
 const AI_FIELDS: { key: string; label: string; placeholder: string; hint?: string }[] = [
@@ -59,6 +61,24 @@ const SEARCH_FIELDS: { key: string; label: string; placeholder: string; hint?: s
     label: "Chiave API Geoapify (facoltativa)",
     placeholder: "chiave Geoapify...",
     hint: "Gratuita e SENZA carta di credito su geoapify.com (3000 ricerche/giorno). Si affianca a OpenStreetMap per trovare piu attivita.",
+  },
+  {
+    key: "tomtom_api_key",
+    label: "Chiave API TomTom (facoltativa)",
+    placeholder: "chiave TomTom...",
+    hint: "Terza fonte geografica, gratuita e SENZA carta di credito su developer.tomtom.com (5000 ricerche/mese). Si affianca a OpenStreetMap e Geoapify: con piu fonti la ricerca trova piu attivita, e le tre vengono interrogate insieme.",
+  },
+];
+
+// Fonti OpenStreetMap: non sono chiavi, sono solo l'identificativo che la
+// fair-use policy di OSM chiede di mandare insieme alle richieste di ricerca e
+// geocoding. Senza, l'app si identifica con l'URL del progetto.
+const OSM_FIELDS: { key: string; label: string; placeholder: string; hint?: string }[] = [
+  {
+    key: "osm_contact_email",
+    label: "Email di contatto per OpenStreetMap (facoltativa)",
+    placeholder: "tu@esempio.it",
+    hint: "Non e' una chiave e non serve per attivare nulla: OpenStreetMap (Overpass e Nominatim) la usa solo per identificare le tue richieste di ricerca e geocoding. Lasciandola vuota l'app si identifica con l'URL del progetto, che e' accettato. Un indirizzo segnaposto (es. tu@esempio.it) viene ignorato: Nominatim risponde 403 a quelli e il geocoding smetterebbe di funzionare.",
   },
 ];
 
@@ -115,16 +135,27 @@ function presetForScopes(scopes: string[]): string {
   return found ? found.id : "custom";
 }
 
-// URL base dell'API mostrato negli esempi.
-// Priorita': URL del browser (sempre corretto, anche con tunnel/dominio/VPS),
-// poi NEXT_PUBLIC_BASE_URL, infine localhost.
-function resolveApiBase(): string {
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return window.location.origin;
-  }
+// URL base dell'API mostrato negli esempi. Valore deterministico: lo stesso
+// sul server e al primo render del client (le variabili d'ambiente, altrimenti
+// localhost).
+function serverApiBase(): string {
   const env = process.env.NEXT_PUBLIC_BASE_URL;
   if (env) return env.replace(/\/+$/, "");
   return "http://localhost:3000";
+}
+
+// L'origine reale del browser (sempre corretta, anche con tunnel, dominio o
+// VPS) si legge DOPO il mount, in un effetto: leggerla durante il render
+// faceva divergere il testo del server da quello del client e React idratava
+// con un errore (#418) ributtando giu' il contenuto della pagina.
+function useApiBase(): string {
+  const [base, setBase] = React.useState(serverApiBase);
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && window.location?.origin) {
+      setBase(window.location.origin);
+    }
+  }, []);
+  return base;
 }
 
 function formatDateTime(iso: string | null, t: (key: string) => string): string {
@@ -144,7 +175,7 @@ function formatDateTime(iso: string | null, t: (key: string) => string): string 
 
 function API_USAGE_EXAMPLES() {
   const { t } = useLocale();
-  const base = resolveApiBase();
+  const base = useApiBase();
   return (
     <details className="rounded-lg border bg-muted/20 p-4">
       <summary className="cursor-pointer text-sm font-medium">
@@ -154,7 +185,7 @@ function API_USAGE_EXAMPLES() {
         <div>
           <p className="mb-1 font-medium">{t("api.example1")}</p>
           <pre className="overflow-x-auto rounded-md bg-background p-3 font-mono text-[11px] leading-relaxed">
-{`fetch("${base}/api/v1/leads?hasWebsite=false&city=Feltre", {
+{`fetch("${base}/api/v1/leads?hasWebsite=false&city=Milano", {
   headers: { "x-api-key": "LA_TUA_CHIAVE" }
 })
   .then((r) => r.json())
@@ -167,7 +198,7 @@ function API_USAGE_EXAMPLES() {
 {`fetch("${base}/api/v1/search", {
   method: "POST",
   headers: { "Content-Type": "application/json", "x-api-key": "LA_TUA_CHIAVE" },
-  body: JSON.stringify({ categories: ["ristorante"], searchCity: "Feltre", radius: 5000 })
+  body: JSON.stringify({ categories: ["ristorante"], searchCity: "Milano", radius: 5000 })
 })
   .then((r) => r.json())
   .then((d) => console.log(d.leads));`}
@@ -505,6 +536,61 @@ export default function ImpostazioniPage() {
     if (fileRef.current) fileRef.current.value = "";
   }
 
+  // Stato delle funzioni in base a quello che e' configurato. La stessa lista
+  // risponde alla domanda "cosa funziona senza chiavi?": le prime voci sono
+  // attive appena scarichi l'app, senza attivazione e senza account.
+  const keyStatus: { label: string; detail: string; state: "on" | "optional" | "off" }[] = [
+    {
+      label: "Ricerca attivita e mappa",
+      detail: "OpenStreetMap / Overpass: nessuna chiave",
+      state: "on",
+    },
+    {
+      label: "Citta, comune e provincia",
+      detail: "geocoding Nominatim con ripiego su Photon: nessuna chiave",
+      state: "on",
+    },
+    {
+      label: "Verifica dei dati del lead",
+      detail: "record MX reali e risposta HTTP del sito: nessuna chiave",
+      state: "on",
+    },
+    {
+      label: "CRM, ricevute, backup, siti demo",
+      detail: "tutto in locale, nel tuo database SQLite",
+      state: "on",
+    },
+    {
+      label: "Seconda fonte geografica (Geoapify)",
+      detail: values.geoapify_api_key
+        ? "chiave configurata"
+        : "facoltativa: si affianca a OpenStreetMap per trovare piu attivita",
+      state: values.geoapify_api_key ? "on" : "optional",
+    },
+    {
+      label: "Terza fonte geografica (TomTom)",
+      detail: values.tomtom_api_key
+        ? "chiave configurata"
+        : "facoltativa: si affianca a OpenStreetMap e Geoapify",
+      state: values.tomtom_api_key ? "on" : "optional",
+    },
+    {
+      label: "AI (siti demo su misura, cold call, messaggi)",
+      detail:
+        values.gemini_api_key || values.groq_api_key
+          ? "chiave configurata"
+          : "serve una chiave gratuita Gemini o Groq (senza, l'app usa testi modello)",
+      state: values.gemini_api_key || values.groq_api_key ? "on" : "off",
+    },
+    {
+      label: "Invio email automatico",
+      detail: values.smtp_host
+        ? "SMTP configurato"
+        : "serve un account SMTP (es. Gmail con una password per le app)",
+      state: values.smtp_host ? "on" : "off",
+    },
+  ];
+
   return (
     <div className="max-w-3xl space-y-6">
       <div>
@@ -514,6 +600,50 @@ export default function ImpostazioniPage() {
         </p>
       </div>
 
+      {/* Nessuna attivazione: cosa funziona senza chiavi */}
+      <Card>
+        <CardContent className="space-y-4 p-6">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <ShieldCheck className="h-5 w-5" /> Cosa funziona senza chiavi
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Qui non c&apos;e&apos; niente da attivare e nessun account da creare: l&apos;app gira sul
+            tuo computer, le chiavi che generi restano nel tuo database e nessuno controlla licenze.
+          </p>
+          {loading ? (
+            <div className="flex h-16 items-center justify-center text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+            </div>
+          ) : (
+            <ul className="space-y-2 text-sm">
+              {keyStatus.map((row) => (
+                <li key={row.label} className="flex items-start gap-2">
+                  {row.state === "on" ? (
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle
+                      className={
+                        "mt-0.5 h-4 w-4 shrink-0 " +
+                        (row.state === "optional" ? "text-amber-500" : "text-muted-foreground")
+                      }
+                    />
+                  )}
+                  <span>
+                    <span className="font-medium">{row.label}</span>
+                    <span className="text-muted-foreground"> — {row.detail}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Le funzioni che interrogano la rete (ricerca, geocoding, verifica dei dati) hanno bisogno
+            di internet; CRM, mappa, ricevute, backup e i siti demo gia generati funzionano anche
+            offline.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Branding */}
       <Card>
         <CardContent className="space-y-4 p-6">
@@ -521,7 +651,7 @@ export default function ImpostazioniPage() {
             <Palette className="h-5 w-5" /> Il tuo brand
           </h2>
           <p className="text-sm text-muted-foreground">
-            Questi dati compaiono in automatico nei messaggi WhatsApp/Email e nell'intestazione dei preventivi.
+            Questi dati compaiono in automatico nei messaggi WhatsApp/Email e nell'intestazione delle anteprime sito e delle ricevute di pagamento.
           </p>
           {loading ? (
             <div className="flex h-24 items-center justify-center text-muted-foreground">
@@ -565,7 +695,7 @@ export default function ImpostazioniPage() {
         <CardContent className="space-y-4 p-6">
           <h2 className="text-lg font-semibold">Salva impostazioni</h2>
           <p className="text-sm text-muted-foreground">
-            Salva i dati del brand e i contatti che usi nei preventivi e nelle ricevute.
+            Salva i dati del brand e i contatti che usi nei messaggi e nelle ricevute di pagamento.
           </p>
           <Button onClick={save} disabled={saving || loading}>
             {saving ? (
@@ -671,6 +801,44 @@ export default function ImpostazioniPage() {
         </CardContent>
       </Card>
 
+      {/* Contatto OpenStreetMap (non e' una chiave) */}
+      <Card>
+        <CardContent className="space-y-4 p-6">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <Globe className="h-5 w-5" /> Contatto OpenStreetMap
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            OpenStreetMap e gratuito e non richiede chiavi: chiede solo chi sta facendo le richieste.
+            Facoltativo, e senza di esso la ricerca funziona comunque.
+          </p>
+          {loading ? null : (
+            <div className="grid gap-4">
+              {OSM_FIELDS.map((f) => (
+                <div key={f.key} className="space-y-1.5">
+                  <Label>{f.label}</Label>
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    value={values[f.key] ?? ""}
+                    onChange={(e) => setField(f.key, e.target.value)}
+                    placeholder={f.placeholder}
+                  />
+                  {f.hint ? <p className="text-xs text-muted-foreground">{f.hint}</p> : null}
+                </div>
+              ))}
+            </div>
+          )}
+          <Button onClick={save} disabled={saving || loading}>
+            {saving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Salva contatto
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Email / SMTP */}
       <Card>
         <CardContent className="space-y-4 p-6">
@@ -719,6 +887,11 @@ export default function ImpostazioniPage() {
               <Code2 className="h-5 w-5" /> {t("api.title")}
             </h2>
             <p className="text-sm text-muted-foreground">{t("api.subtitle")}</p>
+            <p className="text-xs text-muted-foreground">
+              Le chiavi sono create e controllate su questo computer: nel tuo database viene salvato
+              solo l&apos;hash SHA-256, e ogni chiamata viene verificata qui. Funzionano senza
+              attivazione, senza account e senza internet, anche appena scarichi l&apos;app.
+            </p>
           </div>
 
           {/* Generazione nuova chiave */}
@@ -973,12 +1146,12 @@ export default function ImpostazioniPage() {
             Scarica i tuoi lead in CSV (apribile con Excel/Google Fogli) oppure un backup completo in JSON.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href="/api/leads/export">
+            <a href="/api/leads/export" download>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" /> Esporta lead (CSV)
               </Button>
             </a>
-            <a href="/api/backup">
+            <a href="/api/backup" download>
               <Button variant="outline">
                 <Database className="mr-2 h-4 w-4" /> Backup completo (JSON)
               </Button>

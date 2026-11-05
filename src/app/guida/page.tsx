@@ -1,4 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata = {
+  title: "Guida",
+  alternates: { canonical: "/guida" },
+};
 import {
   Rocket,
   Search,
@@ -11,11 +16,13 @@ import {
   Camera,
   Map,
   CalendarDays,
-  FileText,
+  Receipt,
   Bell,
   ScrollText,
   Settings,
   ShieldCheck,
+  BadgeCheck,
+  Target,
 } from "lucide-react";
 
 type Section = { icon: React.ComponentType<{ className?: string }>; title: string; steps: string[] };
@@ -26,8 +33,9 @@ const SECTIONS: Section[] = [
     title: "Primo avvio",
     steps: [
       "Installa le dipendenze: npm install",
-      "Crea il database con dati di esempio: npm run setup",
+      "Copia .env.example in .env, poi crea il database: npm run setup (template, tag e impostazioni di base: nessuna attivita di esempio viene inserita)",
       "Avvia l'app: npm run dev, poi apri http://localhost:3000",
+      "Al primo avvio l'onboarding chiede brand e citta in cui cerchi i clienti: la citta viene geolocalizzata e diventa l'area delle ricerche. Puoi anche saltare il passaggio e compilarlo dopo in Impostazioni.",
       "(Opzionale) Per gli screenshot dei siti: npm run setup:screenshot",
     ],
   },
@@ -36,7 +44,7 @@ const SECTIONS: Section[] = [
     title: "1. Trovare i lead",
     steps: [
       "Vai su Ricerca lead nella sidebar.",
-      "Scegli le categorie e avvia la ricerca su Feltre (raggio 5 km).",
+      "Scegli le categorie e l'area (citta, tutta la provincia o un singolo comune): la citta di partenza arriva dalle impostazioni salvate in onboarding.",
       "Seleziona le attivita interessanti e salvale: i duplicati vengono scartati in automatico.",
       "Hanno priorita piu alta le attivita senza sito e/o senza social.",
     ],
@@ -49,6 +57,16 @@ const SECTIONS: Section[] = [
       "Clicca un lead per aprirne la scheda: note, tag, contatti, stato.",
       "Cambia lo stato (Nuovo, Contattato, In trattativa, Cliente, Scartato).",
       "Usa le azioni massive per aggiornare piu lead insieme.",
+      "Da qui parte anche la verifica in blocco: 'Verifica tutta la coda' o 'Verifica selezionati' controllano i dati a blocchi di 20 e mostrano l'avanzamento.",
+    ],
+  },
+  {
+    icon: Target,
+    title: "2b. Coda delle opportunita (attivita senza sito)",
+    steps: [
+      "Apri Opportunita: elenca le attivita senza sito web ordinate per priorita.",
+      "Filtra per citta e usa le azioni rapide chiamata, email o WhatsApp per partire subito.",
+      "L'elenco e paginato: vedi una pagina alla volta, cosi resta veloce anche con centinaia di attivita.",
     ],
   },
   {
@@ -91,6 +109,17 @@ const SECTIONS: Section[] = [
     ],
   },
   {
+    icon: BadgeCheck,
+    title: "4b. Verifica dei dati (email, telefono, indirizzo, social)",
+    steps: [
+      "Nella scheda lead premi 'Verifica ora': telefono, email, sito, indirizzo e social vengono controllati davvero, non a stima.",
+      "L'email passa dalla risoluzione MX del dominio, il sito da una richiesta HTTP reale (con tempo di risposta), citta e indirizzi dal geocoding di OpenStreetMap.",
+      "Ogni esito ha la sua fonte (OpenStreetMap, controllo diretto, ricerca web), una spiegazione leggibile e la data del controllo: verificato, da verificare, non raggiungibile, non valido, assente.",
+      "Il riepilogo in cima dice quanti dati sono verificati e quanti restano da controllare, e segnala i possibili duplicati (stesso nome e stessa citta).",
+      "Con 'Arricchisci contatti' l'app scarica la pagina del sito e ricava email e profili social pubblici: nessun dato viene inventato.",
+    ],
+  },
+  {
     icon: Camera,
     title: "5. Screenshot del sito (opzionale)",
     steps: [
@@ -100,13 +129,13 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    icon: FileText,
-    title: "6. Sito professionale con AI & Preventivi",
+    icon: Receipt,
+    title: "6. Anteprima del sito e pagamento ricevuto",
     steps: [
-      "Dalla scheda lead clicca 'Genera sito (AI)' oppure apri 'Sito demo': con una chiave AI configurata viene creato un sito UNICO, premium e su misura (layout, colori e testi diversi per ogni attivita, mai 'sempre lo stesso').",
+      "Dalla scheda lead clicca 'Genera sito (AI)' oppure apri 'Sito demo': con una chiave AI configurata viene creata un'anteprima UNICA e su misura (layout, colori e testi diversi per ogni attivita, mai 'sempre la stessa').",
       "Puoi dare istruzioni AI specifiche nella card del sito (es. 'aggiungi il menu', 'stile elegante e moderno').",
-      "Senza chiave AI viene mostrato un sito modello di riserva; per attivare l'AI vedi la sezione 'Chiavi AI'.",
-      "Crea un Preventivo con listino servizi e sconto, poi esportalo in PDF e invialo al cliente.",
+      "Senza chiave AI viene mostrata un'anteprima modello; per attivare l'AI vedi la sezione 'Chiavi AI'.",
+      "Quando l'attivita ti paga, registra il pagamento in 'Ricevute di pagamento': numero, importo, metodo e data, con badge PAGATO pronto da stampare.",
     ],
   },
   {
@@ -139,7 +168,7 @@ const SECTIONS: Section[] = [
     icon: Settings,
     title: "10. Impostazioni, Export & Backup",
     steps: [
-      "In Impostazioni imposta i dati del tuo brand (usati in messaggi e preventivi).",
+      "In Impostazioni imposta i dati del tuo brand (usati in messaggi e ricevute di pagamento).",
       "Esporta i lead in CSV o importali da CSV (con dedup).",
       "Scarica un backup completo in JSON prima di modifiche importanti.",
     ],

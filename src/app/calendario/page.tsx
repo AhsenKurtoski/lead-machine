@@ -196,7 +196,7 @@ export default function CalendarioPage() {
             {autoLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Sparkles className="mr-1 h-4 w-4" />}
             Genera promemoria automatici
           </Button>
-          <a href="/api/appointments/ics">
+          <a href="/api/appointments/ics" download>
             <Button variant="outline" size="sm">
               <Download className="mr-1 h-4 w-4" /> Esporta .ics
             </Button>

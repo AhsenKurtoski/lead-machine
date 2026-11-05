@@ -22,27 +22,51 @@ export async function POST(req: NextRequest) {
   const notes = asString(body?.notes, 5000);
   const leadId = asString(body?.leadId, 100);
   const channel = asString(body?.channel, 20);
-  const startsAt = asString(body?.startsAt, 100);
-  if (!body || !title || !startsAt) {
+  const startsAtRaw = asString(body?.startsAt, 100);
+  const endsAtRaw = asString(body?.endsAt, 100);
+  if (!body || !title || !startsAtRaw) {
     return NextResponse.json({ error: "title e startsAt obbligatori" }, { status: 400 });
   }
-  const appointment = await prisma.appointment.create({
-    data: {
-      title,
-      startsAt: new Date(startsAt),
-      endsAt: body.endsAt ? new Date(body.endsAt) : null,
-      notes,
-      leadId: leadId || null,
-    },
-  });
+
+  const startsAt = new Date(startsAtRaw);
+  if (isNaN(startsAt.getTime())) {
+    return NextResponse.json({ error: "data di inizio non valida" }, { status: 400 });
+  }
+  const endsAt = endsAtRaw ? new Date(endsAtRaw) : null;
+  if (endsAt && isNaN(endsAt.getTime())) {
+    return NextResponse.json({ error: "data di fine non valida" }, { status: 400 });
+  }
+  if (endsAt && endsAt.getTime() < startsAt.getTime()) {
+    return NextResponse.json({ error: "la fine non puo precedere l'inizio" }, { status: 400 });
+  }
   if (leadId) {
-    await prisma.activity.create({
+    const lead = await prisma.lead.findUnique({ where: { id: leadId }, select: { id: true } });
+    if (!lead) {
+      return NextResponse.json({ error: "Lead non trovato" }, { status: 404 });
+    }
+  }
+
+  try {
+    const appointment = await prisma.appointment.create({
       data: {
-        leadId,
-        type: "sistema",
-        description: "Appuntamento programmato: " + title,
+        title,
+        startsAt,
+        endsAt,
+        notes,
+        leadId: leadId || null,
       },
     });
+    if (leadId) {
+      await prisma.activity.create({
+        data: {
+          leadId,
+          type: "sistema",
+          description: "Appuntamento programmato: " + title,
+        },
+      });
+    }
+    return NextResponse.json({ appointment });
+  } catch {
+    return NextResponse.json({ error: "Creazione appuntamento non riuscita" }, { status: 400 });
   }
-  return NextResponse.json({ appointment });
 }

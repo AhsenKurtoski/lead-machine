@@ -36,11 +36,60 @@ type LeadCandidate = {
   osmId: string | null;
 };
 
-// GET /api/leads -> elenco lead (per CRM/dashboard)
+// GET /api/leads -> elenco lead (per CRM/dashboard).
+// Escludiamo di proposito i campi che possono pesare decine di KB l'uno
+// (demoHtml, demoPrompt, screenshot, note): l'elenco serve a liste e menu a
+// tendina e senza questa esclusione la risposta puo' arrivare a diversi MB,
+// con l'interfaccia che si blocca mentre la scarica.
+// Elenco dei campi dell'elenco lead: tutto tranne quelli pesanti. Con `select`
+// Prisma restituisce SOLO i campi elencati, quindi l'elenco e' esplicito e
+// verificato dal typecheck: un campo nuovo va aggiunto qui di proposito.
+// Esclusi di proposito:
+// - `demoHtml`: l'HTML completo dell'anteprima AI (decine di KB per lead);
+// - `demoPrompt`: il prompt AI salvato;
+// - `websiteScreenshot`: il path dello screenshot.
+// Senza questa selezione la risposta supera il mega e l'interfaccia si blocca
+// ad analizzarla a ogni apertura di elenchi e menu a tendina.
+const LEAD_LIST_SELECT = {
+  id: true,
+  name: true,
+  category: true,
+  subcategory: true,
+  phone: true,
+  mobile: true,
+  whatsapp: true,
+  email: true,
+  hasWebsite: true,
+  website: true,
+  websiteStatus: true,
+  demoHtmlAt: true,
+  hasSocial: true,
+  instagram: true,
+  facebook: true,
+  tiktok: true,
+  lastSocialPost: true,
+  googleRating: true,
+  googleReviews: true,
+  addressFull: true,
+  city: true,
+  postalCode: true,
+  lat: true,
+  lng: true,
+  priorityScore: true,
+  priorityReason: true,
+  status: true,
+  notes: true,
+  source: true,
+  osmId: true,
+  createdAt: true,
+  updatedAt: true,
+  tags: true,
+} as const;
+
 export async function GET() {
   const leads = await prisma.lead.findMany({
     orderBy: { priorityScore: "desc" },
-    include: { tags: true },
+    select: LEAD_LIST_SELECT,
     take: 2000,
   });
   return NextResponse.json({ ok: true, leads });
@@ -152,16 +201,18 @@ export async function POST(req: Request) {
 
       try {
         await prisma.$transaction(async (tx) => {
+          // Nessuna citta inventata: se il candidato non ne ha una, resta null
+          // (l'utente la compila dopo, se serve).
           const defaultsCity = c.city ||
             (typeof process.env.NEXT_PUBLIC_SEARCH_CITY === "string" && process.env.NEXT_PUBLIC_SEARCH_CITY) ||
-            "Feltre";
+            "";
           const lead = await tx.lead.create({
             data: {
               name: c.name,
               category: c.category,
               subcategory: c.categoryLabel,
               addressFull: c.addressFull,
-              city: defaultsCity,
+              city: defaultsCity || null,
               postalCode: c.postalCode,
               lat: c.lat,
               lng: c.lng,

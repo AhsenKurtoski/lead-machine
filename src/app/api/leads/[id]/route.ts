@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { STATUS_LABELS } from "@/lib/utils";
-import { rateLimitedResponse, asString, asInt, asBoolean, asArray } from "@/lib/security";
+import {
+  rateLimitedResponse,
+  asString,
+  asNonEmptyString,
+  asInt,
+  asNumber,
+  asBoolean,
+  asArray,
+  isValidEmail,
+  isLikelyUrl,
+  normalizeUrl,
+} from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +52,11 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   const data: Record<string, unknown> = {};
 
   if ("name" in body) {
-    const v = asString(body.name, 200);
-    data.name = v === null ? null : v;
+    const v = asNonEmptyString(body.name, 200);
+    if (!v) {
+      return NextResponse.json({ ok: false, error: "Il nome non puo essere vuoto." }, { status: 400 });
+    }
+    data.name = v;
   }
   if ("category" in body) {
     const v = asString(body.category, 200);
@@ -65,12 +79,18 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     data.whatsapp = v === null ? null : v;
   }
   if ("email" in body) {
-    const v = asString(body.email, 500);
+    const v = asString(body.email, 254);
+    if (v && v.trim() && !isValidEmail(v)) {
+      return NextResponse.json({ ok: false, error: "Indirizzo email non valido." }, { status: 400 });
+    }
     data.email = v === null ? null : v;
   }
   if ("website" in body) {
-    const v = asString(body.website, 500);
-    data.website = v === null ? null : v;
+    const v = asString(body.website, 2048);
+    if (v && v.trim() && !isLikelyUrl(v)) {
+      return NextResponse.json({ ok: false, error: "URL del sito non valido." }, { status: 400 });
+    }
+    data.website = v === null ? null : normalizeUrl(v);
   }
   if ("websiteStatus" in body) {
     const v = asString(body.websiteStatus, 100);
@@ -100,6 +120,20 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const v = asString(body.postalCode, 100);
     data.postalCode = v === null ? null : v;
   }
+  if ("lat" in body) {
+    const n = asNumber(body.lat, -90, 90);
+    if (body.lat !== null && body.lat !== "" && n === null) {
+      return NextResponse.json({ ok: false, error: "Latitudine non valida." }, { status: 400 });
+    }
+    data.lat = n;
+  }
+  if ("lng" in body) {
+    const n = asNumber(body.lng, -180, 180);
+    if (body.lng !== null && body.lng !== "" && n === null) {
+      return NextResponse.json({ ok: false, error: "Longitudine non valida." }, { status: 400 });
+    }
+    data.lng = n;
+  }
   if ("notes" in body) {
     const v = asString(body.notes, 10000);
     data.notes = v === null ? null : v;
@@ -111,13 +145,17 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
   if ("status" in body) {
     const s = asString(body.status, 50);
-    if (s && ALLOWED_STATUSES.includes(s)) {
-      data.status = s;
+    if (!s || !ALLOWED_STATUSES.includes(s)) {
+      return NextResponse.json({ ok: false, error: "Stato non valido." }, { status: 400 });
     }
+    data.status = s;
   }
   if ("priorityScore" in body) {
     const n = asInt(body.priorityScore, 0, 100);
-    if (n !== null) data.priorityScore = n;
+    if (n === null) {
+      return NextResponse.json({ ok: false, error: "Priorita non valida." }, { status: 400 });
+    }
+    data.priorityScore = n;
   }
   if ("hasWebsite" in body) {
     const b = asBoolean(body.hasWebsite);
@@ -140,22 +178,49 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     data.tags = { set: names.map((name) => ({ name })) };
   }
 
-  await prisma.lead.update({ where: { id }, data });
+  try {
+    await prisma.lead.update({ where: { id }, data });
 
-  if (typeof body.status === "string" && body.status !== existing.status && ALLOWED_STATUSES.includes(String(body.status))) {
-    await prisma.activity.create({
-      data: { leadId: id, type: "stato", description: "Stato cambiato in " + body.status },
-    });
+    if (typeof data.status === "string" && data.status !== existing.status) {
+      await prisma.activity.create({
+        data: { leadId: id, type: "stato", description: "Stato cambiato in " + data.status },
+      });
+    }
+
+    const lead = await prisma.lead.findUnique({ where: { id }, include: leadInclude });
+    return NextResponse.json({ ok: true, lead });
+  } catch {
+    return NextResponse.json({ ok: false, error: "Aggiornamento non riuscito." }, { status: 400 });
   }
-
-  const lead = await prisma.lead.findUnique({ where: { id }, include: leadInclude });
-  return NextResponse.json({ ok: true, lead });
 }
 
 export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rl = await rateLimitedResponse(req, "leads:item", 60, 60000);
   if (rl) return rl;
 
-  await prisma.lead.delete({ where: { id: (await context.params).id } });
+  const id = (await context.params).id;
+  const existing = await prisma.lead.findUnique({
+    where: { id },
+    select: { id: true, websiteScreenshot: true },
+  });
+  if (!existing) {
+    return NextResponse.json({ ok: false, error: "Lead non trovato" }, { status: 404 });
+  }
+
+  await prisma.lead.delete({ where: { id } });
+
+  // Rimuove lo screenshot locale, se presente e dentro la cartella prevista.
+  if (existing.websiteScreenshot?.startsWith("/screenshots/")) {
+    try {
+      const { unlink } = await import("node:fs/promises");
+      const path = await import("node:path");
+      const file = path.join(process.cwd(), "public", existing.websiteScreenshot);
+      const root = path.join(process.cwd(), "public", "screenshots");
+      if (file.startsWith(root + path.sep)) await unlink(file);
+    } catch {
+      // File gia assente o non rimovibile: non blocca la cancellazione del lead.
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }

@@ -46,11 +46,13 @@ What is usually **out of scope**:
 
 For deployments that go beyond `localhost`, follow `DEPLOY.md` and, in addition:
 
-1. **Put authentication in front.** This app does not ship user/login (it's single-user by design). If you expose it publicly, add a proxy with Basic Auth, a Vercel/Cloudflare Access policy, or a small auth layer in front.
-2. **Rotate secrets.** Never commit `.env`. Rotate `GROQ_API_KEY`, `GEMINI_API_KEY`, and SMTP passwords periodically.
-3. **Restrict the DB file.** Set filesystem ACLs on `prisma/dev.db` so only the runtime user can read it.
-4. **Keep dependencies up to date.** We provide Dependabot config; enable it on your fork.
-5. **Disable optional modules you don't use.** If you don't need screenshots, don't install Playwright (reduces attack surface).
+1. **Set `APP_PASSWORD`.** The app has a built-in single-user login. Use a strong password of at least 8 characters; changing it invalidates every session. Without it, protected pages and APIs fail closed with `503` on every host.
+2. **Terminate TLS and consider a second layer.** Put Caddy/Nginx in front, and optionally add Basic Auth or an identity-aware proxy. Start the app with `npm run start:public` only behind that proxy; `npm start` binds `127.0.0.1`.
+3. **Set `TRUST_PROXY=1` only behind your own proxy.** Otherwise rate limiting deliberately ignores forwarded headers, because a direct client can spoof them.
+4. **Rotate secrets.** Never commit `.env`. Rotate `GROQ_API_KEY`, `GEMINI_API_KEY`, SMTP passwords and API keys periodically.
+5. **Restrict the DB file.** Set filesystem ACLs on `prisma/dev.db` so only the runtime user can read it.
+6. **Keep dependencies up to date.** Dependabot is configured; enable alerts on your fork.
+7. **Disable optional modules you don't use.** If you don't need screenshots, don't install Playwright (reduces attack surface).
 
 ## Security-Related Layers Already in the Codebase
 
@@ -58,7 +60,12 @@ A quick reference for auditors:
 
 | Layer | Where | What |
 |---|---|---|
-| Rate limiting (in-memory, per-IP+UA fingerprint) | `src/lib/security.ts` → `rateLimitedResponse` | Applied to writes, AI, email, lead import. |
+| Session authentication | `src/lib/auth.ts`, `src/middleware.ts` | `APP_PASSWORD` → HMAC-signed HttpOnly cookie, constant-time comparison, 30-day expiry; protected routes fail closed with `503` when unset. |
+| CSRF protection | `src/middleware.ts` → `sameOrigin` | Cookie-authenticated mutations reject cross-origin `Origin` / `Sec-Fetch-Site`; `/api/v1/*` uses bearer keys instead. |
+| Security headers | `next.config.mjs` | CSP, HSTS in production, `X-Frame-Options`, `nosniff`, Referrer-Policy, Permissions-Policy; remote image hosts disabled. |
+| SSRF protection | `src/lib/url-safety.ts` | Resolves hostnames and rejects loopback, private, link-local and metadata targets before fetching or navigating. |
+| Demo sandbox | `src/app/demo/[id]/page.tsx` | AI HTML runs in an iframe with `sandbox="allow-forms allow-popups"`, no scripts and `referrerPolicy="no-referrer"`. |
+| Rate limiting (in-memory) | `src/lib/security.ts` → `rateLimitedResponse` | Applied to login, writes, AI, email, verification and lead import; proxy headers only honored with `TRUST_PROXY=1`. |
 | Input type/size coercion | `src/lib/security.ts` → `asString`, `asNumber`, `sanitizePlainText`, `isValidEmail`, `normalizeUrl` | Used on every API route body field we care about. |
 | HTML escape for emails / exports | `escapeHtml` in `security.ts` and `email/send/route.ts` | Prevents stored XSS via lead data when rendering an HTML email body. |
 | Secrets redaction on settings GET | `api/settings/route.ts` | `*_api_key` and `*_pass` returned as `••••••••` over HTTP; masked values are rejected on write (no accidental wipe). |
@@ -66,7 +73,7 @@ A quick reference for auditors:
 | Prisma parameterized queries | Everywhere via Prisma client | SQL injection surface removed by ORM. |
 | Prepared statements + transactions for atomic writes | `prisma.$transaction(...)` in lead import, settings bulk-upsert, etc. | Prevent partial writes. |
 | Safe navigation on `req.json()` | `await req.json().catch(() => ({}))` + typed wrappers | Malformed JSON can't crash handlers. |
-| `next/images` domain wildcard with `next.config.mjs` | `remotePatterns` allowlist (`http*://**`) | Lead websites render through `next/image` (already behind fetch, no SSRF on static images via `next/image`; for the Playwright screenshot route, only user-clicked URLs are fetched). |
-| CSRF on same-origin | All state-changing endpoints use POST/PATCH/DELETE + JSON | Avoids many forms of CSRF; a future layer can add a token for public-facing installs. |
+| Remote images disabled | `next.config.mjs` → `images.remotePatterns` | Empty allowlist and `dangerouslyAllowSVG: false`; lead screenshots are served from local storage, not arbitrary remote hosts. |
+| Email fallback is local-only | `src/lib/mailer.ts` | With no SMTP host the message is written to `./tmp/emails`; no external delivery is attempted. |
 
 If you spot a gap in any of these, please report it using the process above.

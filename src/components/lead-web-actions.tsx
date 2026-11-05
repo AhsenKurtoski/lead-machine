@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Globe, Loader2, Sparkles, Search, Wand2, Database } from "lucide-react";
 
 // Azioni "web" per un lead: genera il sito demo con l'AI (con prompt
-// personalizzato), apre la demo e cerca il sito ufficiale su Google.
+// personalizzato), apre la demo, cerca il sito ufficiale e arricchisce la
+// scheda con email e social pubblici trovati sul sito.
 export function LeadWebActions({
   leadId,
   initialPrompt,
@@ -81,11 +82,12 @@ export function LeadWebActions({
       const res = await fetch("/api/leads/" + leadId + "/enrich", { method: "POST" });
       const data = await res.json();
       if (data.ok) {
-        const fields =
-          Array.isArray(data.updated) && data.updated.length > 0
-            ? data.updated.join(", ")
-            : "note aggiornate";
-        show("Scheda arricchita con l'AI (" + fields + "). Aggiorno...", "ok");
+        const fields = Array.isArray(data.updated) ? data.updated.join(", ") : "";
+        if (fields) {
+          show("Contatti aggiunti: " + fields + ". Aggiorno...", "ok");
+        } else {
+          show(data.note || "Nessun nuovo contatto pubblico trovato.", "warn");
+        }
         setTimeout(() => window.location.reload(), 1400);
       } else {
         show(data.note || data.error || "Arricchimento non riuscito.", "warn");
@@ -130,7 +132,7 @@ export function LeadWebActions({
           ) : (
             <Database className="mr-1 h-4 w-4" />
           )}
-          Arricchisci (AI)
+          Arricchisci contatti
         </Button>
       </div>
 

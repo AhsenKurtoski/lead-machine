@@ -1,13 +1,13 @@
 # Lead Machine
 
 > **Open-source, self-hosted, local-first lead generation platform for freelancers and small agencies.**
-> Find nearby businesses on OpenStreetMap, score them, contact them, build quotes & invoices — with optional AI help — **for €0 in subscriptions**.
+> Find nearby businesses on OpenStreetMap, score them, verify their contact data and reach out — with optional AI help — **for €0 in subscriptions**.
 
 <div align="center">
 
-**✨ [Features](#-features) · 🚀 [Quick start](#-quick-start) · 🌍 [Locales supported](#-multilingual-support--locales) · 🛡️ [Security](./SECURITY.md) · 🤝 [Contributing](./CONTRIBUTING.md)**
+**✨ [Features](#-features) · 🚀 [Quick start](#-quick-start) · 🌍 [Locales supported](#-multilingual-support--locales) · ✅ [Testing](#-testing--verification) · 🛡️ [Security](./SECURITY.md) · 🤝 [Contributing](./CONTRIBUTING.md)**
 
-[![Made with Next.js 14](https://img.shields.io/badge/Next.js_14-000?logo=next.js&logoColor=fff)](#)
+[![Made with Next.js 15](https://img.shields.io/badge/Next.js_15-000?logo=next.js&logoColor=fff)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?logo=typescript&logoColor=fff)](#)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38bdf8?logo=tailwindcss&logoColor=000)](#)
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000?logo=shadcnui&logoColor=fff)](#)
@@ -16,7 +16,7 @@
 [![License: MIT](https://img.shields.io/github/license/AhsenKurtoski/lead-machine?color=0969da)](./LICENSE)
 
 ---
-**👨‍💻 An Ahsen-Studio Creation**
+**👨‍💻 Created by Ahsen Kurtoski**
 *The perfect blend of human vision and AI execution.*
 **Idea & Vision:** Ahsen Kurtoski (teenager developer & visionary)
 **AI Execution:** Built flawlessly by Artificial Intelligence
@@ -36,11 +36,11 @@
 |---|---|---|
 | ![Dashboard](screenshots/dashboard-desktop.png) | ![Ricerca lead](screenshots/ricerca-desktop.png) | ![CRM](screenshots/crm-desktop.png) |
 
-| Mappa | Preventivi | Impostazioni |
+| Mappa | Ricerca lead (mobile) | Impostazioni |
 |---|---|---|
-| ![Mappa](screenshots/mappa-desktop.png) | ![Preventivi](screenshots/preventivi-desktop.png) | ![Impostazioni](screenshots/impostazioni-desktop.png) |
+| ![Mappa](screenshots/mappa-desktop.png) | ![Ricerca lead](screenshots/ricerca-mobile.png) | ![Impostazioni](screenshots/impostazioni-desktop.png) |
 
-> Tutti gli screenshot sono generati dal codice reale: `npm run screenshots` (PNG desktop + mobile) e `node scripts/demo-gif.mjs` (GIF). Le versioni mobile sono in `screenshots/`.
+> Tutti gli screenshot sono generati dal codice reale: con il server avviato, `APP_PASSWORD=… npm run screenshots` (PNG desktop + mobile) e `node scripts/demo-gif.mjs` (GIF). Lo script effettua il login, fotografa dashboard, ricerca, CRM, mappa, ricevute e impostazioni; le versioni mobile sono in `screenshots/`.
 
 ---
 
@@ -65,14 +65,27 @@ Everything is built-in — no plugins to buy:
 ### 🔎 Research & Prospecting
 - **Geographic search**: query **OpenStreetMap (Overpass)** by category + radius + city, with automatic failover across public mirrors. Optional **second source: Geoapify** (free tier) — results from both sources are merged and deduplicated.
 - **Deduplication engine** with 3 layers (OSM ID, then `name+city`, then fuzzy) to avoid polluting your CRM.
-- **Website crawler**: given a lead, find its homepage and extract email / phone / socials.
+- **Website finder**: given a lead, find its official homepage (AI + free DuckDuckGo fallback) and the social profiles it links to — directories and marketplaces are filtered out.
 - **Screenshot pipeline** (Playwright): one-click homepage preview so you know what to fix before calling.
-- **Map view** (Leaflet) with clustering and color-coded lead statuses.
+- **Map view** (Leaflet) with color-coded lead statuses.
+
+### 🧭 City-agnostic setup & search
+- **First-run onboarding** (`/onboarding`): the code ships **no default city and no default brand**. On first start the app asks for your brand, your name and the city where you look for clients. It can be skipped and filled in later from *Impostazioni*.
+- **Automatic geocoding** (Nominatim / OpenStreetMap, no API key): the city you type is turned into coordinates, so search, map and demo sites are centered where you actually work.
+- **Search area resolution**, in this order: explicit `lat`/`lng` in the request → geocoded city → coordinates saved in your settings. Nothing is invented: with no area configured the endpoint answers `400` and a clear message.
+- The area you configure is used by search, the map, the priority scoring and the message templates.
 
 ### 🧠 Lead Scoring & Priority
-- **0–100 AI-assisted score** based on: category, presence of email/phone/website, social signals, last-changed-in-OSM timestamp, distance from office, city affluence proxy.
+- **0–100 rule-based priority score** based on what the lead actually has: missing or broken website, social presence, review count and rating, and available phone/WhatsApp/email. No distance, affluence or OSM-timestamp guesswork.
 - **Heatmap dashboard** to understand **when** you were most productive (hours vs. days).
 - **Tags** (hot / warm / cold / bespoke) and **custom statuses** for every stage of the funnel.
+
+### ✅ Data verification (know what is true before you call)
+- Every lead field — **phone, email, website, address, social** — gets a verdict: `verificato`, `da_verificare`, `non_raggiungibile`, `non_valido`, `assente`.
+- Each verdict carries a **source** (`openstreetmap`, `controllo_diretto`, `ricerca_web`), a **human-readable explanation** and the time of the check; results are stored per lead (`Verification`), so nothing is re-checked blindly.
+- What the checks cover: phone shape (landline/mobile), email syntax with disposable-domain and (when available) MX checks, live website reachability, address completeness and whether social links exist. A stored WhatsApp number or social link is **not** proof of ownership, so those fields stay `da_verificare`.
+- A **verification panel** in the lead detail (**Verifica ora**), an honest `verified / pending / problems` summary and duplicate-group detection.
+- Routes: `GET /api/leads/{id}/verification`, `POST /api/leads/{id}/verify`, `POST /api/leads/verify` (bulk).
 
 ### 🔌 Public API for external projects (`/api/v1/*`)
 - Generate an **API key** from *Impostazioni → API Key & Integrazioni esterne* and connect Lead Machine to a website builder, a script or any other tool.
@@ -82,8 +95,11 @@ Everything is built-in — no plugins to buy:
 - Endpoints: `GET /api/v1/leads` (filter by city, category, website presence, score), `GET /api/v1/leads/{id}`, `POST /api/v1/leads` (create), `POST /api/v1/search` (live OpenStreetMap search), `POST /api/v1/demo/generate` (AI website for a lead).
 - Requests are never left hanging: every source has a time budget and the response carries a `warnings` array explaining what was unavailable.
 - Rate limits are counted **per key** (not per IP), so several projects never block each other, and return `429` with `Retry-After`.
-- Full reference: [API.md](./API.md#20-public-api-for-external-projects-api-v1).
-- End-to-end checks: `npm run smoke:api` (31 assertions covering profiles, scopes, auth, CORS and 404s) and `npm run smoke:geo` (live OpenStreetMap + Geoapify search against a running instance, `SMOKE_BASE=http://localhost:3111`).
+- Full reference: [API.md](./API.md#19-public-api-for-external-projects-api-v1).
+- End-to-end checks: `npm run smoke:api` (profiles, scopes, auth, CORS and 404s, against a running instance) and `npm run smoke:geo` (live OpenStreetMap + Geoapify search, `SMOKE_BASE=http://localhost:3111`).
+- Unit tests: `npm test` runs the Node built-in test runner (`node:test` + `tsx`, no extra framework) over the pure helpers in `src/lib/` — the verification engine and its retry queue, the receipt helpers, search-area resolution, geocoding parsing, onboarding rules, opportunity scoring, currency formatting and the Overpass query builder.
+- Hygiene guard rails: `npm run check:hygiene` fails on an empty page, a link or menu entry pointing at a removed route, an unreachable page, a `layout` without a `page`, an empty folder — and, when the database exists, on leftover smoke-test data or verification rows that are orphaned, duplicated or outside the rules.
+- The app itself also exposes `/api/onboarding`, `/api/leads/{id}/verify`, `/api/leads/verify`, `/api/leads/verify/retry`, `/api/leads/{id}/verification`, `/api/leads/{id}/enrich` and `/api/receipts` — all documented in [API.md](./API.md).
 
 <details>
 <summary><b>🔑 How to get an API key — step by step (humans & AI agents)</b></summary>
@@ -109,7 +125,7 @@ curl -X POST http://localhost:3000/api/keys \
 # → { "ok": true, "apiKey": { … }, "rawKey": "lm_live_…" }
 ```
 
-Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `currentScopes` when a scope is missing, `429` with `Retry-After` on rate limits. Full contract (scopes, limits, CORS, error codes): [API.md → § 20](./API.md#20-public-api-for-external-projects-api-v1).
+Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `currentScopes` when a scope is missing, `429` with `Retry-After` on rate limits. Full contract (scopes, limits, CORS, error codes): [API.md → § 19](./API.md#19-public-api-for-external-projects-api-v1).
 
 </details>
 
@@ -119,16 +135,15 @@ Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `cu
 - **WhatsApp**: one-click deep-link to `wa.me/<phone>` with a per-lead template.
 - **Follow-up buckets** ("today / next 7 days / overdue / done") so nothing slips.
 
-### 🧾 Quotes & Invoices (with VAT)
-- Line-item quotes with **quantity, discounts, VAT rates, payment terms**.
-- **PDF generation** (react-pdf), Italian / German / French / English / Spanish / Portuguese / Slovenian labels.
-- **Workflow**: Draft → Sent → Accepted → Invoiced → Paid (or Rejected / Cancelled).
-- **Mark paid**, send reminders, **export CSV / JSON**.
+### 🧾 Payment receipts (not a fiscal document)
+- Register what a client actually paid: **number** (`RICEVUTA-2026-001`), **amount**, **method** (cash / bank transfer / card / other), **date** and notes.
+- Printable receipt (`/ricevuta`, `/ricevuta/{id}`) and the full list of payments per client, with amounts formatted in your locale's currency.
+- Explicitly **no VAT, no tax rates, no invoices**: the app tracks the payment, not the paperwork.
 
-### 📈 Portfolio, Price List & Reports
+### 📈 Opportunities, Portfolio & Reports
+- **Opportunity queue** (`/opportunita`): the businesses with **no website**, ranked by how much they need you, with one-click call / email / WhatsApp and a city filter.
 - Drag-and-light **Portfolio showcase** page (great for personal brand).
-- Configurable **price list** of your services (synced into quote creation).
-- Revenue reports, **funnel by status**, city breakdown, tag breakdown, top N leads by score.
+- Reports with **funnel by status**, city breakdown, tag breakdown, top N leads by score and CSV / JSON export.
 
 ### 🤖 AI (optional)
 - **Gemini** + **Groq** providers with **automatic failover**. If one key is missing or returns an error, the other is tried. Results are deterministic per-input where feasible.
@@ -136,11 +151,12 @@ Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `cu
   - Elevator-pitch cold-call scripts,
   - Follow-up email drafts,
   - Lead-score justifications,
-  - Contract / terms drafts (seeded templates).
+  - **Website & contact enrichment**: find a lead's official site and social profiles and report how confident the guess is,
+  - **Demo websites**: a complete one-page showcase built from the lead's real data, previewable at `/demo/{id}`.
 
 ### 🌍 Multilingual support & locales
 
-The entire UI is fully translated and localized for **7 languages**, with per-country formatting:
+The interface is translated into **7 languages**, with per-country formatting:
 
 | Flag | Code | Language | Currency default | Date format | Distance unit | Typical countries |
 |---|---|---|---|---|---|---|
@@ -152,9 +168,10 @@ The entire UI is fully translated and localized for **7 languages**, with per-co
 | 🇪🇸 | `es` | **Español** | EUR (€) | `DD/MM/YYYY` | km | España, México, Argentina, Colombia + LATAM |
 | 🇵🇹 | `pt` | **Português** | EUR (€) / BRL fallback | `DD/MM/YYYY` | km | Portugal, Brasil, Angola, Moçambique |
 
+- **Language coverage**: navigation, forms and core CRM flows are translated in all 7 languages; some domain-specific copy, seeded templates and AI-generated demo text remain Italian-first.
 - **Switch language anytime** via the 🌐 Globe dropdown in the top-right corner (persisted in `localStorage`, syncs to the `<html lang>` attribute for a11y + SEO).
 - Formatting uses `Intl.DateTimeFormat`, `Intl.NumberFormat` and `Intl.NumberFormat(currency)` **under the hood** — dates, numbers, currency and distances are natively correct for each locale.
-- Settings `locale` + `currency` are also in the DB so API routes (server-side emails, PDF generation) can use the same format without needing React context.
+- Settings `locale` + `currency` are also in the DB so API routes (server-side emails, receipts) can use the same format without needing React context.
 
 ### ♿ Accessibility (WCAG 2.1 AA aware)
 - **Skip-to-content** link as first focusable element on every page.
@@ -165,12 +182,15 @@ The entire UI is fully translated and localized for **7 languages**, with per-co
 - Colors inherited from the shadcn/ui palette (contrasts are AA-safe on foreground/background pairs — test it with axe if you want to be 100% sure).
 
 ### 🔒 Security (self-hosted by default)
-- **Rate limiting** (in-memory, IP+UA fingerprint) on writes, emails and AI endpoints.
-- **Input sanitization** + typed coercion: `asString / asNumber / asBoolean / asArray`, HTML-escaping, URL normalization, email validation.
-- **Settings whitelist**: only ~30 allowed keys can be written to `Setting` (rejects arbitrary mass-injection).
-- **Secrets never leave the server redacted**: `*_api_key` and `*_pass` are returned as `••••••••` to the client; masked values are refused on write (no accidental wipe when you hit Save).
-- **Prisma transactions + batch operations**: no partial writes, no N+1 queries on bulk lead import.
-- **CSP-friendly** (no inline `javascript:`) and strict default middleware from Next.js.
+- **Password-protected app**: set `APP_PASSWORD` (at least 8 characters). Sessions are signed HttpOnly cookies; without a password, protected pages and APIs fail closed with a clear `503` on every host.
+- **CSRF protection**: cookie-authenticated mutations must be same-origin. `/api/v1/*` is exempt because it uses API keys, not session cookies.
+- **Security headers**: CSP, HSTS in production, `X-Frame-Options`, `nosniff`, Referrer-Policy and Permissions-Policy are set in `next.config.mjs`; remote `next/image` hosts are disabled.
+- **SSRF guard**: user-supplied website URLs are resolved and private, loopback and link-local targets are rejected before HTTP checks, screenshots or Playwright navigation.
+- **Sandboxed demo previews**: generated demo HTML runs in an iframe without scripts and without a referrer.
+- **Rate limiting** (in-memory) on login, writes, emails, verification and AI endpoints. Set `TRUST_PROXY=1` only behind a proxy you control; otherwise forwarded headers are ignored.
+- **Input sanitization** + typed coercion: `asString / asNumber / asBoolean / asArray`, HTML escaping, URL normalization and email validation.
+- **Settings whitelist** and **secret redaction**: only known keys can be written; `*_api_key` and `*_pass` values are returned masked and masked values are refused on write.
+- **Prisma parameterized queries and transactions**: atomic writes on imports, receipts and bulk operations.
 
 See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure process.
 
@@ -180,7 +200,7 @@ See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure
 
 This repository contains **only Lead Machine, the app**. The public marketing site and the in-browser demo are maintained as a separate project.
 
-- 🌍 **Live demo**: <https://website-mocha-one-59.vercel.app> — real OpenStreetMap search, AI lead scoring, cold-email generation in your browser.
+- 🌍 **Live demo**: <https://website-mocha-one-59.vercel.app> — real OpenStreetMap search, rule-based lead scoring, cold-email generation in your browser.
 - 💻 **This repo**: everything you need to self-host Lead Machine (app + docs + CI).
 
 ---
@@ -191,7 +211,7 @@ This repository contains **only Lead Machine, the app**. The public marketing si
 
 | Tool | Minimum version | Notes |
 |---|---|---|
-| **Node.js** | `18.17 LTS` (or `20 LTS`, `22`) | `node -v` to check. We recommend 20 LTS. |
+| **Node.js** | `18.18 LTS` (or `20 LTS`, `22`) | `node -v` to check. We recommend 20 LTS. |
 | **npm** (or pnpm / yarn) | Comes with Node | `npm -v` ≥ 10 works. |
 | That's it. | — | SQLite is file-based — **no Postgres / MySQL install needed**. |
 
@@ -229,14 +249,17 @@ npm install
 copy .env.example .env        # Windows (PowerShell / CMD)
 # cp .env.example .env        # macOS / Linux / WSL
 
-# Create SQLite DB + seed default templates and sample leads
+# Required to use the app (at least 8 characters):
+#   APP_PASSWORD=choose-a-strong-password
+
+# Create the SQLite DB + default templates, tags and neutral settings
 npm run setup
 
 # 🚀  Start the dev server
 npm run dev
 ```
 
-👉 Then open <http://localhost:3000> in your browser. You should land on the **Dashboard** with some sample Feltre (BL), Italia leads loaded by the seed.
+👉 Then open <http://localhost:3000> in your browser. On a fresh database you land on the **first-run setup**: enter your brand and the city where you look for clients (it is geocoded automatically). Skip it and you go straight to the **Dashboard**, which is **empty by design** — no sample, demo or fake business is ever inserted: you fill the CRM with real leads from **Ricerca** (OpenStreetMap), and your search area comes from the city you just configured.
 
 On Windows PowerShell, replace `cp` with `copy`; `&&` with `;`. The npm scripts already handle cross-platform steps.
 
@@ -247,25 +270,28 @@ On Windows PowerShell, replace `cp` with `copy`; `&&` with `;`. The npm scripts 
 npm run build
 
 # Then start the production server
-npm start        # by default http://localhost:3000
+npm start             # http://127.0.0.1:3000, local only
+npm run start:public  # 0.0.0.0, only with APP_PASSWORD and a TLS proxy in front
 ```
 
-Behind a reverse proxy (Nginx, Caddy, Traefik, etc.) set the `NEXT_PUBLIC_BASE_URL` in `.env` to your canonical URL.
+Behind a reverse proxy (Nginx, Caddy, Traefik, etc.) set `NEXT_PUBLIC_BASE_URL` to your canonical URL and `TRUST_PROXY=1` so rate limits use the proxy's forwarded client IP. Do not set `TRUST_PROXY` when the app is reachable directly.
 
 ---
 
 ## 🛠️ Environment variables (`.env`)
 
-Edit `.env` (created from `.env.example`). The **only required** variable is a database URL that points to your SQLite file.
+Edit `.env` (created from `.env.example`). `DATABASE_URL` points to your SQLite file and `APP_PASSWORD` (at least 8 characters) is required to use the app; without it protected pages and APIs answer `503`.
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `DATABASE_URL` | `file:./dev.db` | SQLite location (relative to `prisma/`). |
 | `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` | Canonical public URL (used in emails, ics, deep links). |
+| `APP_PASSWORD` | *(empty)* | Required to use the app (min 8 chars). Shared password for the single-user session; changing it invalidates all sessions. Without it, protected routes fail closed with `503`. |
+| `TRUST_PROXY` | *(empty)* | Set to `1` only behind a trusted reverse proxy so rate limits use `X-Forwarded-For`; leave empty otherwise to prevent spoofing. |
 | `GEMINI_API_KEY` | *(empty)* | Optional. Google AI Studio key. |
 | `GROQ_API_KEY` | *(empty)* | Optional. Groq key. If both are set, Groq is tried first, then Gemini on failure. |
 | `GEOAPIFY_API_KEY` | *(empty)* | Optional. Second geographic source (free tier at <https://myprojects.geoapify.com/>). |
-| `OSM_CONTACT_EMAIL` | `anonimo@example.com` | Contact sent to the Overpass API fair-use policy (identifies your queries). |
+| `OSM_CONTACT_EMAIL` | *(empty)* | Optional. Contact sent to OpenStreetMap (Overpass and Nominatim) to identify your requests. Not a key: leave it empty and the app sends the project URL instead. A placeholder such as `you@example.com` is ignored on purpose — Nominatim rejects placeholder addresses with `403`, which would break geocoding. |
 | `SMTP_HOST` | *(empty)* | Optional. SMTP hostname (e.g. `smtp.gmail.com`). |
 | `SMTP_PORT` | `587` | `587` (STARTTLS) or `465` (implicit TLS). |
 | `SMTP_USER` | *(empty)* | SMTP username (often your email). |
@@ -280,16 +306,17 @@ Edit `.env` (created from `.env.example`). The **only required** variable is a d
 
 ## 🧭 Feature walkthrough (one paragraph each)
 
-1. **Dashboard** (`/dashboard`) — KPIs, 4 charts, top leads, upcoming follow-ups.
+1. **Dashboard** (`/dashboard`) — KPIs, 4 charts, top leads, upcoming follow-ups. On a fresh database you first pass through **`/onboarding`** (brand, name, search city).
 2. **Ricerca / Lead Research** (`/ricerca`) — search OSM by keyword + radius, import candidates, run website research in bulk, tag and score.
-3. **CRM / Lead list** (`/crm`) — filterable, sortable list; bulk actions (set status, add/remove tags, delete); open a detail drawer with timeline.
-4. **Map** (`/mappa`) — interactive Leaflet map with clusters; click a pin for lead summary and quick actions (call, email, WhatsApp, open).
-5. **Preventivi / Quotes** (`/preventivi`) — create line-item quotes, turn them into PDFs, send by email, convert to invoice on acceptance.
+3. **CRM / Lead list** (`/crm`) — filterable, sortable list; bulk actions (set status, add/remove tags, delete); open a detail drawer with timeline, **data verification panel** and the web actions (find site, enrich, generate demo).
+4. **Map** (`/mappa`) — interactive Leaflet map with color-coded pins; click a pin for lead summary and quick actions (call, email, WhatsApp, open).
+5. **Ricevute / Receipts** (`/ricevuta`) — register a payment (amount, method, date), print the receipt, keep the list of what each client paid.
 6. **Follow-ups** (`/crm`) — per-lead follow-ups with due dates, automatic bucketization ("today" / "this week" / "overdue").
-7. **Portfolio & Price list** (`/portfolio`, `/listino`) — public-style showcases of your best work and your service catalog.
+7. **Opportunita without a website** (`/opportunita`) — the queue of leads with no site, ranked by priority, with one-click call / email / WhatsApp. **Portfolio** (`/portfolio`) showcases your best work.
 8. **Guida / Guide** (`/guida`) — a short in-app manual with screenshots and copy/paste templates for cold outreach.
 9. **Report** (`/report`) — more detailed business analytics (revenue over time, cohort by status, tag/city splits).
-10. **Settings** (`/impostazioni`) — brand info, locale/currency defaults, AI & SMTP keys, tags & categories cleanup.
+10. **Stato sistema** (`/health`) — scans the project, database, auth and security configuration, and optional integrations; it says plainly what works, what is only a warning, and what is broken, without ever showing a secret.
+11. **Settings** (`/impostazioni`) — brand info, locale/currency defaults, AI & SMTP keys, tags & categories cleanup.
 
 ---
 
@@ -297,18 +324,17 @@ Edit `.env` (created from `.env.example`). The **only required** variable is a d
 
 | Layer | Choice | Why |
 |---|---|---|
-| **Framework** | **Next.js 14 App Router** | File-based routing + SSR + API routes in one process; great cold start even on hobby deploy. |
+| **Framework** | **Next.js 15 App Router** | File-based routing + SSR + API routes in one process; great cold start even on hobby deploy. |
 | **Language** | **TypeScript strict** | Catches most bugs at compile-time. |
 | **Styling** | **Tailwind CSS 3 + shadcn/ui** | Consistent, accessible, hackable UI primitives. |
 | **Data layer** | **Prisma ORM + SQLite** | Zero-DB-admin, file-portable, great DX. |
 | **Map** | **Leaflet + OpenStreetMap tiles** | Free, tile-based, no Google Maps key required. |
 | **Email** | **nodemailer** | Battle-tested. |
-| **PDF** | **@react-pdf/renderer** | Typed, layout-by-component, i18n-friendly. |
 | **Charts** | **Recharts** | Composable SVG charts with responsive sizing. |
-| **AI** | **Google Generative AI + Groq SDK** | Two providers for redundancy, with a small failover wrapper. |
+| **AI** | **Google Gemini + Groq** (direct HTTP API, no vendor SDK) | Two providers for redundancy, with automatic failover and model fallbacks. |
 | **Screenshots** | **Playwright (optional)** | Modern, reliable, installs its own Chromium. |
 | **i18n** | **Custom implementation** (dictionaries + `Intl`) | Lightweight, no extra dependencies, App-routers + Server Components friendly. |
-| **Auth** | *(None, by design)* | Single-user tool; **add auth yourself** if you expose publicly. |
+| **Auth** | **Shared password + signed session cookie** | Single-user tool: one `APP_PASSWORD`, HttpOnly cookie, fail-closed `503` when unset. |
 
 ---
 
@@ -317,13 +343,13 @@ Edit `.env` (created from `.env.example`). The **only required** variable is a d
 ```
 lead-machine/
 ├── prisma/
-│   ├── schema.prisma     # DB model (Lead, Tag, Quote, Invoice, Activity, Notification, Setting, Template…)
-│   └── seed.ts           # Templates + sample data (run once with npm run db:seed)
+│   ├── schema.prisma     # DB model (Lead, Tag, Location, Activity, FollowUp, Appointment, MessageTemplate, GeneratedMessage, Notification, Setting, Verification, Receipt, EmailLog, ApiKey)
+│   └── seed.ts           # Message templates, tags and neutral settings — no sample data (npm run db:seed)
 ├── public/               # Static assets (logo, favicon, og image)
 ├── src/
 │   ├── app/              # App Router: pages + /api/* routes
 │   ├── components/       # UI: app-shell, charts, forms, cards, locale-switcher, theme-toggle…
-│   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, quotes, security, i18n)
+│   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, verify, receipts, onboarding, geocode, search-area, opportunities, security, i18n)
 ├── .env.example
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
@@ -347,7 +373,7 @@ For **localhost use**, nothing beyond the Quick Start above is needed.
 
 If you'd like to host Lead Machine on a VPS, Vercel (⚠️ note about ephemeral SQLite), Fly.io, Coolify, etc — see [DEPLOY.md](./DEPLOY.md). It covers:
 
-- Reverse proxy with Caddy / Nginx (with HTTPS, Basic Auth).
+- Reverse proxy with Caddy / Nginx (HTTPS, with optional Basic Auth as a second layer).
 - SQLite backups (cron + rclone to S3-compatible storage).
 - Moving to Postgres (single `DATABASE_URL` change, Prisma handles the rest).
 - Vercel / serverless caveats (⚠️ you will lose your DB on cold restarts unless you attach a persistent volume).
@@ -412,6 +438,23 @@ More issues? Open a **Bug report** with your Node / OS / browser + a minimal rep
 
 ---
 
+## ✅ Testing & verification
+
+Nothing here is simulated: the checks below talk to the real services (OpenStreetMap/Overpass, Nominatim geocoding, DNS MX records, live HTTP) or to a real running server. The full inventory — what each suite proves and what is **not** covered — is in [docs/TESTING.md](./docs/TESTING.md).
+
+| Command | What it verifies |
+|---|---|
+| `npm run qa` | typecheck + lint + translation parity (7 locales) + content and hygiene guard rails + unit tests on the pure helpers in `src/lib/` |
+| `npm run check:auth` | login, session cookie, CSRF, security headers and fail-closed behaviour without `APP_PASSWORD`; starts its own production servers (requires `npm run build` and `npm run setup`) |
+| `npm run check:hygiene` | empty pages, links and menu entries pointing at removed routes, unreachable pages, `layout` files without a page, empty folders, and (when the DB exists) leftovers and inconsistent verification rows |
+| `npm run smoke:api` | end-to-end API-key behaviour against a running server: access profiles, scope enforcement, `401/403/404`, CORS preflight |
+| `npm run smoke:geo` | live geographic sources through the app: Overpass, Geoapify, real city geocoding without coordinates, public `/api/v1/search` |
+| `npm run perf:check` | real response time and payload size of the key pages/APIs, failing when a budget is exceeded |
+
+Smoke and perf checks need a server: `npm run build`, then `PORT=3111 npm start` (override the address with `SMOKE_BASE`).
+
+---
+
 ## 🤝 Contributing
 
 **Every contribution is welcome**, big or small. See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
@@ -427,7 +470,7 @@ Good first issues are labeled [🐣 good first issue](https://github.com/AhsenKu
 
 All UI strings live in `src/lib/i18n-dictionaries.ts`. The 7 current languages are `it`, `de`, `fr`, `sl`, `en`, `es`, `pt`. To add an 8th (e.g. Dutch `nl`, Polish `pl`, Swedish `sv`):
 
-1. Add the locale metadata in `src/lib/i18n-config.ts` (flag, currency, dateFormat, distanceUnit, VAT default, tax label).
+1. Add the locale metadata in `src/lib/i18n-config.ts` (flag, currency, dateFormat, distanceUnit).
 2. Add a new entry in `DICTIONARIES` in `src/lib/i18n-dictionaries.ts` — copy-paste the `en` object as a starting point and translate.
 3. Update the language list in `src/components/locale-switcher.tsx` (it already uses the config, so it'll show up automatically — you're done).
 4. Open a PR with "i18n(lang): add …" title. Screenshots appreciated.
@@ -459,12 +502,12 @@ See [LICENSE](./LICENSE) for the exact legal text.
 
 ## ❤️ Acknowledgments & Credits
 
-**An Ahsen-Studio Creation**
+**Created by Ahsen Kurtoski**
 - 🧠 **Idea & Vision:** Ahsen Kurtoski, a passionate teenager developer.
 - 🤖 **Development & Execution:** Built by Artificial Intelligence (OpenCode / Antigravity).
 - 🤝 **The Mission:** Proving that with the right AI tools and a great human vision, anyone can build enterprise-grade software.
 
 Other huge thanks to:
 - OpenStreetMap & Overpass contributors for the amazing free geographic data. ❤️
-- All the authors of `next.js`, `prisma`, `tailwindcss`, `shadcn/ui`, `recharts`, `leaflet`, `nodemailer`, `react-pdf`, `playwright`.
+- All the authors of `next.js`, `prisma`, `tailwindcss`, `shadcn/ui`, `recharts`, `leaflet`, `nodemailer`, `playwright`.
 - **You**, for reading this far and considering the project. ⭐

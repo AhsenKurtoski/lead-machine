@@ -1,11 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { rateLimitedResponse } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
 // Crea automaticamente un promemoria di ricontatto per i lead che sono fermi:
 // status CONTATTATO o IN_TRATTATIVA, non aggiornati da piu di 3 giorni e senza
 // un follow-up gia in sospeso. Cosi non perdi nessun lead caldo.
-export async function POST() {
+export async function POST(req: Request) {
+  const limited = await rateLimitedResponse(req, "followups:auto", 10, 60_000);
+  if (limited) return limited;
+
   const threeDaysAgo = new Date(Date.now() - 3 * 86400000);
 
   const leads = await prisma.lead.findMany({

@@ -36,9 +36,10 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const name = asString(body.name, 100)?.trim() || "Nuova Integrazione";
     // Gli scope vengono validati: valori sconosciuti sono ignorati.
-    // Profilo predefinito = accesso completo (nessuna restrizione a sorpresa).
+    // Il default e' il minimo necessario (sola lettura); write/search/ai
+    // devono essere richiesti esplicitamente.
     const requested = asString(body.permissions, 100)?.trim();
-    const scopes = requested ? parseScopes(requested) : parseScopes("*");
+    const scopes = requested ? parseScopes(requested) : parseScopes("read");
     if (scopes.length === 0) {
       return NextResponse.json(
         { ok: false, error: "Nessun permesso valido richiesto. Valori ammessi: read, write, search, ai." },

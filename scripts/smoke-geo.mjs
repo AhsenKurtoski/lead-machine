@@ -12,6 +12,13 @@ function check(name, ok, detail) {
   (ok ? pass : fail).push(name);
 }
 
+// I mirror pubblici di Overpass limitano le raffiche dallo stesso IP: tre
+// ricerche consecutive possono far rispondere una pagina di errore non-JSON.
+// Questa pausa non allenta i controlli, evita solo di farsi throttlare.
+// Si puo' accorciare con SMOKE_PAUSE_MS (es. 0 in locale).
+const PAUSE_MS = Number(process.env.SMOKE_PAUSE_MS ?? 20000);
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // 1) Ricerca interna: risposta { ok, count, candidates, sources: {osm, geoapify, ai}, warnings }
 const res = await fetch(BASE + "/api/ricerca", {
   method: "POST",
@@ -19,7 +26,11 @@ const res = await fetch(BASE + "/api/ricerca", {
   body: JSON.stringify({
     categories: ["ristorante"],
     radius_m: 5000,
-    searchCity: "Feltre",
+    searchCity: "Milano",
+    // Coordinate esplicite: questo controllo verifica le FONTI geografiche,
+    // senza dipendere dal geocoding (verificato subito dopo).
+    lat: 45.4642,
+    lng: 9.19,
     useAi: false,
   }),
 });
@@ -48,8 +59,29 @@ check(
 const first = (data.candidates || [])[0];
 if (first) console.log(`   esempio reale: ${first.name} @ ${first.lat},${first.lng}`);
 
+// 1b) Stessa ricerca SENZA coordinate: l'area deve essere risolta dalla citta
+// indicata nella richiesta (geocoding), non da una citta scritta nel codice.
+await pause(PAUSE_MS);
+const geoRes = await fetch(BASE + "/api/ricerca", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    categories: ["ristorante"],
+    radius_m: 5000,
+    searchCity: "Milano",
+    useAi: false,
+  }),
+});
+const geoData = await geoRes.json().catch(() => ({}));
+check(
+  "citta della richiesta risolta via geocoding (senza coordinate)",
+  geoRes.status === 200 && (geoData.count || 0) > 0,
+  `status=${geoRes.status} count=${geoData.count}`
+);
+
 // 2) API pubblica /api/v1/search con API key reale
 // risposta { ok, count, area, timedOut, warnings, leads }
+await pause(PAUSE_MS);
 const keyRes = await fetch(BASE + "/api/keys", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -62,7 +94,7 @@ if (rawKey) {
   const s = await fetch(BASE + "/api/v1/search", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": rawKey },
-    body: JSON.stringify({ categories: ["bar"], searchCity: "Feltre", radius: 3000 }),
+    body: JSON.stringify({ categories: ["bar"], searchCity: "Milano", lat: 45.4642, lng: 9.19, radius: 3000 }),
   });
   const sd = await s.json().catch(() => ({}));
   check("POST /api/v1/search con chiave -> 200", s.status === 200, String(s.status));

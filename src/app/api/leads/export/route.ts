@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const leads = await prisma.lead.findMany({ orderBy: { priorityScore: "desc" } });
   const csv = toCsv(leads as Array<Record<string, unknown>>, LEAD_CSV_COLUMNS);
-  const filename = "lead-feltre-" + new Date().toISOString().slice(0, 10) + ".csv";
+  const filename = "lead-export-" + new Date().toISOString().slice(0, 10) + ".csv";
   // BOM iniziale per far riconoscere UTF-8 a Excel
   return new NextResponse("\uFEFF" + csv, {
     headers: {

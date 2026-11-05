@@ -52,7 +52,7 @@ model Lead {
 
   // Posizione principale
   addressFull   String?
-  city          String?  @default("Feltre")
+  city          String?
   postalCode    String?
   lat           Float?
   lng           Float?
@@ -75,7 +75,9 @@ model Lead {
   followUps     FollowUp[]
   appointments  Appointment[]
   messages      GeneratedMessage[]
-  quotes        Quote[]
+  receipts      Receipt[]
+  verifications Verification[]
+  retryQueue    VerificationRetry[]
   emailLogs     EmailLog[]
   tags          Tag[]
 
@@ -194,26 +196,70 @@ model Setting {
   value String
 }
 
-// --- Preventivi brandizzati (funzione O) ---
-model Quote {
-  id         String   @id @default(cuid())
-  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  leadId     String
-  number     String   // es. "PREV-2026-001"
-  title      String?
-  items      String   @default("[]") // JSON: [{ description, qty, price }]
-  notes      String?
-  discount   Float    @default(0)   // sconto in euro
-  taxRate    Float    @default(0)   // IVA in %, es. 22 (0 = prestazione occasionale, non soggetta a IVA)
-  depositPercent Float @default(0)  // acconto richiesto in % all'accettazione
-  paymentTerms String?              // condizioni / modalita di pagamento
-  deliveryTime String?              // tempi di consegna stimati
-  status     String   @default("bozza") // bozza | inviato | accettato | rifiutato
-  validUntil DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+// --- Verifiche dei dati del lead (Fase 3) ---
+// Ogni riga dice: per QUALE campo, con quale ESITO, da quale FONTE e QUANDO.
+// Cosi l'utente sa sempre se un dato e verificato o solo ipotizzato.
+model Verification {
+  id        String   @id @default(cuid())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  field     String   // "phone" | "email" | "website" | "address" | "social"
+  status    String   // "verificato" | "da_verificare" | "non_raggiungibile" | "non_valido" | "assente"
+  source    String?  // "openstreetmap" | "controllo_diretto" | "ricerca_web"
+  evidence  String?  // spiegazione leggibile del risultato
+  checkedAt DateTime @default(now())
+
+  // Una sola fotografia per lead e campo e' garantita dalla scrittura (una
+  // transazione che sostituisce l'intera fotografia del lead, in
+  // verify-runner.ts) e NON da un vincolo unique: aggiungerlo qui farebbe
+  // fallire `prisma db push` di ogni installazione esistente chiedendo
+  // `--accept-data-loss`. L'invariante si verifica dal vivo con
+  // `node scripts/probe-verify-concurrency.mjs` (verifiche in parallelo ->
+  // una riga per campo) e `npm run check:hygiene` la controlla nel database.
+  @@index([leadId])
+  @@index([field])
+}
+
+// --- Coda dei controlli rinviati per un problema di rete (verifica dati) ---
+// Quando un controllo NON si e potuto fare (il resolver DNS non risponde, il
+// sito non da nessuna risposta per un errore di rete) il dato resta "da
+// verificare" e finisce qui: l'app lo riprova da sola piu tardi, con attese
+// crescenti e un numero massimo di tentativi, invece di lasciarlo in sospeso
+// per sempre. Ogni riga e un lead + il campo da riprovare (uno per campo).
+model VerificationRetry {
+  id            String   @id @default(cuid())
+  lead          Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId        String
+  field         String   // "email" | "website"
+  reason        String?  // perche e rinviato (es. "il resolver DNS non ha risposto")
+  attempts      Int      @default(1) // quanti tentativi sono gia stati fatti
+  nextAttemptAt DateTime // quando riprovare
+  lastError     String?  // ultimo errore tecnico visto (per diagnosi)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([leadId, field])
+  @@index([nextAttemptAt])
+}
+
+// --- Ricevute di pagamento (prova che il cliente ha pagato) ---
+// NON e un documento fiscale: niente aliquote, niente partita IVA, niente sconti.
+// Registra semplicemente: chi ha pagato, quanto, come e quando.
+model Receipt {
+  id          String   @id @default(cuid())
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId      String
+  number      String   @unique // es. "RICEVUTA-2026-001"
+  description String?  // cosa e stato pagato
+  amount      Float    @default(0) // quanto e stato pagato
+  method      String   @default("contanti") // contanti | bonifico | carta | altro
+  paidAt      DateTime @default(now())
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([leadId])
+  @@index([paidAt])
 }
 
 // --- Log delle email inviate: a chi, con quale stato e chi ha risposto ---

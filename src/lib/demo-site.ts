@@ -55,10 +55,10 @@ export const NAV_LINKS: DemoNavLink[] = [
 const DEFAULT_GROUP: GroupDef = {
   emoji: "\u2B50",
   font: "sans",
-  tagline: "Qualità e cura, vicino a te a Feltre",
+  tagline: "Qualità e cura, vicino a te",
   photoKeyword: "shop,store",
   faqs: [
-    { q: "Dove vi trovate?", a: "Siamo a Feltre (BL) e dintorni. Contattaci per indicazioni e orari aggiornati." },
+    { q: "Dove vi trovate?", a: "Siamo nella tua zona. Contattaci per indicazioni e orari aggiornati." },
     { q: "Come posso contattarvi?", a: "Puoi chiamarci, scriverci su WhatsApp o inviarci una email: rispondiamo in giornata." },
     { q: "Il preventivo è gratuito?", a: "Sì, il preventivo è gratuito e senza impegno: raccontaci cosa ti serve." },
     { q: "Quali metodi di pagamento accettate?", a: "Contanti, bancomat e bonifico. Concordiamo insieme la soluzione più comoda." },
@@ -83,7 +83,7 @@ const DEFAULT_GROUP: GroupDef = {
   ],
   stats: [
     { value: "100%", label: "Clienti soddisfatti" },
-    { value: "Local", label: "Nel cuore di Feltre" },
+    { value: "Local", label: "Nel cuore della zona" },
     { value: "Top", label: "Qualità del servizio" },
   ],
   testimonial: { quote: "Professionalità e gentilezza non comuni. Consigliatissimi!", author: "Recensione cliente" },
@@ -94,7 +94,7 @@ const GROUPS: Record<string, GroupDef> = {
   Ricettivita: {
     emoji: "\uD83D\uDECF\uFE0F",
     font: "serif",
-    tagline: "Il tuo soggiorno nel cuore delle Dolomiti",
+    tagline: "Il tuo soggiorno nel cuore del territorio",
     photoKeyword: "hotel,room",
     faqs: [
       { q: "A che ora sono check-in e check-out?", a: "Il check-in è dal pomeriggio e il check-out in mattinata. Siamo flessibili: scrivici per esigenze particolari." },
@@ -102,7 +102,7 @@ const GROUPS: Record<string, GroupDef> = {
       { q: "C'è il parcheggio?", a: "Sì, mettiamo a disposizione un parcheggio comodo per gli ospiti." },
       { q: "Gli animali sono ammessi?", a: "Contattaci prima di prenotare: valutiamo insieme la soluzione migliore." },
     ],
-    heroSubtitle: "Camere accoglienti, ospitalità autentica e la bellezza del territorio a pochi passi.",
+    heroSubtitle: "Camere accoglienti, ospitalità autentica e il territorio a pochi passi.",
     palettes: [
       { primary: "#0e7490", secondary: "#0891b2", dark: "#083344" },
       { primary: "#1d4ed8", secondary: "#0ea5e9", dark: "#0c1e3a" },
@@ -211,7 +211,7 @@ const GROUPS: Record<string, GroupDef> = {
       { q: "Il sopralluogo è gratuito?", a: "Sì, sopralluogo e preventivo sono gratuiti e senza impegno." },
       { q: "In quanto tempo intervenite?", a: "Per le urgenze cerchiamo di intervenire in giornata; per i lavori programmati concordiamo la data insieme." },
       { q: "Offrite garanzia sul lavoro?", a: "Sì, ogni intervento è garantito e usiamo materiali di qualità." },
-      { q: "Lavorate anche fuori Feltre?", a: "Sì, operiamo a Feltre e nei comuni limitrofi." },
+      { q: "Lavorate anche fuori zona?", a: "Sì, operiamo in zona e nei comuni limitrofi." },
     ],
     heroSubtitle: "Interventi rapidi e affidabili, con preventivi chiari e senza sorprese.",
     palettes: [
@@ -242,7 +242,7 @@ const GROUPS: Record<string, GroupDef> = {
   Negozi: {
     emoji: "\uD83D\uDECD\uFE0F",
     font: "sans",
-    tagline: "Il tuo negozio di fiducia a Feltre",
+    tagline: "Il tuo negozio di fiducia in zona",
     photoKeyword: "store,products",
     faqs: [
       { q: "Quali sono gli orari?", a: "Contattaci per gli orari aggiornati: siamo aperti tutta la settimana, con orario continuato in alcuni giorni." },
@@ -271,7 +271,7 @@ const GROUPS: Record<string, GroupDef> = {
     stats: [
       { value: "4.9", label: "Giudizio clienti" },
       { value: "1000+", label: "Prodotti" },
-      { value: "Local", label: "A Feltre" },
+      { value: "Local", label: "In zona" },
     ],
     testimonial: { quote: "Sempre gentili e disponibili, trovo sempre quello che cerco.", author: "Cliente abituale" },
     ctaLabel: "Vieni a trovarci",

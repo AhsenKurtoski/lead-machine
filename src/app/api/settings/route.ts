@@ -24,9 +24,9 @@ const ALLOWED_KEYS: Record<string, { maxLen: number; pattern?: RegExp }> = {
   search_lat: { maxLen: 50 },
   search_lng: { maxLen: 50 },
   search_radius_m: { maxLen: 20 },
+  business_country: { maxLen: 2, pattern: /^[A-Z]{2}$/ },
   locale: { maxLen: 10, pattern: /^[a-z]{2}(-[A-Z]{2})?$/i },
   currency: { maxLen: 10, pattern: /^[A-Z]{3}$/ },
-  tax_rate_default: { maxLen: 20 },
   gemini_api_key: { maxLen: 500 },
   gemini_model: { maxLen: 200 },
   groq_api_key: { maxLen: 500 },
@@ -39,6 +39,7 @@ const ALLOWED_KEYS: Record<string, { maxLen: number; pattern?: RegExp }> = {
   smtp_from: { maxLen: 255 },
   osm_contact_email: { maxLen: 254 },
   geoapify_api_key: { maxLen: 500 },
+  tomtom_api_key: { maxLen: 500 },
   privacy_mode: { maxLen: 20 },
 };
 
@@ -96,6 +97,25 @@ export async function POST(req: Request) {
         "[settings:write] Chiavi scartate dalla whitelist o non valide:",
         rejected.map((r) => r.key + "(" + r.reason + ")").join(", ")
       );
+    }
+
+    // Cambiare l'host SMTP senza reinserire la password permetterebbe di
+    // ricevere un tentativo di AUTH con la password gia salvata. La password
+    // (o l'utente) deve quindi essere reinviata insieme al nuovo host.
+    const smtpHostUpdate = updates.find((u) => u.key === "smtp_host");
+    const sendsSmtpSecret = updates.some((u) => u.key === "smtp_pass" && u.value.trim() !== "");
+    if (smtpHostUpdate) {
+      const current = await prisma.setting.findUnique({ where: { key: "smtp_host" } });
+      if (current?.value !== smtpHostUpdate.value && !sendsSmtpSecret) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "Per cambiare il server SMTP devi reinserire anche la password SMTP. Operazione annullata per sicurezza.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     if (updates.length > 0) {

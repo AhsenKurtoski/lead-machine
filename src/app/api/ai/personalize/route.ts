@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 import { fillTemplate } from "@/lib/templates";
 import { generateText, aiConfigured } from "@/lib/ai";
+import { rateLimitedResponse } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -32,6 +33,9 @@ function buildUserPrompt(channel: string, contesto: string, filled: string): str
 }
 
 export async function POST(req: Request) {
+  const limited = await rateLimitedResponse(req, "ai:personalize", 20, 60_000);
+  if (limited) return limited;
+
   try {
     const body = await req.json().catch(() => ({}));
     const lead = await prisma.lead.findUnique({ where: { id: body.leadId } });

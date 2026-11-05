@@ -28,8 +28,8 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
           orderBy: { createdAt: "desc" },
           take: 20,
         },
-        quotes: {
-          orderBy: { createdAt: "desc" },
+        receipts: {
+          orderBy: { paidAt: "desc" },
         },
       },
     });

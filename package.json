@@ -14,6 +14,12 @@
     "url": "https://github.com/AhsenKurtoski/lead-machine/issues"
   },
   "keywords": [
+    "ahsen-kurtoski",
+    "ahsen kurtoski",
+    "created by ahsen kurtoski",
+    "ahsen kurtoski lead machine",
+    "ahsen-studio",
+    "lead-machine",
     "lead-generation",
     "crm",
     "openstreetmap",
@@ -27,8 +33,8 @@
     "gemini",
     "whatsapp",
     "email",
-    "quotes",
-    "invoicing",
+    "data-verification",
+    "receipts",
     "self-hosted",
     "local-first",
     "small-business",
@@ -36,10 +42,14 @@
     "i18n",
     "multilingual"
   ],
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "next start -H 127.0.0.1",
+    "start:public": "next start -H 0.0.0.0",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
@@ -48,8 +58,14 @@
     "i18n:check": "node scripts/check-i18n.mjs",
     "i18n:merge": "node scripts/merge-i18n.mjs",
     "smoke:api": "node scripts/smoke-api.mjs",
+    "check:auth": "node scripts/check-auth.mjs",
     "smoke:geo": "node scripts/smoke-geo.mjs",
-    "qa": "npm run typecheck && npm run lint && npm run i18n:check",
+    "perf:check": "node scripts/perf-check.mjs",
+    "test": "node scripts/run-tests.mjs",
+    "check:content": "node scripts/check-content.mjs",
+    "check:hygiene": "node --import tsx scripts/check-hygiene.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
+    "qa": "npm run typecheck && npm run lint && npm run i18n:check && npm run check:content && npm run check:hygiene && npm test",
     "setup": "prisma db push && tsx prisma/seed.ts",
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
     "screenshots": "node scripts/screenshot.mjs"
@@ -70,9 +86,9 @@
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.454.0",
-    "next": "^15.5.27",
+    "next": "^15.5.29",
     "next-themes": "^0.3.0",
-    "nodemailer": "^10.0.15",
+    "nodemailer": "^10.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
@@ -88,15 +104,19 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
-    "eslint-config-next": "^15.5.27",
+    "eslint-config-next": "^15.5.29",
     "playwright": "^1.63.0",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.32",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.2",
     "typescript": "^5"
   },
-  "optionalDependencies": {
-    "playwright": "^1.62.1"
+  "overrides": {
+    "postcss": "^8.5.32",
+    "postcss-selector-parser": "^7.1.7",
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.1"
+    }
   }
 }

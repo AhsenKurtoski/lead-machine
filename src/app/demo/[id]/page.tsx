@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getDemoTheme } from "@/lib/demo-site";
 import { getSettings } from "@/lib/settings";
-import { aiConfigured } from "@/lib/ai";
-import { generateDemoHtml } from "@/lib/demo-generate";
 
 export const dynamic = "force-dynamic";
 
@@ -13,50 +11,26 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
   const lead = await prisma.lead.findUnique({ where: { id: params.id } });
   if (!lead) notFound();
 
+  const settings = await getSettings();
+
   // Se esiste un sito generato dall'AI, lo mostriamo a tutta pagina,
-  // isolato in un iframe (il suo CSS non interferisce con l'app).
+  // isolato in un iframe. Il sandbox impedisce a script nell'HTML generato
+  // di leggere il CRM o chiamare le API con la sessione dell'utente.
   if (lead.demoHtml) {
     return (
       <iframe
         srcDoc={lead.demoHtml}
         title={"Sito demo - " + lead.name}
+        sandbox="allow-forms allow-popups"
+        referrerPolicy="no-referrer"
         className="h-screen w-full border-0"
       />
     );
   }
 
-  const settings = await getSettings();
-
-  // Nessun sito AI ancora salvato: se c'e una chiave AI configurata, generane
-  // uno UNICO e su misura al volo, poi salvalo. Cosi ogni attivita ha il suo
-  // sito professionale premium e non escono mai "sempre gli stessi siti".
-  if (!lead.demoHtml && (await aiConfigured())) {
-    try {
-      const gen = await generateDemoHtml(
-        lead,
-        settings.brand_name || "La tua Web Agency",
-        settings.brand_owner || "",
-        settings.formsubmit_email || settings.brand_email || lead.email || "",
-        lead.demoPrompt || "",
-      );
-      if (gen) {
-        await prisma.lead.update({
-          where: { id: lead.id },
-          data: { demoHtml: gen.html, demoHtmlAt: new Date() },
-        });
-        return (
-          <iframe
-            srcDoc={gen.html}
-            title={"Sito demo - " + lead.name}
-            className="h-screen w-full border-0"
-          />
-        );
-      }
-    } catch {
-      // AI non disponibile: mostriamo comunque il template premium qui sotto.
-    }
-  }
-
+  // Nessun sito AI ancora salvato: mostriamo il template locale. La
+  // generazione AI e' un'azione esplicita (POST /api/demo/generate), non un
+  // effetto collaterale di una GET, e non parte da crawler o prefetch.
   const theme = getDemoTheme(lead.category, lead.id);
   const p = theme.palette;
 
@@ -64,6 +38,7 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
   const wa = lead.whatsapp ? "https://wa.me/" + lead.whatsapp : "";
   const brandName = settings.brand_name || "La tua Web Agency";
   const bookingEmail = settings.formsubmit_email || settings.brand_email || lead.email || "";
+  const cityLabel = (lead.city || settings.search_city || "").trim();
   const formAction = bookingEmail ? "https://formsubmit.co/" + bookingEmail : "";
   const year = new Date().getFullYear();
   const subtitle =
@@ -76,7 +51,7 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
   );
   // Mappa Google integrata senza API key (output=embed).
   const mapQuery = encodeURIComponent(
-    ((lead.addressFull ? lead.addressFull + " " : "") + (lead.city ?? "Feltre")) || lead.name
+    ((lead.addressFull ? lead.addressFull + " " : "") + (lead.city ?? "")) || lead.name
   );
   const mapSrc = "https://www.google.com/maps?q=" + mapQuery + "&output=embed";
   const hoursRows: Array<{ d: string; h: string }> = [
@@ -98,6 +73,7 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
       ".float-btn{animation:floatY 3s ease-in-out infinite}",
   };
   // Dati strutturati LocalBusiness (SEO): aiutano Google a capire l'attività.
+  const countryCode = (settings.business_country || process.env.BUSINESS_COUNTRY || "IT").toUpperCase();
   const ldData: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -108,8 +84,8 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
     address: {
       "@type": "PostalAddress",
       streetAddress: lead.addressFull || undefined,
-      addressLocality: lead.city || "Feltre",
-      addressCountry: "IT",
+      addressLocality: lead.city || undefined,
+      addressCountry: countryCode,
     },
   };
   const jsonLd = { __html: JSON.stringify(ldData) };
@@ -254,7 +230,7 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
               Perché scegliere {lead.name}
             </h2>
             <p className="mt-4 text-zinc-600">
-              Siamo una realtà di {lead.city ?? "Feltre"} che mette al centro le persone e la
+              Siamo una realtà {cityLabel ? <>di {cityLabel}</> : "del territorio"} che mette al centro le persone e la
               qualità del servizio. La nostra esperienza è al tuo servizio, ogni giorno.
             </p>
             <ul className="mt-6 space-y-3">
@@ -344,7 +320,7 @@ export default async function DemoPage(props: { params: Promise<{ id: string }> 
           <div>
             <h2 className={"text-3xl font-bold " + headingFont}>Dove siamo</h2>
             <p className="mt-3 text-zinc-600">
-              Siamo a {lead.city ?? "Feltre"}. Passa a trovarci o contattaci: ti rispondiamo subito.
+              {cityLabel ? <>Siamo a {cityLabel}. </> : null}Passa a trovarci o contattaci: ti rispondiamo subito.
             </p>
             <div className="mt-6 space-y-3 text-sm">
               {lead.addressFull ? (

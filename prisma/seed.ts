@@ -1,8 +1,9 @@
 // ============================================================
 // Seed del database (idempotente: puoi rieseguirlo senza paura).
-// - Ricrea i 3 template standard (con italiano corretto e accenti).
+// - Ricrea i template standard WhatsApp ed email (italiano con accenti).
 // - Crea/aggiorna i tag e le impostazioni SENZA sovrascrivere i tuoi valori.
-// - Inserisce 2 lead di esempio SOLO se il CRM e vuoto (non tocca i tuoi lead).
+// - Nessun dato inventato: il CRM parte vuoto e i lead arrivano solo dalle
+//   ricerche reali dell'utente (niente attivita di esempio).
 // Esegui:  npm run db:seed
 // ============================================================
 
@@ -123,71 +124,12 @@ async function main() {
       create: t,
     });
   }
-  const tagCaldo = await prisma.tag.findUnique({ where: { name: "Caldo" } });
 
-  // 3) IMPOSTAZIONI — crea solo se mancanti (NON sovrascrive i tuoi valori).
-  const settingDefs = [
-    { key: "brand_name", value: "La Tua Web Agency" },
-    { key: "brand_owner", value: "Il Tuo Nome" },
-    { key: "search_city", value: "Feltre" },
-  ];
-  for (const s of settingDefs) {
-    await prisma.setting.upsert({
-      where: { key: s.key },
-      update: {},
-      create: s,
-    });
-  }
+  // 3) IMPOSTAZIONI — nessun brand inventato. Il brand viene impostato
+  // dall'onboarding o dalle Impostazioni; il seed non deve far comparire
+  // "La Tua Web Agency" nelle email o nei siti demo.
 
-  // 4) LEAD DI ESEMPIO — solo se il CRM e completamente vuoto.
-  const leadCount = await prisma.lead.count();
-  if (leadCount === 0) {
-    await prisma.lead.create({
-      data: {
-        name: "Trattoria da Esempio",
-        category: "restaurant",
-        subcategory: "Ristorante",
-        phone: "+39 0439 000000",
-        whatsapp: "390439000000",
-        city: "Feltre",
-        addressFull: "Via Esempio 1, 32032 Feltre BL",
-        hasWebsite: false,
-        hasSocial: false,
-        websiteStatus: "da_verificare",
-        googleRating: 4.6,
-        googleReviews: 38,
-        priorityScore: 95,
-        priorityReason: "nessun sito rilevato (da verificare) + nessun social attivo + buone recensioni",
-        status: "NUOVO",
-        source: "seed",
-        lat: 46.0172,
-        lng: 11.91,
-        tags: tagCaldo ? { connect: { id: tagCaldo.id } } : undefined,
-      },
-    });
-    await prisma.lead.create({
-      data: {
-        name: "Parrucchiere Demo",
-        category: "hairdresser",
-        subcategory: "Parrucchiere",
-        phone: "+39 0439 111111",
-        city: "Feltre",
-        addressFull: "Piazza Demo 2, 32032 Feltre BL",
-        hasWebsite: false,
-        hasSocial: true,
-        instagram: "https://instagram.com/esempio",
-        websiteStatus: "da_verificare",
-        priorityScore: 70,
-        priorityReason: "nessun sito rilevato (da verificare) + presente sui social",
-        status: "NUOVO",
-        source: "seed",
-        lat: 46.018,
-        lng: 11.905,
-      },
-    });
-  }
-
-  console.log("Seed completato: template aggiornati, tag e impostazioni ok.");
+  console.log("Seed completato: template aggiornati e tag ok.");
 }
 
 main()

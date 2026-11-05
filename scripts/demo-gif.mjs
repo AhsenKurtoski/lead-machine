@@ -31,7 +31,7 @@ try {
     ["/ricerca", 3000],
     ["/crm", 3000],
     ["/mappa", 3200],
-    ["/preventivi", 3000],
+    ["/ricevuta", 3000],
     ["/impostazioni", 2600],
   ];
   for (const [route, pause] of tour) {

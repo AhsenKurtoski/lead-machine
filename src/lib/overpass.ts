@@ -1,4 +1,5 @@
 import { CATEGORIES, getCategoryById, type Category } from "./categories";
+import { userAgentFor } from "./osm";
 
 export type OsmCandidate = {
   osmId: string;
@@ -21,20 +22,43 @@ export type OsmCandidate = {
   hasSocial: boolean;
 };
 
-// Piu endpoint pubblici gratuiti: se uno e sovraccarico (504) si prova il successivo.
-// Verificati in produzione (ottobre 2026):
-// - overpass-api.de: copertura MONDIALE, risponde in 1-6s con Accept: application/json
-//   e User-Agent identificante (risponde 406 agli UA da browser, per questo lo
-//   identifichiamo sempre come LeadMachine + contatto).
-// - maps.mail.ru: copertura mondiale, spesso 504 ma ogni tanto regge: secondo in lista.
-// - overpass.osm.ch: velocissimo (<1s) ma copre SOLO la Svizzera: puo' dichiarare
-//   "0 risultati" anche per citta' italiane piene di attivita', quindi non puo'
-//   confermare un risultato vuoto (vedi global in execQueryWithRetry).
-// Rimossi kumi.systems, private.coffee, osm.jp, openstreetmap.ru: non rispondono piu'.
-const OVERPASS_ENDPOINTS: { url: string; global: boolean }[] = [
-  { url: "https://overpass-api.de/api/interpreter", global: true },
-  { url: "https://maps.mail.ru/osm/tools/overpass/api/interpreter", global: true },
-  { url: "https://overpass.osm.ch/api/interpreter", global: false },
+// Piu' endpoint pubblici gratuiti: se uno e' sovraccarico (504) si prova il
+// successivo. L'ordine e' quello verificato con `node scripts/probe-mirrors.mjs`
+// (ottobre 2026), che interroga ogni candidato con la query reale dell'app:
+// - overpass-api.de: il nodo principale, copertura MONDIALE. Risponde 406 agli
+//   UA da browser e 504 quando e' sotto carico, per questo identifichiamo sempre
+//   la richiesta come LeadMachine (Accept: application/json + User-Agent).
+// - z.overpass-api.de e lz4.overpass-api.de: altri due nodi dello stesso
+//   cluster. Quando il nodo principale risponde 504 questi spesso rispondono
+//   regolarmente, quindi valgono il tentativo.
+// - overpass.openstreetmap.fr: gestore INDIPENDENTE (OpenStreetMap Francia),
+//   utile quando il cluster tedesco e' sotto carico, ma con due difetti noti:
+//   l'indice delle AREE amministrative e' guasto (risponde "No such file or
+//   directory area_blocks.bin") e il suo archivio non e' completo — sulla
+//   stessa zona risponde 80 comuni per un punto e 0 per un punto a due
+//   chilometri. Un "0 risultati" da questo mirror NON e' una risposta, quindi
+//   `trustEmpty: false`: si usano i suoi risultati veri, ma le sue risposte
+//   vuote non possono far sparire quelli degli altri.
+// - overpass.osm.ch: velocissimo (<1s) ma copre SOLO la Svizzera: stessa cosa,
+//   un suo "0" non dice niente su una citta' italiana (`trustEmpty: false`).
+// Rimosso maps.mail.ru (504 a ogni prova) e kumi.systems, private.coffee,
+// osm.jp, openstreetmap.ru, rambler, yandex, nchc: non rispondono piu'.
+//
+// `trustEmpty`: se un mirror risponde 200 con zero elementi, ci si puo' credere?
+// Solo per i nodi con copertura mondiale reale; un "0" da un mirror parziale o
+// incompleto non deve cancellare i risultati degli altri.
+// `cluster`: i nodi dello stesso gestore condividono il carico. Se uno risponde
+// "sono sovraccarico" (504/503/429) gli altri due dello stesso cluster non
+// possono fare meglio, e insistere costa ~9s a testa (misurato con
+// `node scripts/probe-mirrors.mjs`: 1.5s di risposta sana, 8.9-9.3s il 504 dello
+// stesso cluster). Si salta quindi al gestore indipendente successivo, e i
+// fratelli si ritentano solo al giro dopo, quando il carico puo' essere cambiato.
+const OVERPASS_ENDPOINTS: { url: string; trustEmpty: boolean; cluster: string }[] = [
+  { url: "https://overpass-api.de/api/interpreter", trustEmpty: true, cluster: "de" },
+  { url: "https://z.overpass-api.de/api/interpreter", trustEmpty: true, cluster: "de" },
+  { url: "https://lz4.overpass-api.de/api/interpreter", trustEmpty: true, cluster: "de" },
+  { url: "https://overpass.openstreetmap.fr/api/interpreter", trustEmpty: false, cluster: "fr" },
+  { url: "https://overpass.osm.ch/api/interpreter", trustEmpty: false, cluster: "ch" },
 ];
 
 // Errore Overpass con flag "transient": true se vale la pena riprovare (504, timeout...).
@@ -56,19 +80,33 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Diagnostica opt-in: con OVERPASS_DEBUG=1 il server scrive nei log cosa ha
+// risposto ogni mirror. Serve quando una ricerca torna vuota e non si sa se il
+// problema e' la query, il mirror o la rete. Silenzioso per default.
+const OVERPASS_DEBUG = process.env.OVERPASS_DEBUG === "1";
+function debugLog(...parts: unknown[]): void {
+  if (OVERPASS_DEBUG && typeof console !== "undefined") console.log("[overpass]", ...parts);
+}
+
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
   return out;
 }
 
-// Normalizza un numero italiano in formato wa.me (39XXXXXXXXXX)
-export function normalizePhone(raw?: string): string | undefined {
+// Normalizza un numero in formato wa.me. Il prefisso 39 viene aggiunto SOLO
+// ai numeri locali italiani: con un altro paese il numero resta com'e' invece
+// di essere corrotto con un prefisso sbagliato.
+export function normalizePhone(
+  raw?: string,
+  countryCode = (process.env.BUSINESS_COUNTRY || "IT").trim().toUpperCase(),
+): string | undefined {
   if (!raw) return undefined;
   let digits = raw.replace(/[^0-9+]/g, "");
   digits = digits.replace(/^00/, "");
   digits = digits.replace(/^\+/, "");
   if (digits.startsWith("39")) return digits;
+  if (countryCode !== "IT") return digits;
   if (digits.startsWith("3") || digits.startsWith("0")) return "39" + digits;
   return digits || undefined;
 }
@@ -172,7 +210,10 @@ async function rawFetch(
     const headers: Record<string, string> = {
       // Senza Accept alcuni server Overpass rispondono 406 Not Acceptable.
       Accept: "application/json",
-      "User-Agent": "LeadMachine/1.0 (" + contactEmail + ")",
+      // User-Agent sempre valido: se il contatto e' un'indirizzo segnaposto
+      // (es. anonimo@example.com) si manda l'URL del progetto, perche' i mirror
+      // rifiutano gli identificativi finti.
+      "User-Agent": userAgentFor(contactEmail),
     };
     let url = endpoint;
     let body: string | undefined;
@@ -253,10 +294,15 @@ async function execQueryWithRetry(
 ): Promise<OverpassElement[]> {
   let lastError: unknown = null;
   for (let round = 0; round < rounds; round++) {
-    // Un risultato vuoto "confermato" solo da un mirror con copertura parziale
-    // (es. osm.ch = solo Svizzera) non basta: vogliamo l'ok di almeno un mirror
-    // con copertura mondiale prima di dichiarare che non ci sono risultati.
-    let emptyConfirmedByGlobal = false;
+    // Un risultato vuoto vale solo se arriva da mirror di cui ci si puo' fidare
+    // (`trustEmpty`): un mirror con archivio parziale o con copertura di un solo
+    // paese puo' rispondere 200 con zero elementi per una query che ha risultati,
+    // e fidarsi farebbe sparire i risultati veri. E non basta nemmeno uno solo di
+    // quelli buoni: servono due conferme indipendenti, altrimenti si prova ancora
+    // invece di dichiarare che non c'e' niente.
+    let emptyConfirmedByGlobal = 0;
+    // Cluster che in questo giro hanno detto di essere sovraccarichi.
+    const busyClusters = new Set<string>();
     for (const endpoint of OVERPASS_ENDPOINTS) {
       const remaining = deadline - Date.now();
       // Tempo quasi esaurito: meglio fermarsi con un errore chiaro che far
@@ -264,24 +310,78 @@ async function execQueryWithRetry(
       if (remaining < 3_000) {
         throw lastError ?? new OverpassError("Overpass: tempo di ricerca esaurito", true, 0);
       }
+      if (busyClusters.has(endpoint.cluster)) {
+        debugLog(
+          "giro " + (round + 1) + "/" + rounds,
+          endpoint.url.replace("https://", ""),
+          "saltato: cluster " + endpoint.cluster + " gia' sovraccarico in questo giro"
+        );
+        continue;
+      }
+      const attemptStart = Date.now();
       try {
+        // Un tentativo non puo' durare piu' di 12s anche se il budget e' piu'
+        // grande: misurato, un mirror sano risponde in ~4s alle query dell'app,
+        // mentre un mirror morto teneva occupato il budget per 25s prima di
+        // passare al successivo (era la causa principale della ricerca lenta).
+        // Scaduti i 12s si passa all'endpoint dopo: il tempo totale e' quello del
+        // primo mirror vivo, non la somma dei timeout di quelli morti.
         const elements = await fetchOverpass(
           endpoint.url,
           query,
           contactEmail,
-          Math.min(25_000, remaining - 500)
+          Math.max(5_000, Math.min(12_000, remaining - 500))
+        );
+        debugLog(
+          "giro " + (round + 1) + "/" + rounds,
+          endpoint.url.replace("https://", ""),
+          "http 200, elementi=" + elements.length,
+          Date.now() - attemptStart + "ms",
+          endpoint.trustEmpty ? "(risultato vuoto attendibile)" : "(risultato vuoto NON attendibile)"
         );
         if (elements.length > 0) return elements;
-        if (endpoint.global) emptyConfirmedByGlobal = true;
+        if (endpoint.trustEmpty) emptyConfirmedByGlobal++;
       } catch (err) {
         lastError = err;
+        const status = err instanceof OverpassError ? err.status : 0;
+        // Rifiuto esplicito per sovraccarico: si salta il resto del cluster.
+        if (status === 503 || status === 504 || status === 429) busyClusters.add(endpoint.cluster);
+        debugLog(
+          "giro " + (round + 1) + "/" + rounds,
+          endpoint.url.replace("https://", ""),
+          "errore: " + (err instanceof Error ? err.message : String(err)),
+          Date.now() - attemptStart + "ms",
+          isTransient(err) ? "(temporaneo, si continua)" : "(definitivo)"
+        );
         if (!isTransient(err)) throw err;
         await sleep(Math.min(700 + round * 1200, Math.max(0, deadline - Date.now() - 3_000)));
       }
     }
-    if (emptyConfirmedByGlobal) return [];
+    if (emptyConfirmedByGlobal >= 2) {
+      debugLog("nessun risultato confermato da " + emptyConfirmedByGlobal + " mirror mondiali");
+      return [];
+    }
+    // Una sola conferma: si prova un altro giro di mirror prima di arrendersi.
+    if (emptyConfirmedByGlobal === 1 && round === rounds - 1) {
+      debugLog("nessun risultato confermato da un solo mirror: accettato a fine giri");
+      return [];
+    }
   }
+  debugLog("catena esaurita senza risultati: " + (lastError instanceof Error ? lastError.message : "nessun errore registrato"));
   throw lastError ?? new Error("Overpass non raggiungibile");
+}
+
+// Esegue una query Overpass QL qualsiasi (non solo la ricerca per categorie)
+// con la stessa catena di mirror, gli stessi retry e la stessa deadline di
+// runOverpassSearch. Serve a chi deve chiedere ad OpenStreetMap qualcosa di
+// diverso dalle attivita commerciali (es. i comuni di una provincia).
+export async function runOverpassQuery(
+  query: string,
+  contactEmail: string,
+  budgetMs = 60_000
+) {
+  const deadline = Date.now() + Math.max(5_000, budgetMs - 1_500);
+  return execQueryWithRetry(query, contactEmail, 2, deadline);
 }
 
 export async function runOverpassSearch(

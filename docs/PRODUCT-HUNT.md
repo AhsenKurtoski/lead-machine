@@ -11,7 +11,7 @@ Lead Machine — open-source lead-gen CRM, free forever
 
 **Description** (max 260 char):
 ```
-Find nearby businesses on OpenStreetMap, score them 0–100 with AI, contact them, and build quotes & invoices. Self-hosted, 7 languages, your data & your keys. €0 forever, MIT licensed.
+Find nearby businesses on OpenStreetMap, score them 0–100, verify their contact data and reach out. Self-hosted, 7 languages, your data & your keys. €0 forever, MIT licensed.
 ```
 
 **Topics**: `Open Source` · `CRM` · `Lead Generation` · `Productivity` · `SaaS`
@@ -24,11 +24,11 @@ Find nearby businesses on OpenStreetMap, score them 0–100 with AI, contact the
 
 | # | File | Caption |
 |---|---|---|
-| 1 | `docs/assets/lead-machine-demo.gif` | *Lead Machine in 20 seconds: real leads, AI scoring, quotes & invoices.* |
+| 1 | `docs/assets/lead-machine-demo.gif` | *Lead Machine in 20 seconds: real leads, rule-based priority scoring and honestly labelled contact data.* |
 | 2 | `screenshots/dashboard-desktop.png` | *Dashboard: KPIs, productivity heatmap, top leads and upcoming follow-ups.* |
-| 3 | `screenshots/ricerca-desktop.png` | *Geographic search on OpenStreetMap: category + radius + city, with 3-layer deduplication.* |
-| 4 | `screenshots/mappa-desktop.png` | *Map view with clustering and color-coded statuses — call, email or WhatsApp any pin.* |
-| 5 | `screenshots/preventivi-desktop.png` | *Quotes & invoices with VAT, discounts and multilingual PDF export.* |
+| 3 | `screenshots/ricerca-desktop.png` | *Geographic search on OpenStreetMap: category + radius + city, with automatic deduplication and duplicate groups for manual review.* |
+| 4 | `screenshots/mappa-desktop.png` | *Map view with color-coded statuses — call, email or WhatsApp any pin.* |
+| 5 | `screenshots/impostazioni-desktop.png` | *Settings: brand, locale, AI keys and API keys — everything stays on your machine.* |
 
 ## First comment (Maker's comment) — pronto
 
@@ -37,10 +37,11 @@ Find nearby businesses on OpenStreetMap, score them 0–100 with AI, contact the
 > Lead Machine is the opposite bet: a complete lead-gen + CRM stack that runs on your laptop, stores everything in a single SQLite file you can back up with a copy-paste, and costs €0 forever. No "pro" tier, no trial, no credit card.
 >
 > What's inside:
-> 🔎 Real business search on OpenStreetMap (40M+ places) with dedup + website crawler
-> 🧠 0–100 AI-assisted lead scoring (Gemini + Groq with automatic failover)
+> 🔎 Real business search on OpenStreetMap (40M+ places) with dedup + website finder
+> 🧠 0–100 rule-based priority scoring (website gap, social presence, reviews and contactability)
 > 📞 Full CRM: timeline, follow-ups, email, WhatsApp deep-links
-> 🧾 Quotes & invoices with VAT and multilingual PDFs
+> ✅ Data verification: phone, email, website, address and socials, each with source and evidence
+> 🧾 One-click payment receipts (explicitly not fiscal documents)
 > 🔌 A real public API: your own API keys, per-key scopes and rate limits — AI agents can integrate in minutes
 > 🌍 7 fully localized languages · ♿ WCAG-aware UI · 🔒 BYOK: your AI keys are AES-256-GCM encrypted in your browser
 >

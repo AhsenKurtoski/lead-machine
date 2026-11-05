@@ -6,7 +6,10 @@
 export function toCsv(rows: Array<Record<string, unknown>>, columns: string[]): string {
   const esc = (v: unknown): string => {
     if (v === null || v === undefined) return "";
-    const s = String(v);
+    let s = String(v);
+    // CSV formula injection: Excel/Sheets eseguono celle che iniziano con
+    // = + - @ (o tab/CR). Un apostrofo iniziale le rende testo innocuo.
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
     if (/[",\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
   };

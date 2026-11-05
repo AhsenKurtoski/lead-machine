@@ -1,6 +1,6 @@
 # 📱 Post social pronti — Instagram & LinkedIn
 
-> Lead Machine · Ahsen-Studio · ideato e creato da Ahsen Kurtoski
+> Lead Machine · ideato e creato da Ahsen Kurtoski
 > Pubblica LinkedIn e Instagram lo stesso giorno, a 2–3 ore di distanza (LinkedIn ~9:00, Instagram ~18:30).
 
 ---
@@ -27,7 +27,8 @@
 > 🔎 Trova attività reali vicino a te (40M+ su OpenStreetMap)
 > 🧠 Le valuta da 0 a 100 con l'AI
 > 📞 Le contatti via email, WhatsApp, chiamate
-> 🧾 Crea preventivi e fatture in PDF
+> ✅ Verifica telefono, email e sito prima di contattare
+> 🧾 Registra la ricevuta in un click quando ti pagano
 > 🌍 7 lingue · 📁 I tuoi dati restano sul TUO computer · 🔑 Le tue chiavi AI restano nel TUO browser
 >
 > Nessun abbonamento. Nessuna carta di credito. Nessuna sorpresa.
@@ -46,14 +47,15 @@
 
 > **Ho sostituito uno stack software da €200/mese con un'app open source. E l'ho regalata al mondo.**
 >
-> Ogni anno freelancer e piccole agenzie spendono migliaia di euro in abbonamenti per tre cose: trovare clienti locali, gestirli, fargli un preventivo. I dati? Bloccati dentro un SaaS che, se smetti di pagare, sparisce tutto.
+> Ogni anno freelancer e piccole agenzie spendono migliaia di euro in abbonamenti per tre cose: trovare clienti locali, verificare che i loro contatti siano reali, tenere traccia di quello che incassano. I dati? Bloccati dentro un SaaS che, se smetti di pagare, sparisce tutto.
 >
 > Ho deciso di costruire l'alternativa. Si chiama **Lead Machine** ed è ora open source su GitHub, con licenza MIT:
 >
 > → Ricerca geografica di attività reali (OpenStreetMap, 40M+ attività)
 > → Lead scoring 0–100 assistito da AI
 > → CRM completo: timeline, follow-up, email, WhatsApp
-> → Preventivi e fatture con PDF multilingua
+> → Verifica dei dati di contatto (telefono, email, sito, indirizzo, social) con esito, fonte e prova
+> → Ricevute di pagamento in un click (nessun documento fiscale)
 > → **API pubblica con chiavi e permessi** — qualsiasi tool o AI agent può integrarsi in pochi minuti
 > → 7 lingue, dark mode, accessibilità WCAG, self-hosted: i tuoi dati restano tuoi
 >
@@ -64,7 +66,7 @@
 > È online da oggi: demo live nel browser, senza registrazione.
 > Chi lo prova e mi lascia un feedback onesto nei commenti mi fa un favore enorme. 🙏
 >
-> Ahsen Kurtoski — Ahsen-Studio
+> Ahsen Kurtoski
 >
 > #opensource #leadgeneration #crm #freelance #startup #ai #saas #selfhosted #tech #innovation
 

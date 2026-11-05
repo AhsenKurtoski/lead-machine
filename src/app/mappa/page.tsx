@@ -65,7 +65,7 @@ export default function MappaPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Mappa lead</h1>
         <p className="text-muted-foreground">
-          {geoLeads.length} lead geolocalizzati nella zona di Feltre.
+          {geoLeads.length} lead geolocalizzati nella tua zona di ricerca.
         </p>
       </div>
 

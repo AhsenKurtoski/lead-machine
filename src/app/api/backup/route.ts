@@ -21,7 +21,11 @@ export async function GET(req: Request) {
       generatedMessages,
       notifications,
       settings,
-      quotes,
+      receipts,
+      verifications,
+      verificationRetries,
+      emailLogs,
+      apiKeys,
     ] = await Promise.all([
       prisma.lead.findMany(),
       prisma.location.findMany(),
@@ -33,7 +37,22 @@ export async function GET(req: Request) {
       prisma.generatedMessage.findMany(),
       prisma.notification.findMany(),
       prisma.setting.findMany(),
-      prisma.quote.findMany(),
+      prisma.receipt.findMany(),
+      prisma.verification.findMany(),
+      prisma.verificationRetry.findMany(),
+      prisma.emailLog.findMany(),
+      prisma.apiKey.findMany({
+        select: {
+          id: true,
+          name: true,
+          keyPrefix: true,
+          permissions: true,
+          enabled: true,
+          lastUsedAt: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
     ]);
 
     const safeSettings = settings.map((s) => {
@@ -42,12 +61,13 @@ export async function GET(req: Request) {
       }
       return s;
     });
-    const redactedQuotes = quotes;
+    const exportedReceipts = receipts;
 
     const backup = {
       app: "lead-machine",
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
+      note: "Export dei dati. Non contiene chiavi API in chiaro ne password. Il ripristino automatico non e implementato.",
       data: {
         leads,
         locations,
@@ -59,7 +79,11 @@ export async function GET(req: Request) {
         generatedMessages,
         notifications,
         settings: safeSettings,
-        quotes: redactedQuotes,
+        receipts: exportedReceipts,
+        verifications,
+        verificationRetries,
+        emailLogs,
+        apiKeys,
       },
     };
 

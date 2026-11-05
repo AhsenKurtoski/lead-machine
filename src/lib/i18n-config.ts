@@ -12,7 +12,6 @@ export type CountryConfig = {
   phonePrefix: string;
   countries: string[];
   taxRateDefault: number;
-  vatNumberLabel: string;
 };
 
 export const LOCALES: Record<LocaleCode, CountryConfig> = {
@@ -28,7 +27,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+39",
     countries: ["Italia", "San Marino", "Città del Vaticano"],
     taxRateDefault: 22,
-    vatNumberLabel: "Partita IVA",
   },
   de: {
     code: "de",
@@ -42,7 +40,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+49",
     countries: ["Deutschland", "Österreich"],
     taxRateDefault: 19,
-    vatNumberLabel: "USt-IdNr.",
   },
   fr: {
     code: "fr",
@@ -56,7 +53,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+33",
     countries: ["France", "Monaco"],
     taxRateDefault: 20,
-    vatNumberLabel: "TVA",
   },
   sl: {
     code: "sl",
@@ -70,7 +66,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+386",
     countries: ["Slovenija"],
     taxRateDefault: 22,
-    vatNumberLabel: "ID za DDV",
   },
   en: {
     code: "en",
@@ -84,7 +79,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+1",
     countries: ["United States", "Canada", "United Kingdom", "Ireland", "Australia", "New Zealand"],
     taxRateDefault: 0,
-    vatNumberLabel: "Tax ID",
   },
   es: {
     code: "es",
@@ -98,7 +92,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+34",
     countries: ["España", "México", "Argentina", "Chile", "Colombia", "Perú"],
     taxRateDefault: 21,
-    vatNumberLabel: "NIF / CIF",
   },
   pt: {
     code: "pt",
@@ -112,7 +105,6 @@ export const LOCALES: Record<LocaleCode, CountryConfig> = {
     phonePrefix: "+351",
     countries: ["Portugal", "Brasil"],
     taxRateDefault: 23,
-    vatNumberLabel: "NIF",
   },
 };
 

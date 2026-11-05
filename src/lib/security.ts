@@ -13,8 +13,13 @@ type Bucket = {
 };
 
 const buckets = new Map<string, Bucket>();
+let cleanupTick = 0;
 
 function cleanup() {
+  // Non scansionare l'intera mappa a ogni richiesta: con molte chiavi
+  // diventerebbe un costo O(n) per ogni chiamata. Ogni 100 richieste basta.
+  cleanupTick = (cleanupTick + 1) % 100;
+  if (cleanupTick !== 0) return;
   const now = Date.now();
   for (const [key, b] of buckets.entries()) {
     if (b.resetAt < now) buckets.delete(key);
@@ -46,11 +51,16 @@ export function checkRateLimit(
 // (combinazione di IP + user-agent se disponibili).
 export function clientFingerprint(req: Request, suffix = ""): string {
   const headers = req.headers;
-  const ip =
-    headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    headers.get("x-real-ip") ||
-    headers.get("cf-connecting-ip") ||
-    "unknown";
+  // X-Forwarded-For e' controllabile dal client: va usato solo dietro un
+  // reverse proxy fidato che lo sovrascrive. In locale tutti condividono un
+  // bucket, che per un'app single-user va benissimo.
+  const trustProxy = (process.env.TRUST_PROXY || "").trim() === "1";
+  const ip = trustProxy
+    ? headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      headers.get("x-real-ip") ||
+      headers.get("cf-connecting-ip") ||
+      "unknown"
+    : "local";
   const ua = headers.get("user-agent") || "";
   let h = 0;
   const s = ip + "|" + ua + "|" + suffix;

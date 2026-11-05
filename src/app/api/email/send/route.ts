@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendEmail, smtpConfigured } from "@/lib/mailer";
+import { sendEmail } from "@/lib/mailer";
+import { rateLimitedResponse } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,6 +15,9 @@ function escapeHtml(s: string): string {
 // Invia DAVVERO l'email al lead via SMTP, registra il messaggio + attivita
 // e porta il lead da NUOVO a CONTATTATO (flusso semi-automatico).
 export async function POST(req: Request) {
+  const limited = await rateLimitedResponse(req, "email:send", 20, 60_000);
+  if (limited) return limited;
+
   const body = await req.json().catch(() => ({}));
   const lead = await prisma.lead.findUnique({ where: { id: body.leadId } });
   if (!lead) {
@@ -25,17 +29,6 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (!(await smtpConfigured())) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Invio email non configurato. Vai in Impostazioni > Email e inserisci i dati SMTP (per Gmail: una Password per le app).",
-      },
-      { status: 400 },
-    );
-  }
-
   const subject = String(body.subject ?? "").trim() || "Una proposta per " + lead.name;
   const text = String(body.body ?? "").trim();
   if (!text) {
@@ -90,7 +83,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ ok: true, messageId: res.messageId });
+    return NextResponse.json({ ok: true, messageId: res.messageId, provider: res.provider, file: res.file });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Errore durante l'invio dell'email";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });

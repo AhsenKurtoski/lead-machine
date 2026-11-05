@@ -37,7 +37,17 @@ function readInitial(): LocaleCode {
 }
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = React.useState<LocaleCode>(() => readInitial());
+  // Primo render deterministico: server e client partono dalla stessa lingua
+  // (DEFAULT_LOCALE), poi la preferenza salvata o quella del browser si applica
+  // subito dopo il mount. Leggere localStorage/navigator nel primo render
+  // faceva divergere l'HTML del server da quello del client e React idratava
+  // con un errore (#418) su ogni pagina, per chi non usa la lingua di default.
+  const [locale, setLocaleState] = React.useState<LocaleCode>(DEFAULT_LOCALE);
+
+  React.useEffect(() => {
+    const initial = readInitial();
+    if (initial !== DEFAULT_LOCALE) setLocaleState(initial);
+  }, []);
 
   const setLocale = React.useCallback((code: LocaleCode) => {
     setLocaleState(code);

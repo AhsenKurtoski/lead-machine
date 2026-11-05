@@ -86,17 +86,8 @@ export async function POST(req: Request) {
     return n === null ? 50 : n;
   })();
 
-  if (!(await smtpConfigured())) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Invio email non configurato. Vai in Impostazioni > Email e inserisci i dati SMTP (per Gmail: una Password per le app).",
-      },
-      { status: 400 },
-    );
-  }
-
+  // Senza SMTP il mailer scrive file .eml in ./tmp/emails (fallback locale
+  // documentato). Non blocchiamo il flusso: l'utente vede comunque l'anteprima.
   const settings = await getSettings();
   const all = await eligibleLeads(statuses, onlyNeverEmailed);
   const list = all.slice(0, limit);

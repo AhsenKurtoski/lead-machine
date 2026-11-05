@@ -1,4 +1,8 @@
 import type { Config } from "tailwindcss";
+// Import ESM, non `require("tailwindcss-animate")`: questo file e' un modulo
+// ESM e con `require` il dev server si spegneva al primo render di una pagina
+// ("ReferenceError: require is not defined" dentro tailwind.config.ts).
+import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: ["class"],
@@ -75,7 +79,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

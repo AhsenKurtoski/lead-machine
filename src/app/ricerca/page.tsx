@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CATEGORIES, CATEGORY_GROUPS } from "@/lib/categories";
-import { BELLUNO_COMUNI, FELTRE_CENTER, RADIUS_PRESETS } from "@/lib/comuni-belluno";
+import { MAX_AREA_CENTERS, RADIUS_PRESETS, type ProvinceComune } from "@/lib/province-area";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,11 +52,96 @@ export default function RicercaPage() {
   const [onlyNoWeb, setOnlyNoWeb] = React.useState(false);
   const [searched, setSearched] = React.useState(false);
   const [useAi, setUseAi] = React.useState(true);
-  const [sources, setSources] = React.useState<{ osm: number | null; geoapify: number | null; ai: number | null } | null>(null);
+  const [sources, setSources] = React.useState<{
+    osm: number | null;
+    geoapify: number | null;
+    tomtom: number | null;
+    ai: number | null;
+  } | null>(null);
   const [warnings, setWarnings] = React.useState<string[]>([]);
-  const [area, setArea] = React.useState<"feltre" | "provincia" | "comune">("feltre");
-  const [comune, setComune] = React.useState<string>(FELTRE_CENTER.name);
+  const [area, setArea] = React.useState<"citta" | "provincia" | "comune">("citta");
+  const [comune, setComune] = React.useState<string>("");
   const [radius, setRadius] = React.useState<number>(10000);
+  const [city, setCity] = React.useState<string>("");
+
+  // Comuni dell'area intorno alla citta scelta: arrivano da OpenStreetMap
+  // (/api/provincia) a runtime, non da un elenco scritto nel codice. Se non
+  // arrivano restano vuoti: meglio nessuna ricerca "a zona" che una inventata.
+  const [comuni, setComuni] = React.useState<ProvinceComune[]>([]);
+  const [areaLabel, setAreaLabel] = React.useState<string | null>(null);
+  const [areaLoading, setAreaLoading] = React.useState<boolean>(false);
+  const [areaWarning, setAreaWarning] = React.useState<string | null>(null);
+
+  // Li chiede al server, che interroga OpenStreetMap: nessun elenco cablato e
+  // nessun comune inventato, se la risposta non arriva la lista resta vuota.
+  const loadArea = React.useCallback(async (name: string, coords?: { lat: number; lng: number }) => {
+    if (!name && !coords) return;
+    setAreaLoading(true);
+    setAreaWarning(null);
+    try {
+      // Le coordinate salvate in Impostazioni vengono passate al server: con
+      // quelle il geocoding non serve e la pagina funziona anche se Nominatim
+      // non risponde.
+      const qs = new URLSearchParams();
+      if (name) qs.set("city", name);
+      if (coords) {
+        qs.set("lat", String(coords.lat));
+        qs.set("lng", String(coords.lng));
+      }
+      const res = await fetch("/api/provincia?" + qs.toString());
+      const data = await res.json();
+      if (!data?.ok) throw new Error(data?.error || "Comuni non disponibili");
+      const list: ProvinceComune[] = Array.isArray(data.comuni) ? data.comuni : [];
+      setComuni(list);
+      setAreaLabel(typeof data.areaLabel === "string" ? data.areaLabel : null);
+      if (typeof data.warning === "string" && data.warning) setAreaWarning(data.warning);
+      if (list.length > 0) {
+        // Preseleziona la citta dell'utente se c'e', altrimenti il primo comune.
+        setComune((prev) => {
+          if (prev && list.some((c) => c.name === prev)) return prev;
+          const exact = name
+            ? list.find((c) => c.name.toLowerCase() === name.toLowerCase())
+            : undefined;
+          return (exact ?? list[0]).name;
+        });
+      } else {
+        setComune("");
+      }
+    } catch (e) {
+      setComuni([]);
+      setComune("");
+      setAreaWarning(
+        (e instanceof Error ? e.message : "Comuni non disponibili") +
+          " - la ricerca a zona non e disponibile, usa la tua citta o un comune."
+      );
+    } finally {
+      setAreaLoading(false);
+    }
+  }, []);
+
+  // Citta scelta dall'utente (onboarding o impostazioni): serve per le
+  // etichette e per caricare i comuni dell'area.
+  React.useEffect(() => {
+    let alive = true;
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        const c = d?.settings?.search_city;
+        const name = typeof c === "string" ? c.trim() : "";
+        const lat = Number(d?.settings?.search_lat);
+        const lng = Number(d?.settings?.search_lng);
+        const coords =
+          Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined;
+        if (!name && !coords) return;
+        if (name) setCity(name);
+        void loadArea(name, coords);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [loadArea]);
 
   function toggleCategory(id: string) {
     setSelected((prev) => {
@@ -89,17 +174,38 @@ export default function RicercaPage() {
       let centers: { lat: number; lng: number; city: string }[] = [];
       let searchRadius = 5000;
       if (area === "provincia") {
-        centers = BELLUNO_COMUNI.map((c) => ({ lat: c.lat, lng: c.lng, city: c.name }));
+        if (comuni.length === 0) {
+          throw new Error("Comuni non disponibili: riprova tra poco oppure cerca sulla tua citta.");
+        }
+        // Un centro = una interrogazione a OpenStreetMap: usiamo i comuni piu
+        // vicini invece di tutta la lista, cosi la ricerca resta veloce e
+        // copre il territorio intorno alla citta senza esaurire il tempo.
+        centers = comuni
+          .slice(0, MAX_AREA_CENTERS)
+          .map((c) => ({ lat: c.lat, lng: c.lng, city: c.name }));
         searchRadius = radius;
       } else if (area === "comune") {
-        const c = BELLUNO_COMUNI.find((x) => x.name === comune) ?? FELTRE_CENTER;
+        const c = comuni.find((x) => x.name === comune);
+        if (!c) {
+          throw new Error("Scegli un comune dall'elenco.");
+        }
         centers = [{ lat: c.lat, lng: c.lng, city: c.name }];
         searchRadius = radius;
       }
       const res = await fetch("/api/ricerca", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: Array.from(selected), useAi, centers, radius: searchRadius }),
+        body: JSON.stringify({
+          categories: Array.from(selected),
+          useAi,
+          centers,
+          radius: searchRadius,
+          // Etichetta dell'area per il prompt AI: nessuna provincia cablata.
+          areaLabel:
+            area === "provincia" && areaLabel
+              ? "provincia di " + areaLabel
+              : centers[0]?.city ?? city,
+        }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Errore nella ricerca");
@@ -137,12 +243,34 @@ export default function RicercaPage() {
 
   const visible = onlyNoWeb ? results.filter((r) => !r.hasWebsite) : results;
 
+  // Etichetta della zona "allargata": nessun nome di provincia scritto nel
+  // codice, si adatta a quello che OpenStreetMap ha restituito.
+  const centriArea = Math.min(comuni.length, MAX_AREA_CENTERS);
+  const provinciaLabel = areaLoading
+    ? "Carico i comuni..."
+    : comuni.length > 0
+      ? "Tutta la zona" +
+        (areaLabel ? " (provincia di " + areaLabel + ")" : "") +
+        (comuni.length > MAX_AREA_CENTERS
+          ? " - i " + MAX_AREA_CENTERS + " comuni piu vicini"
+          : " - " + comuni.length + " comuni")
+      : "Tutta la zona (non disponibile)";
+  const areaOptions = [
+    { id: "citta" as const, label: city ? city + " (5 km)" : "La mia citta (5 km)", disabled: false },
+    { id: "provincia" as const, label: provinciaLabel, disabled: areaLoading || comuni.length === 0 },
+    { id: "comune" as const, label: "Comune specifico", disabled: areaLoading || comuni.length === 0 },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Ricerca lead</h1>
         <p className="text-muted-foreground">
-          Attivita locali a Feltre, in un comune o in tutta la provincia di Belluno - fonti gratuite: OpenStreetMap, Geoapify e AI (Gemini).
+          Attivita locali {city ? "a " + city : "nella tua zona"}
+          {areaLabel
+            ? ", in un comune o in tutta la provincia di " + areaLabel
+            : ", in un comune o in tutta la zona"}{" "}
+          - fonti gratuite: OpenStreetMap, Geoapify e AI (Gemini).
         </p>
       </div>
 
@@ -153,34 +281,44 @@ export default function RicercaPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            {([
-              { id: "feltre", label: "Feltre (5 km)" },
-              { id: "provincia", label: "Tutta la provincia di Belluno" },
-              { id: "comune", label: "Comune specifico" },
-            ] as const).map((opt) => (
+            {areaOptions.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setArea(opt.id)}
+                disabled={opt.disabled}
+                title={opt.disabled && areaWarning ? areaWarning : undefined}
                 className={cn(
                   "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                  area === opt.id ? "border-primary bg-primary/10 text-primary" : "border-input hover:bg-accent"
+                  area === opt.id ? "border-primary bg-primary/10 text-primary" : "border-input hover:bg-accent",
+                  opt.disabled && "cursor-not-allowed opacity-50"
                 )}
               >
                 {opt.label}
               </button>
             ))}
           </div>
+          {areaWarning ? (
+            <p className="text-xs text-amber-600 dark:text-amber-400">{areaWarning}</p>
+          ) : null}
           {area === "comune" ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">Comune:</span>
-              <select value={comune} onChange={(e) => setComune(e.target.value)} className={SELECT_CLASS}>
-                {BELLUNO_COMUNI.map((c) => (
+              <select
+                value={comune}
+                onChange={(e) => setComune(e.target.value)}
+                disabled={areaLoading || comuni.length === 0}
+                className={SELECT_CLASS}
+              >
+                {comuni.length === 0 ? (
+                  <option value="">{areaLoading ? "Carico i comuni..." : "Nessun comune disponibile"}</option>
+                ) : null}
+                {comuni.map((c) => (
                   <option key={c.name} value={c.name}>{c.name}</option>
                 ))}
               </select>
             </div>
           ) : null}
-          {area !== "feltre" ? (
+          {area !== "citta" ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">Raggio per comune:</span>
               <select value={radius} onChange={(e) => setRadius(Number(e.target.value))} className={SELECT_CLASS}>
@@ -192,7 +330,17 @@ export default function RicercaPage() {
           ) : null}
           {area === "provincia" ? (
             <p className="text-xs text-muted-foreground">
-              La ricerca verra eseguita su {BELLUNO_COMUNI.length} comuni della provincia: puo richiedere piu tempo.
+              La ricerca verra eseguita su {centriArea} comuni
+              {comuni.length > MAX_AREA_CENTERS
+                ? " (i " +
+                  MAX_AREA_CENTERS +
+                  " piu vicini a " +
+                  (city || "te") +
+                  ", su " +
+                  comuni.length +
+                  " disponibili nell&apos;area)"
+                : " dell&apos;area"}
+              : puo richiedere piu tempo.
             </p>
           ) : null}
         </CardContent>
@@ -276,6 +424,7 @@ export default function RicercaPage() {
           <span className="font-medium">Fonti:</span>
           <Badge variant="secondary">OpenStreetMap: {sources.osm ?? "-"}</Badge>
           <Badge variant="secondary">Geoapify: {sources.geoapify ?? "-"}</Badge>
+          <Badge variant="secondary">TomTom: {sources.tomtom ?? "-"}</Badge>
           <Badge variant="secondary">AI Gemini: {sources.ai ?? "-"}</Badge>
         </div>
       )}

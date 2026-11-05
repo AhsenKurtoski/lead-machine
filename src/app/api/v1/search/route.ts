@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { runOverpassSearch, type OsmCandidate } from "@/lib/overpass";
 import { runGeoapifySearch, geoapifyEnabled } from "@/lib/geoapify";
+import { runTomTomSearch, tomtomEnabled } from "@/lib/tomtom";
 import { scoreCandidate } from "@/lib/scoring";
 import { getCategoryById } from "@/lib/categories";
 import { validateApiKey, CORS_HEADERS, withTimeout, rateLimitApiKey, requireScope } from "@/lib/api-auth";
 import { asString, asInt, asArray } from "@/lib/security";
+import { getSettings } from "@/lib/settings";
+import { resolveSearchArea } from "@/lib/search-area";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -27,7 +30,8 @@ function dedupKey(c: OsmCandidate): string {
   return normName(c.name) + "@" + la + "," + ln;
 }
 
-// POST /api/v1/search -> Ricerca live attività su OpenStreetMap (+ Geoapify se configurato)
+// POST /api/v1/search -> Ricerca live attività su OpenStreetMap (+ Geoapify e
+// TomTom, se configurati: si affiancano a OSM quando non trova nulla)
 export async function POST(req: Request) {
   const auth = await validateApiKey(req);
   if (!auth.ok) {
@@ -45,21 +49,36 @@ export async function POST(req: Request) {
       .map((c: unknown) => asString(c, 100))
       .filter((c: string | null): c is string => Boolean(c && c.length > 0));
 
-    const lat = Number(body.lat ?? process.env.NEXT_PUBLIC_SEARCH_LAT ?? "46.0172");
-    const lng = Number(body.lng ?? process.env.NEXT_PUBLIC_SEARCH_LNG ?? "11.91");
-    const radiusM = asInt(body.radius_m) ?? asInt(body.radius) ?? 5000;
-    const searchCity = asString(body.searchCity, 200) || (process.env.NEXT_PUBLIC_SEARCH_CITY ?? "Feltre");
-    const contactEmail = process.env.OSM_CONTACT_EMAIL ?? "api@leadmachine.local";
-    // Budget di tempo: i mirror Overpass possono essere lenti o irraggiungibili.
-    // Il client puo' abbassarlo, ma non alzarlo oltre 100s (limite della piattaforma).
-    const budgetMs = Math.min(Math.max(asInt(body.timeoutMs) ?? 45_000, 5_000), 100_000);
-
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    // Nessuna citta o coordinata di default: l'area arriva dalla richiesta
+    // (lat/lng, searchCity) oppure dalle impostazioni salvate in onboarding.
+    const settings = await getSettings();
+    // Contatto OSM dalla configurazione salvata, altrimenti dall'ambiente:
+    // mai un'email segnaposto, che i servizi OSM rifiutano con un 403.
+    const contactEmail = settings.osm_contact_email || process.env.OSM_CONTACT_EMAIL || "";
+    const areaResult = await resolveSearchArea({
+      city: asString(body.searchCity, 200),
+      lat: body.lat ?? process.env.NEXT_PUBLIC_SEARCH_LAT,
+      lng: body.lng ?? process.env.NEXT_PUBLIC_SEARCH_LNG,
+      radiusM: asInt(body.radius_m) ?? asInt(body.radius),
+      contactEmail,
+      settings: {
+        ...settings,
+        search_city: settings.search_city || process.env.NEXT_PUBLIC_SEARCH_CITY || "",
+        search_lat: settings.search_lat || process.env.NEXT_PUBLIC_SEARCH_LAT || "",
+        search_lng: settings.search_lng || process.env.NEXT_PUBLIC_SEARCH_LNG || "",
+        search_radius_m: settings.search_radius_m || process.env.NEXT_PUBLIC_SEARCH_RADIUS_M || "",
+      },
+    });
+    if (!areaResult.area) {
       return NextResponse.json(
-        { ok: false, error: "Coordinate non valide: fornisci lat e lng numerici." },
+        { ok: false, error: areaResult.warning },
         { status: 400, headers: CORS_HEADERS }
       );
     }
+    const { city: searchCity, lat, lng, radiusM } = areaResult.area;
+    // Budget di tempo: i mirror Overpass possono essere lenti o irraggiungibili.
+    // Il client puo' abbassarlo, ma non alzarlo oltre 100s (limite della piattaforma).
+    const budgetMs = Math.min(Math.max(asInt(body.timeoutMs) ?? 45_000, 5_000), 100_000);
 
     const warnings: string[] = [];
     let results: OsmCandidate[] = [];
@@ -78,19 +97,28 @@ export async function POST(req: Request) {
       warnings.push("OpenStreetMap non ha risposto: " + msg);
     }
 
-    // 2) Geoapify (opzionale, solo se c'e' una chiave configurata)
-    if (results.length === 0 && (await geoapifyEnabled())) {
-      try {
-        const geoResults = await withTimeout(
-          runGeoapifySearch(categories, lat, lng, radiusM),
-          Math.max(10_000, budgetMs),
-          "Geoapify"
-        );
-        results = results.concat(geoResults);
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        warnings.push("Geoapify non ha risposto: " + msg);
-      }
+    // 2) Fonti aggiuntive (Geoapify e TomTom): solo se OpenStreetMap non ha
+    // trovato nulla e solo se c'e' una chiave configurata. Le due partono
+    // insieme, cosi' il tempo e' quello della piu' veloce e non la somma.
+    if (results.length === 0) {
+      const [geoOn, tomOn] = await Promise.all([geoapifyEnabled(), tomtomEnabled()]);
+      const extra = await Promise.allSettled([
+        geoOn
+          ? withTimeout(runGeoapifySearch(categories, lat, lng, radiusM), Math.max(10_000, budgetMs), "Geoapify")
+          : Promise.resolve([] as OsmCandidate[]),
+        tomOn
+          ? withTimeout(runTomTomSearch(categories, lat, lng, radiusM), Math.max(10_000, budgetMs), "TomTom")
+          : Promise.resolve([] as OsmCandidate[]),
+      ]);
+      const names = ["Geoapify", "TomTom"];
+      extra.forEach((r, i) => {
+        if (r.status === "fulfilled") {
+          results = results.concat(r.value);
+        } else {
+          const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
+          warnings.push(names[i] + " non ha risposto: " + msg);
+        }
+      });
     }
 
     // 3) Dedup (stesso nome + coordinate), categoria e scoring

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { generateWithSearch, hasGeminiKey } from "@/lib/ai";
 import { checkWebsite } from "@/lib/website-check";
 import { findWebsiteHeuristic } from "@/lib/website-finder";
+import { rateLimitedResponse } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,7 +38,10 @@ function parseJsonLoose(text: string): Record<string, unknown> | null {
   }
 }
 
-export async function POST(_req: Request, context: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
+  const limited = await rateLimitedResponse(req, "leads:find-website", 20, 60_000);
+  if (limited) return limited;
+
   try {
     const id = (await context.params).id;
     const lead = await prisma.lead.findUnique({ where: { id } });
@@ -46,7 +50,7 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
     }
 
     const name = lead.name || "";
-    const city = lead.city || "Feltre";
+    const city = lead.city || "";
     const category = lead.subcategory || lead.category || "";
 
     let website: string | null = null;

@@ -2,81 +2,125 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { quoteTotalFromRaw, formatEuro } from "@/lib/quotes";
+import { formatCurrency, methodLabel } from "@/lib/receipts";
+import type { LocaleCode } from "@/lib/i18n-config";
+import { getSettings } from "@/lib/settings";
 import { formatDate } from "@/lib/utils";
-import { Receipt, ExternalLink } from "lucide-react";
+import { Printer } from "lucide-react";
+import { ReceiptForm } from "@/components/receipt-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function RicevutaListPage() {
-  const quotes = await prisma.quote.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { lead: { select: { name: true } } },
-  });
-  const accepted = quotes.filter((q) => q.status === "accettato");
-  const others = quotes.filter((q) => q.status !== "accettato");
+export const metadata = {
+  title: "Ricevute di pagamento",
+  description:
+    "Registra e stampa la prova di pagamento ricevuta dalle attivita che hai contattato.",
+  alternates: { canonical: "/ricevuta" },
+};
 
-  function row(q: (typeof quotes)[number], highlight: boolean) {
-    const total = quoteTotalFromRaw(q.items, q.discount, q.taxRate);
-    return (
-      <Card key={q.id}>
-        <CardContent className="flex flex-wrap items-center gap-3 p-4">
-          <div className="min-w-0 flex-1">
-            <div className="font-medium">
-              {q.number} - {q.lead?.name ?? "(lead rimosso)"}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {q.title || "Senza titolo"} - {formatEuro(total)} - {formatDate(q.createdAt)}
-            </div>
-          </div>
-          {highlight ? (
-            <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-              Accettato
-            </Badge>
-          ) : null}
-          <Link href={"/ricevuta/" + q.id} target="_blank">
-            <Button variant="outline" size="sm">
-              <Receipt className="mr-1 h-4 w-4" /> Genera ricevuta
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    );
+export default async function RicevutaListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lead?: string }>;
+}) {
+  const sp = await searchParams;
+  let settings: Record<string, string> = {};
+  let receipts: {
+    id: string;
+    number: string;
+    amount: number;
+    method: string;
+    paidAt: Date;
+    description: string | null;
+    lead: { id: string; name: string } | null;
+  }[] = [];
+  let leads: { id: string; name: string }[] = [];
+  let dbError = false;
+
+  try {
+    [receipts, leads, settings] = await Promise.all([
+      prisma.receipt.findMany({
+        orderBy: { paidAt: "desc" },
+        include: { lead: { select: { id: true, name: true } } },
+      }),
+      prisma.lead.findMany({
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true },
+        take: 500,
+      }),
+      getSettings(),
+    ]);
+  } catch {
+    dbError = true;
   }
+
+  const locale = (settings.locale as LocaleCode | undefined) || undefined;
+  const currency = settings.currency || undefined;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Ricevute</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Ricevute di pagamento</h1>
         <p className="text-muted-foreground">
-          Genera una ricevuta per prestazione occasionale da un preventivo. Da emettere a nome dell'adulto intestatario.
+          La prova che un&apos;attivita ti ha pagato: chi, quanto, come e quando. Nessun campo
+          fiscale, solo il pagamento ricevuto.
         </p>
       </div>
 
-      {quotes.length === 0 ? (
+      {dbError ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
-            Nessun preventivo disponibile. Crea prima un preventivo, poi potrai generare la ricevuta.
+            Database non raggiungibile. Avvia l&apos;app con <code>npm run setup</code> e ricarica.
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6">
-          <div>
-            <h2 className="mb-3 text-lg font-semibold">Preventivi accettati (consigliati)</h2>
-            {accepted.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nessun preventivo ancora accettato.</p>
-            ) : (
-              <div className="space-y-2">{accepted.map((q) => row(q, true))}</div>
-            )}
-          </div>
-          {others.length > 0 ? (
-            <div>
-              <h2 className="mb-3 text-lg font-semibold">Altri preventivi</h2>
-              <div className="space-y-2">{others.map((q) => row(q, false))}</div>
+        <>
+          {leads.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center text-muted-foreground">
+                Non hai ancora nessuna attivita in archivio. Trova le attivita della tua zona in{" "}
+                <Link href="/ricerca" className="underline">
+                  Ricerca
+                </Link>{" "}
+                e poi torna qui a registrare il pagamento.
+              </CardContent>
+            </Card>
+          ) : (
+            <ReceiptForm leads={leads} defaultLeadId={sp.lead} />
+          )}
+
+          {receipts.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center text-muted-foreground">
+                Nessuna ricevuta registrata.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-2">
+              {receipts.map((r) => (
+                <Card key={r.id}>
+                  <CardContent className="flex flex-wrap items-center gap-3 p-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium">
+                        {r.number} - {r.lead?.name ?? "(attivita rimossa)"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatCurrency(r.amount, locale, currency)} - {methodLabel(r.method)} -{" "}
+                        {formatDate(r.paidAt)}
+                        {r.description ? " - " + r.description : ""}
+                      </div>
+                    </div>
+                    <Link href={"/ricevuta/" + r.id} target="_blank">
+                      <Button variant="outline" size="sm">
+                        <Printer className="mr-1 h-4 w-4" /> Apri e stampa
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          ) : null}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

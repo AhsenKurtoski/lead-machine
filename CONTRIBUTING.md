@@ -23,7 +23,7 @@ Anything in this non-exhaustive list is welcome:
 - **New modules / features** — open a draft issue describing the problem and your idea *before* starting big work, so we can discuss scope.
 - **UI/UX polish** — responsive tweaks, better loading states, keyboard behavior.
 - **Performance** — reduce N+1 queries, optimize renders, improve cold start.
-- **Tests** — we don't have a test suite yet; any starting point is great.
+- **Tests** — the suite runs with the Node built-in test runner (`npm test`, no extra framework): more coverage for `src/lib/*` pure helpers, and end-to-end checks for API routes, is very welcome.
 - **Docs** — the README, inline JSDoc, and this file always need love.
 
 ---
@@ -59,6 +59,12 @@ Useful scripts:
 | `npm start` | Runs the production build |
 | `npm run lint` | Lint with `next lint` (ESLint) |
 | `npm run typecheck` | Runs `tsc --noEmit` |
+| `npm test` | Unit tests (`node:test` + `tsx`) for the pure helpers in `src/lib/*.test.ts` |
+| `npm run qa` | The full gate: typecheck + lint + i18n parity + content and hygiene guard rails + tests |
+| `npm run i18n:check` | Verifies every locale has exactly the same key set |
+| `npm run check:content` | Fails if a removed module (quotes / price list) or a fiscal/age wording creeps back in |
+| `npm run check:hygiene` | Fails on an empty page, a dead internal link, an unreachable page, a `layout` without a `page`, an empty folder — and, when the DB exists, on smoke-test leftovers or inconsistent verification rows |
+| `npm run smoke:api` · `npm run smoke:geo` | End-to-end smoke tests against a running instance (API keys, real geographic sources) |
 | `npm run db:push` | Applies `prisma/schema.prisma` to the SQLite DB |
 | `npm run db:seed` | (Re)loads templates and sample data |
 | `npm run db:studio` | Opens Prisma Studio in the browser |
@@ -66,9 +72,9 @@ Useful scripts:
 
 > **Before opening a PR**, run:
 > ```bash
-> npm run lint && npm run typecheck
+> npm run qa          # typecheck + lint + i18n parity + content and hygiene guard rails + tests
 > ```
-> and make sure both pass.
+> and make sure it passes (it is the same command the CI runs).
 
 ---
 
@@ -77,7 +83,7 @@ Useful scripts:
 ```
 lead-machine/
 ├── prisma/
-│   ├── schema.prisma     # SQLite schema (Lead, Tag, Quote, Notification...)
+│   ├── schema.prisma     # SQLite schema (Lead, Tag, Activity, Verification, Receipt...)
 │   └── seed.ts           # Default templates + sample data
 ├── public/               # Static assets (logo, icons, screenshots)
 ├── src/
@@ -85,7 +91,7 @@ lead-machine/
 │   │   ├── dashboard/
 │   │   ├── ricerca/      # Lead search page
 │   │   ├── crm/
-│   │   ├── preventivi/
+│   │   ├── ricevuta/     # Payment receipts (list + printable receipt)
 │   │   ├── api/          # Every route: GET / POST / PATCH / DELETE
 │   │   ├── layout.tsx    # Root layout + providers (theme, i18n)
 │   │   └── globals.css   # Tailwind tokens, dark mode, scrollbars, print
@@ -105,7 +111,14 @@ lead-machine/
 │       ├── prisma.ts
 │       ├── settings.ts
 │       ├── ai.ts                # Gemini + Groq failover
-│       ├── quotes.ts            # Quote/fiscal math (pure functions)
+│       ├── verify.ts            # Data verification rules (pure, testable)
+│       ├── verify-queue.ts      # When to retry an unperformed check (pure: delays, attempt cap, wording)
+│       ├── verify-runner.ts     # The same rules + real DNS/HTTP checks, saved per lead
+│       ├── receipts.ts          # Payment receipt helpers (number, amount, method)
+│       ├── onboarding.ts        # First-run validation (city, brand)
+│       ├── geocode.ts           # City -> coordinates (Nominatim, then Photon)
+│       ├── osm.ts               # Contact + User-Agent for OpenStreetMap services
+│       ├── search-area.ts       # Resolves the search area (no default city)
 │       ├── scoring.ts           # Lead priority algorithm
 │       ├── mailer.ts            # SMTP (nodemailer)
 │       ├── utils.ts             # Colors, date/currency formatters (locale-aware)
@@ -120,7 +133,7 @@ lead-machine/
 
 1. **Local-first.** The app is designed to run on the user's machine with SQLite. Nothing *requires* the cloud. Optional integrations (AI keys, SMTP) should stay optional.
 2. **One codebase.** Each new module lives inside the existing folders; we do not split the repo into packages.
-3. **Pure helpers where possible.** Business logic (scoring, quote totals, fiscal math) goes into `src/lib/*.ts` as plain functions so it can be unit-tested and reused from server and client.
+3. **Pure helpers where possible.** Business logic (scoring, verification rules, receipt math, search-area resolution) goes into `src/lib/*.ts` as plain functions so it can be unit-tested and reused from server and client.
 4. **Locale-aware formatting.** Dates, numbers, currency and distances use the formatter helpers (see `src/lib/utils.ts` and the `useLocale()` hook). Never hardcode `"it-IT"` or `"EUR"` in UI code — read it from locale config.
 5. **No secrets to the client.** API keys and passwords are redacted by the settings endpoint (see `GET /api/settings`).
 6. **Rate limiting & input validation.** All write-heavy or AI/email endpoints go through the helpers in `src/lib/security.ts`.
@@ -135,7 +148,7 @@ Rules:
 - **Keys are ASCII.** Format: `section.subsection.label` (snake_case inside each section allowed).
 - **English (`en`) is the reference.** When in doubt, add the new key to `en` first, then fill the others; a missing key falls back to `en`.
 - **Variables are `{braced}`** and not interpolated by regex before translate; the helpers replace them.
-- Keep the key list alphabetically ordered inside each locale object when feasible, and group them by UI area (`nav.*`, `status.*`, `quote.*`, `actions.*`, etc).
+- Keep the key list alphabetically ordered inside each locale object when feasible, and group them by UI area (`nav.*`, `status.*`, `verify.*`, `receipt.*`, `actions.*`, etc).
 
 Then add the locale metadata in `src/lib/i18n-config.ts` if it's a **new language**.
 
@@ -146,7 +159,7 @@ Then add the locale metadata in `src/lib/i18n-config.ts` if it's a **new languag
 1. **Fork** the repo on GitHub and clone your fork.
 2. Create a **feature branch**: `git checkout -b feature/my-thing` or `fix/some-bug`.
 3. Make your changes. Commit with descriptive messages (conventional commits welcome, e.g. `feat: add X`, `fix: crash when Y`, `docs(i18n): french updates`).
-4. Run `npm run lint && npm run typecheck`. Fix any issue.
+4. Run `npm run lint && npm run typecheck && npm test`. Fix any issue.
 5. Push: `git push -u origin feature/my-thing`.
 6. Open a **Pull Request** against `main` and fill in the template:
    - **What** is the change (high level summary)?
@@ -171,7 +184,7 @@ feat(crm): allow bulk tag editing
 fix(search): dedup by name + city correctly across large batches
 docs(readme): add Windows PowerShell setup note
 perf(leads): batch existing-osmId lookup (N+1)
-i18n(de): complete quote status translations
+i18n(de): complete receipt labels
 chore(deps): bump prisma to 5.24
 ```
 

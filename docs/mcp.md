@@ -9,7 +9,7 @@ Funzionano con VS Code (Cline), Claude Desktop e qualsiasi client MCP.
 | 2 | `memory` | `@modelcontextprotocol/server-memory` | Memoria persistente: decisioni, contesto, TODO → agente "più intelligente" |
 | 3 | `playwright` | `@playwright/mcp` | Browser reale: naviga il sito, testa click/form, fa screenshot desktop+mobile |
 | 4 | `fetch` | `@modelcontextprotocol/server-fetch` | Testa API esterne (Overpass/OSM/Geoapify) e le API locali Next.js |
-| 5 | `github` | `@modelcontextprotocol/server-github` | Automazione repo `AxsenXzc/lead-machine`: status, commit, PR, issue |
+| 5 | `github` | `@modelcontextprotocol/server-github` | Automazione repo `AhsenKurtoski/lead-machine`: status, commit, PR, issue |
 | 6 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Ragionamento step-by-step per debug e refactor complessi |
 
 ## Setup

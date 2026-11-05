@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { ScreenshotCard } from "@/components/screenshot-card";
 import { WebsiteCheckCard } from "@/components/website-check-card";
 import { LeadWebActions } from "@/components/lead-web-actions";
+import { VerificationPanel } from "@/components/verification-panel";
 import { fillTemplate, buildWaLink, buildMailto } from "@/lib/templates";
 import {
   STATUS_LABELS,
@@ -41,7 +42,7 @@ import {
   Sparkles,
   Send,
   Copy,
-  FileText,
+  Receipt,
 } from "lucide-react";
 
 const STATUSES = Object.keys(STATUS_LABELS);
@@ -343,9 +344,9 @@ export default function LeadDetailPage() {
 
       <div className="flex flex-wrap gap-2">
         <LeadWebActions leadId={lead.id} website={lead.website} initialPrompt={lead.demoPrompt} />
-        <Link href={"/preventivi?lead=" + lead.id}>
+        <Link href={"/ricevuta?lead=" + lead.id}>
           <Button variant="outline" size="sm">
-            <FileText className="mr-1 h-4 w-4" /> Crea preventivo
+            <Receipt className="mr-1 h-4 w-4" /> Registra pagamento
           </Button>
         </Link>
         <Link href={"/calendario?lead=" + lead.id}>
@@ -354,6 +355,8 @@ export default function LeadDetailPage() {
           </Button>
         </Link>
       </div>
+
+      <VerificationPanel leadId={lead.id} />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Colonna sinistra */}
