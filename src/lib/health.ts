@@ -73,6 +73,10 @@ function check(
   return { id, label, status, detail, ...(hint ? { hint } : {}) };
 }
 
+function countLabel(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 function ok(id: string, label: string, detail: string, hint?: string): HealthCheck {
   return check(id, label, "ok", detail, hint);
 }
@@ -259,7 +263,10 @@ function runtimeSection(pkg: PackageJson | null): HealthSection {
   if (existsSync(buildId)) {
     let builtAt = "";
     try {
-      builtAt = statSync(buildId).mtime.toISOString();
+      builtAt = new Intl.DateTimeFormat("it-IT", {
+        dateStyle: "short",
+        timeStyle: "short",
+      }).format(statSync(buildId).mtime);
     } catch {
       builtAt = "";
     }
@@ -341,7 +348,7 @@ async function databaseSection(settings: Record<string, string>): Promise<Health
       ok(
         "database.data",
         "Tabelle dati",
-        `${leads} lead, ${verifications} verifiche, ${retries} controlli in coda, ${receipts} ricevute, ${emailLogs} email registrate, ${followUps} follow-up.`
+        `${leads} lead, ${countLabel(verifications, "verifica", "verifiche")}, ${countLabel(retries, "controllo in coda", "controlli in coda")}, ${countLabel(receipts, "ricevuta", "ricevute")}, ${countLabel(emailLogs, "email registrata", "email registrate")}, ${followUps} follow-up.`
       )
     );
 
@@ -354,7 +361,7 @@ async function databaseSection(settings: Record<string, string>): Promise<Health
         : fail(
             "database.receipts",
             "Numeri ricevuta",
-            `${new Set(duplicateNumbers).size} numeri duplicati.`,
+            `${countLabel(new Set(duplicateNumbers).size, "numero duplicato", "numeri duplicati")}.`,
             "Non emettere altre ricevute finché non hai corretto i duplicati."
           )
     );
@@ -365,7 +372,7 @@ async function databaseSection(settings: Record<string, string>): Promise<Health
         : warn(
             "database.retries",
             "Coda verifiche",
-            `${overdueRetries} controlli in coda da oltre 24 ore.`,
+            `${countLabel(overdueRetries, "controllo in coda da oltre 24 ore", "controlli in coda da oltre 24 ore")}.`,
             "L'app li riprova al prossimo avvio; puoi anche usare POST /api/leads/verify/retry."
           )
     );
@@ -376,7 +383,7 @@ async function databaseSection(settings: Record<string, string>): Promise<Health
         : warn(
             "database.followups",
             "Follow-up",
-            `${overdueFollowUps} follow-up non completati sono scaduti.`,
+            `${countLabel(overdueFollowUps, "follow-up non completato è scaduto", "follow-up non completati sono scaduti")}.`,
             "Apri /calendario o /crm per gestirli."
           )
     );
@@ -536,10 +543,10 @@ async function securitySection(): Promise<HealthSection> {
           ? warn(
               "security.apiKeys",
               "API keys",
-              `${disabled} chiavi su ${keys.length} sono sospese.`,
+              `${countLabel(disabled, "chiave sospesa", "chiavi sospese")} su ${keys.length}.`,
               "Riattivale o revocale da Impostazioni."
             )
-          : ok("security.apiKeys", "API keys", `${keys.length} chiavi attive.`)
+          : ok("security.apiKeys", "API keys", `${countLabel(keys.length, "chiave attiva", "chiavi attive")}.`)
     );
   } catch {
     checks.push(
@@ -652,13 +659,14 @@ async function integrationSection(settings: Record<string, string>): Promise<Hea
         )
   );
 
-  const publicDir = path.join(ROOT, "public");
   checks.push(
     directoryWritable("public")
       ? ok(
           "integration.screenshots",
           "Cartella screenshot",
-          publicDir + (existsSync(path.join(publicDir, "screenshots")) ? " con screenshots/." : " scrivibile; screenshots/ verrà creata al primo utilizzo.")
+          existsSync(path.join(ROOT, "public", "screenshots"))
+            ? "public/screenshots/ è scrivibile."
+            : "public/ è scrivibile; screenshots/ verrà creata al primo utilizzo."
         )
       : warn(
           "integration.screenshots",

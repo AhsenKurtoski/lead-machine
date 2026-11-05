@@ -75,6 +75,10 @@ const OVERALL_META = {
   },
 } as const;
 
+function countLabel(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 function formatCheckedAt(iso: string): string {
   try {
     return new Intl.DateTimeFormat("it-IT", {
@@ -134,7 +138,8 @@ export default async function HealthPage() {
             variant="outline"
             className={cn("shrink-0 text-sm", STATUS_META[report.overall].className)}
           >
-            {report.summary.fail} errori · {report.summary.warn} avvisi
+            {countLabel(report.summary.fail, "errore", "errori")} ·{" "}
+            {countLabel(report.summary.warn, "avviso", "avvisi")}
           </Badge>
         </CardContent>
       </Card>
@@ -179,9 +184,13 @@ export default async function HealthPage() {
                   {section.title}
                 </CardTitle>
                 <span className="text-xs text-muted-foreground">
-                  {section.checks.length} controlli
-                  {sectionFails > 0 ? ` · ${sectionFails} errori` : ""}
-                  {sectionWarns > 0 ? ` · ${sectionWarns} avvisi` : ""}
+                  {countLabel(section.checks.length, "controllo", "controlli")}
+                  {sectionFails > 0
+                    ? ` · ${countLabel(sectionFails, "errore", "errori")}`
+                    : ""}
+                  {sectionWarns > 0
+                    ? ` · ${countLabel(sectionWarns, "avviso", "avvisi")}`
+                    : ""}
                 </span>
               </div>
               {section.description ? (
