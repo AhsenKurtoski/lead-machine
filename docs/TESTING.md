@@ -74,6 +74,12 @@ La password di test è generata a runtime e non viene mai stampata. I server ven
 
 Percorso end-to-end su un server **acceso**, senza simulare nulla: crea davvero delle chiavi API con i quattro profili di permesso, controlla che ogni scope sia applicato (`200` dove consentito, `403` con lo scope richiesto dove no), che una chiave assente o inventata dia `401`, che gli id inesistenti diano `404`, che il preflight CORS risponda `204` con `allow-origin`, e infine cancella le chiavi e i lead creati per il test.
 
+Il server deve avere `APP_PASSWORD`: lo script fa il login e usa il cookie di sessione per gli endpoint interni (`/api/keys`, `/api/leads`), mentre `/api/v1/*` continua a usare le API key. Passa la stessa password con `SMOKE_PASSWORD` (oppure con `APP_PASSWORD`, come fa il job CI):
+
+```bash
+SMOKE_PASSWORD='la-stessa-password' npm run smoke:api
+```
+
 Deve passare **tutto**: lo script esce con codice diverso da zero e stampa l'elenco dei controlli falliti se anche uno solo non torna.
 
 ## 5. Smoke test geografici (`npm run smoke:geo`)

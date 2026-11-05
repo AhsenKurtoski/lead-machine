@@ -451,7 +451,7 @@ Nothing here is simulated: the checks below talk to the real services (OpenStree
 | `npm run smoke:geo` | live geographic sources through the app: Overpass, Geoapify, real city geocoding without coordinates, public `/api/v1/search` |
 | `npm run perf:check` | real response time and payload size of the key pages/APIs, failing when a budget is exceeded |
 
-Smoke and perf checks need a server: `npm run build`, then `PORT=3111 npm start` (override the address with `SMOKE_BASE`).
+Smoke and perf checks need a server: `npm run build`, then `PORT=3111 npm start` (override the address with `SMOKE_BASE`). `smoke:api` also needs a session: pass the server's password with `SMOKE_PASSWORD` (CI sets `APP_PASSWORD` for its ephemeral server).
 
 ---
 

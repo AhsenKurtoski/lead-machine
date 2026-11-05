@@ -2,6 +2,11 @@
 // Test end-to-end delle API key: profili, scope applicati, 401/403/404, CORS.
 // Uso: node scripts/smoke-api.mjs   (server gia' avviato su SMOKE_BASE)
 const BASE = process.env.SMOKE_BASE || "http://localhost:3111";
+// La sessione serve per gli endpoint interni (/api/keys, /api/leads): l'app
+// fallisce chiusa senza APP_PASSWORD. In CI la password e' quella del job;
+// in locale si puo' passare SMOKE_PASSWORD senza esporla nel comando.
+const PASSWORD = process.env.SMOKE_PASSWORD || process.env.APP_PASSWORD || "";
+let sessionCookie = "";
 
 const pass = [];
 const fail = [];
@@ -15,10 +20,29 @@ function check(name, ok, detail) {
   else fail.push(name);
 }
 
+async function login() {
+  if (!PASSWORD) return;
+  const res = await fetch(BASE + "/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: PASSWORD }),
+  });
+  if (!res.ok) {
+    throw new Error(`Login per lo smoke test fallito (HTTP ${res.status}).`);
+  }
+  const raw = res.headers.get("set-cookie") || "";
+  sessionCookie = raw.split(";")[0].trim();
+  if (!sessionCookie) {
+    throw new Error("Login riuscito ma senza cookie di sessione.");
+  }
+}
+
 async function api(key, method, path, body) {
+  const internal = !path.startsWith("/api/v1");
   const res = await fetch(BASE + path, {
     method,
     headers: {
+      ...(internal && sessionCookie ? { cookie: sessionCookie } : {}),
       ...(key ? { "x-api-key": key } : {}),
       ...(body ? { "Content-Type": "application/json" } : {}),
     },
@@ -58,6 +82,8 @@ async function localLeads(name) {
 }
 
 async function main() {
+  await login();
+
   // --- 0. Pulizia dei residui ---
   // Se una run precedente e' stata interrotta a meta', le chiavi di test
   // restano nel database: si cancellano qui, cosi' il controllo finale parla
@@ -82,20 +108,30 @@ async function main() {
     ["readonly", "read"],
     ["search", "read,search"],
     ["writeonly", "write"],
-    ["full", null],
+    ["full", "read,write,search,ai"],
   ]) {
-    const body = { name: "smoke-" + name };
-    if (perms) body.permissions = perms;
-    const r = await api(null, "POST", "/api/keys", body);
+    const r = await api(null, "POST", "/api/keys", {
+      name: "smoke-" + name,
+      permissions: perms,
+    });
     keys[name] = r.data?.rawKey;
     if (r.data?.apiKey?.id) createdIds.push(r.data.apiKey.id);
-    const expected = perms ?? "read,write,search,ai";
     check(
       `profilo "${name}" creato con scope attesi`,
-      r.status === 200 && r.data?.apiKey?.permissions === expected,
+      r.status === 200 && r.data?.apiKey?.permissions === perms,
       r.data?.apiKey?.permissions ?? describe(r)
     );
   }
+
+  // Il default deve restare il minimo privilegio: il test non deve indurre a
+  // concedere write/search/ai a chi omette il campo.
+  const defaultKey = await api(null, "POST", "/api/keys", { name: "smoke-default" });
+  if (defaultKey.data?.apiKey?.id) createdIds.push(defaultKey.data.apiKey.id);
+  check(
+    "permessi omessi -> sola lettura (minimo privilegio)",
+    defaultKey.status === 200 && defaultKey.data?.apiKey?.permissions === "read",
+    defaultKey.data?.apiKey?.permissions ?? describe(defaultKey)
+  );
 
   // --- 2. Scope realmente applicati su ogni endpoint ---
   const matrix = [

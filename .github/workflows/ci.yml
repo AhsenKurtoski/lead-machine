@@ -42,6 +42,9 @@ jobs:
     needs: app
     env:
       DATABASE_URL: file:./dev.db
+      # Password solo per il server effimero del job: smoke-api la usa per
+      # autenticare gli endpoint interni, che senza APP_PASSWORD falliscono 503.
+      APP_PASSWORD: smoke-ci-password-2026
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -59,7 +62,7 @@ jobs:
             if [ "$code" != "000" ]; then echo "server pronto (HTTP $code)"; break; fi
             sleep 2
           done
-      - name: Smoke test API key (31 assert)
+      - name: Smoke test API key
         run: SMOKE_BASE=http://localhost:3111 npm run smoke:api
       - name: Nessun residuo di test nel database
         # `--require-db`: qui il database c'e' per davvero, quindi assente e'
