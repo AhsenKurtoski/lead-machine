@@ -185,6 +185,31 @@ export function isNodeSupported(version: string, requirement: string): boolean {
   return actual[1] >= requiredMinor;
 }
 
+/** Loopback hosts do not need HTTPS for a local-only installation. */
+export function isLocalHostname(hostname: string): boolean {
+  const host = hostname.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  return (
+    host === "localhost" ||
+    host.endsWith(".localhost") ||
+    /^127\./.test(host) ||
+    host === "::1" ||
+    host === "0:0:0:0:0:0:0:1"
+  );
+}
+
+/** Warning only for a real public HTTP URL in production. */
+export function baseUrlNeedsHttps(
+  baseUrl: string,
+  nodeEnv: string | undefined = process.env.NODE_ENV
+): boolean {
+  try {
+    const parsed = new URL(baseUrl);
+    return nodeEnv === "production" && parsed.protocol === "http:" && !isLocalHostname(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function summarizeHealth(sections: HealthSection[]): {
   overall: Exclude<HealthStatus, "info">;
   summary: HealthSummary;
@@ -494,13 +519,21 @@ async function securitySection(): Promise<HealthSection> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   try {
     const parsed = new URL(baseUrl);
-    if (process.env.NODE_ENV === "production" && parsed.protocol !== "https:") {
+    if (baseUrlNeedsHttps(baseUrl)) {
       checks.push(
         warn(
           "security.baseUrl",
           "URL pubblico",
           `${baseUrl} non usa HTTPS in produzione.`,
           "Metti l'app dietro un proxy TLS e imposta NEXT_PUBLIC_BASE_URL su https://."
+        )
+      );
+    } else if (parsed.protocol === "http:" && isLocalHostname(parsed.hostname)) {
+      checks.push(
+        ok(
+          "security.baseUrl",
+          "URL pubblico",
+          `${baseUrl} (loopback locale: HTTPS non necessario).`
         )
       );
     } else {
@@ -630,17 +663,28 @@ async function integrationSection(settings: Record<string, string>): Promise<Hea
       : info("integration.tomtom", "TomTom", "Non configurata (opzionale): restano OSM e Geoapify se presente.")
   );
 
-  const osmContact = settings.osm_contact_email || process.env.OSM_CONTACT_EMAIL;
-  checks.push(
-    isRealContactEmail(osmContact)
-      ? ok("integration.osm", "Contatto OpenStreetMap", "Email di contatto reale configurata.")
-      : warn(
-          "integration.osm",
-          "Contatto OpenStreetMap",
-          "Nessuna email reale configurata: l'app usa l'URL pubblico del progetto.",
-          "È accettato da OSM, ma un contatto reale è consigliato per un uso intenso."
-        )
-  );
+  const osmContact = (settings.osm_contact_email || process.env.OSM_CONTACT_EMAIL || "").trim();
+  if (!osmContact) {
+    checks.push(
+      info(
+        "integration.osm",
+        "Contatto OpenStreetMap",
+        "Non configurato (opzionale): l'app usa l'URL pubblico del progetto.",
+        "Un contatto reale è consigliato solo per un uso intenso di OSM."
+      )
+    );
+  } else if (isRealContactEmail(osmContact)) {
+    checks.push(ok("integration.osm", "Contatto OpenStreetMap", "Email di contatto reale configurata."));
+  } else {
+    checks.push(
+      info(
+        "integration.osm",
+        "Contatto OpenStreetMap",
+        "Il valore configurato viene ignorato (segnaposto o non valido): l'app usa l'URL del progetto.",
+        "Imposta un indirizzo reale se usi OSM intensamente; il fallback è valido."
+      )
+    );
+  }
 
   const playwright = packageInstalled("playwright");
   checks.push(
