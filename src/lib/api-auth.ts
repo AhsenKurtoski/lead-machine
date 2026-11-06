@@ -83,6 +83,15 @@ export function serializeScopes(scopes: ApiScope[]): string {
   return API_SCOPES.filter((s) => scopes.includes(s)).join(",");
 }
 
+// Una nuova chiave senza permessi espliciti e' di sola lettura. Questo e' il
+// minimo privilegio: write/search/ai vanno sempre chiesti dal client.
+export const DEFAULT_NEW_KEY_SCOPES: readonly ApiScope[] = ["read"];
+
+export function scopesForNewKey(permissions: string | null | undefined): ApiScope[] {
+  const requested = (permissions ?? "").trim();
+  return requested ? parseScopes(requested) : [...DEFAULT_NEW_KEY_SCOPES];
+}
+
 // Restituisce una risposta 403 se la chiave non ha lo scope richiesto.
 export function requireScope(
   scopes: ApiScope[],

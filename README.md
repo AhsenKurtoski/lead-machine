@@ -26,7 +26,9 @@
 
 <div align="center">
 
-![Lead Machine — demo del prodotto](docs/assets/lead-machine-demo.gif)
+[![Lead Machine — demo del prodotto](docs/assets/lead-machine-demo.gif)](docs/assets/lead-machine-demo.mp4)
+
+**▶ [Guarda il video demo completo (MP4)](docs/assets/lead-machine-demo.mp4)**
 
 </div>
 
@@ -40,7 +42,7 @@
 |---|---|---|
 | ![Mappa](screenshots/mappa-desktop.png) | ![Ricerca lead](screenshots/ricerca-mobile.png) | ![Impostazioni](screenshots/impostazioni-desktop.png) |
 
-> Tutti gli screenshot sono generati dal codice reale: con il server avviato, `APP_PASSWORD=… npm run screenshots` (PNG desktop + mobile) e `node scripts/demo-gif.mjs` (GIF). Lo script effettua il login, fotografa dashboard, ricerca, CRM, mappa, ricevute e impostazioni; le versioni mobile sono in `screenshots/`.
+> Tutti gli screenshot e il video sono generati dal codice reale: con il server avviato, `APP_PASSWORD=… npm run screenshots` (PNG desktop + mobile) e `APP_PASSWORD=… npm run demo` (MP4 + GIF). Gli screenshot mostrano dashboard, ricerca, CRM, mappa, ricevute e impostazioni; il video aggiunge opportunità e stato sistema. Le versioni mobile sono in `screenshots/`.
 
 ---
 
@@ -447,7 +449,7 @@ Nothing here is simulated: the checks below talk to the real services (OpenStree
 | `npm run qa` | typecheck + lint + translation parity (7 locales) + content and hygiene guard rails + unit tests on the pure helpers in `src/lib/` |
 | `npm run check:auth` | login, session cookie, CSRF, security headers and fail-closed behaviour without `APP_PASSWORD`; starts its own production servers (requires `npm run build` and `npm run setup`) |
 | `npm run check:hygiene` | empty pages, links and menu entries pointing at removed routes, unreachable pages, `layout` files without a page, empty folders, and (when the DB exists) leftovers and inconsistent verification rows |
-| `npm run smoke:api` | end-to-end API-key behaviour against a running server: access profiles, scope enforcement, `401/403/404`, CORS preflight |
+| `npm run smoke:api` | end-to-end API-key behaviour against a running production server: access profiles, scope enforcement, `401/403/404`, CORS preflight |
 | `npm run smoke:geo` | live geographic sources through the app: Overpass, Geoapify, real city geocoding without coordinates, public `/api/v1/search` |
 | `npm run perf:check` | real response time and payload size of the key pages/APIs, failing when a budget is exceeded |
 

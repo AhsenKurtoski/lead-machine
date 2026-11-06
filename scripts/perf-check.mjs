@@ -6,12 +6,29 @@
 // controllo automatico e non una promessa.
 //
 // Uso: server avviato (es. PORT=3111 npm start), poi
-//   SMOKE_BASE=http://localhost:3111 node scripts/perf-check.mjs
+//   APP_PASSWORD=... SMOKE_BASE=http://localhost:3111 node scripts/perf-check.mjs
 //
 // I budget si possono allargare senza toccare il codice (solo per macchine
 // lente o per diagnosi): PERF_BUDGET_SCALE=2 node scripts/perf-check.mjs
 const BASE = process.env.SMOKE_BASE || "http://localhost:3111";
 const SCALE = Number(process.env.PERF_BUDGET_SCALE ?? 1) || 1;
+const PASSWORD = process.env.SMOKE_PASSWORD || process.env.APP_PASSWORD || "";
+let sessionCookie = "";
+
+async function login() {
+  if (!PASSWORD) {
+    throw new Error("APP_PASSWORD (o SMOKE_PASSWORD) non impostata: le pagine protette non sono misurabili.");
+  }
+  const res = await fetch(BASE + "/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: PASSWORD }),
+  });
+  if (!res.ok) throw new Error(`Login per perf-check fallito (HTTP ${res.status}).`);
+  const raw = res.headers.get("set-cookie") || "";
+  sessionCookie = raw.split(";")[0].trim();
+  if (!sessionCookie) throw new Error("Login riuscito ma senza cookie di sessione.");
+}
 
 const pass = [];
 const fail = [];
@@ -50,17 +67,21 @@ function human(bytes) {
 
 async function measure(path) {
   const started = Date.now();
-  const res = await fetch(BASE + path, { headers: { "Accept-Encoding": "identity" } });
+  const res = await fetch(BASE + path, {
+    headers: { cookie: sessionCookie, "Accept-Encoding": "identity" },
+  });
   const body = Buffer.from(await res.arrayBuffer());
   const ms = Date.now() - started;
   return { status: res.status, ms, bytes: body.byteLength, text: body.toString("utf8", 0, 200_000) };
 }
 
 async function main() {
+  await login();
+
   // La home deve essere un redirect HTTP vero (307/308), non un 200 con meta
   // refresh: cosi' non mostra un lampo di interfaccia e i motori di ricerca la
   // trattano come redirect invece che come pagina vuota.
-  const home = await fetch(BASE + "/", { redirect: "manual" });
+  const home = await fetch(BASE + "/", { redirect: "manual", headers: { cookie: sessionCookie } });
   check(
     "la home risponde con un redirect HTTP (non un 200 con meta refresh)",
     home.status === 307 || home.status === 308,
@@ -73,7 +94,7 @@ async function main() {
   );
 
   // Server raggiungibile?
-  const ping = await fetch(BASE + "/api/settings").catch(() => null);
+  const ping = await fetch(BASE + "/api/settings", { headers: { cookie: sessionCookie } }).catch(() => null);
   if (!ping || !ping.ok) {
     console.error(
       `Server non raggiungibile su ${BASE}.\n` +
@@ -110,7 +131,9 @@ async function main() {
   // L'elenco lead alimenta liste e menu a tendina: non deve trasportare i campi
   // pesanti (HTML delle anteprime demo, prompt AI, screenshot), altrimenti
   // l'interfaccia si blocca mentre li scarica e li analizza.
-  const leadsRes = await fetch(BASE + "/api/leads", { headers: { "Accept-Encoding": "identity" } });
+  const leadsRes = await fetch(BASE + "/api/leads", {
+    headers: { cookie: sessionCookie, "Accept-Encoding": "identity" },
+  });
   const leadsJson = await leadsRes.json().catch(() => ({}));
   const rows = Array.isArray(leadsJson.leads) ? leadsJson.leads : [];
   const heavy = ["demoHtml", "demoPrompt", "websiteScreenshot"];
@@ -135,7 +158,9 @@ async function main() {
   // leggero anche con centinaia di attivita' in archivio. Contiamo gli id lead
   // distinti linkati alle schede: il payload di React ripete le stesse stringhe
   // piu' volte, quindi contare le occorrenze grezze darebbe un numero gonfiato.
-  const opp = await fetch(BASE + "/opportunita", { headers: { "Accept-Encoding": "identity" } });
+  const opp = await fetch(BASE + "/opportunita", {
+    headers: { cookie: sessionCookie, "Accept-Encoding": "identity" },
+  });
   const oppHtml = Buffer.from(await opp.arrayBuffer()).toString("utf8");
   const cardIds = new Set(Array.from(oppHtml.matchAll(/\/crm\/([a-z0-9]+)/gi), (m) => m[1]));
   if (skipUnlessData(cardIds.size > 0, "la coda delle opportunita' e' paginata")) {

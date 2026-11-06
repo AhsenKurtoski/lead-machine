@@ -4,6 +4,7 @@
 //   2. APP_PASSWORD=... npm start (in un altro terminale, porta 3000)
 //   3. APP_PASSWORD=... node scripts/screenshot.mjs [baseUrl]
 // Output: screenshots/*.png (desktop 1280x800 + mobile 390x844)
+// Opzionale: SCREENSHOTS_DESKTOP_DIR=C:/Users/... per copiare il set sul Desktop.
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
@@ -14,7 +15,11 @@ const outDir = path.join(here, "..", "screenshots");
 fs.mkdirSync(outDir, { recursive: true });
 
 const base = process.argv[2] || process.env.BASE_URL || "http://localhost:3000";
-const password = process.env.APP_PASSWORD || "";
+const password = process.env.APP_PASSWORD || process.env.DEMO_PASSWORD || "";
+if (!password) {
+  console.error("APP_PASSWORD non impostata: impossibile generare screenshot autenticati.");
+  process.exit(1);
+}
 const pages = [
   ["dashboard", "/dashboard"],
   ["ricerca", "/ricerca"],
@@ -25,10 +30,6 @@ const pages = [
 ];
 
 async function login(page) {
-  if (!password) {
-    console.log("⚠️  APP_PASSWORD non impostata: le pagine protette risponderanno 503.");
-    return;
-  }
   await page.goto(base + "/login", { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.fill("#password", password);
   await Promise.all([
@@ -73,5 +74,13 @@ try {
 if (failures > 0) {
   console.error(`${failures} screenshot non riusciti.`);
   process.exitCode = 1;
+} else {
+  const desktopDir = process.env.SCREENSHOTS_DESKTOP_DIR;
+  if (desktopDir) {
+    const target = path.join(desktopDir, "Lead-Machine-Screenshots");
+    fs.mkdirSync(target, { recursive: true });
+    fs.cpSync(outDir, target, { recursive: true });
+    console.log(`✅ Copiati su ${target}`);
+  }
 }
 console.log("Fatto. Vedi cartella screenshots/");

@@ -1,9 +1,28 @@
 // scripts/smoke-geo.mjs — verifica end-to-end delle fonti geografiche REALI.
 // Controlla che OpenStreetMap/Overpass e Geoapify rispondano davvero tramite
 // le API dell'app, senza simulazioni.
-// Uso: server avviato (es. npm start -- -p 3111), poi:
-//   SMOKE_BASE=http://localhost:3111 node scripts/smoke-geo.mjs
+// Uso: server avviato (es. PORT=3111 npm start), poi:
+//   APP_PASSWORD=... SMOKE_BASE=http://localhost:3111 node scripts/smoke-geo.mjs
 const BASE = process.env.SMOKE_BASE || "http://localhost:3111";
+const PASSWORD = process.env.SMOKE_PASSWORD || process.env.APP_PASSWORD || "";
+let sessionCookie = "";
+
+async function login() {
+  if (!PASSWORD) {
+    throw new Error("APP_PASSWORD (o SMOKE_PASSWORD) non impostata: gli endpoint interni sono protetti.");
+  }
+  const res = await fetch(BASE + "/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: PASSWORD }),
+  });
+  if (!res.ok) throw new Error(`Login per smoke-geo fallito (HTTP ${res.status}).`);
+  const raw = res.headers.get("set-cookie") || "";
+  sessionCookie = raw.split(";")[0].trim();
+  if (!sessionCookie) throw new Error("Login riuscito ma senza cookie di sessione.");
+}
+
+await login();
 
 const pass = [];
 const fail = [];
@@ -22,7 +41,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // 1) Ricerca interna: risposta { ok, count, candidates, sources: {osm, geoapify, ai}, warnings }
 const res = await fetch(BASE + "/api/ricerca", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", cookie: sessionCookie },
   body: JSON.stringify({
     categories: ["ristorante"],
     radius_m: 5000,
@@ -64,7 +83,7 @@ if (first) console.log(`   esempio reale: ${first.name} @ ${first.lat},${first.l
 await pause(PAUSE_MS);
 const geoRes = await fetch(BASE + "/api/ricerca", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", cookie: sessionCookie },
   body: JSON.stringify({
     categories: ["ristorante"],
     radius_m: 5000,
@@ -84,7 +103,7 @@ check(
 await pause(PAUSE_MS);
 const keyRes = await fetch(BASE + "/api/keys", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", cookie: sessionCookie },
   body: JSON.stringify({ name: "smoke-geo", permissions: "read,search" }),
 });
 const keyData = await keyRes.json().catch(() => ({}));
@@ -100,7 +119,10 @@ if (rawKey) {
   check("POST /api/v1/search con chiave -> 200", s.status === 200, String(s.status));
   check("la ricerca pubblica trova attività reali", (sd.count || 0) > 0, `count=${sd.count}`);
   check("nessuna fonte in timeout", sd.timedOut === false, `timedOut=${sd.timedOut}`);
-  await fetch(BASE + "/api/keys/" + keyData.apiKey.id, { method: "DELETE" });
+  await fetch(BASE + "/api/keys/" + keyData.apiKey.id, {
+    method: "DELETE",
+    headers: { cookie: sessionCookie },
+  });
   console.log("   chiave di test rimossa");
 }
 

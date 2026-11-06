@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateRawApiKey, parseScopes, serializeScopes } from "@/lib/api-auth";
+import { generateRawApiKey, scopesForNewKey, serializeScopes } from "@/lib/api-auth";
 import { asString, rateLimitedResponse } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     // Il default e' il minimo necessario (sola lettura); write/search/ai
     // devono essere richiesti esplicitamente.
     const requested = asString(body.permissions, 100)?.trim();
-    const scopes = requested ? parseScopes(requested) : parseScopes("read");
+    const scopes = scopesForNewKey(requested);
     if (scopes.length === 0) {
       return NextResponse.json(
         { ok: false, error: "Nessun permesso valido richiesto. Valori ammessi: read, write, search, ai." },

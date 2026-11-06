@@ -22,13 +22,15 @@ Gli ultimi tre hanno bisogno di un server acceso:
 
 ```bash
 npm run build
-PORT=3111 npm start        # oppure: npm run dev
+APP_PASSWORD='la-tua-password' PORT=3111 npm start
 ```
 
-Per default puntano a `http://localhost:3111`; cambia la porta con `SMOKE_BASE`:
+Per default puntano a `http://localhost:3111`; cambia la porta con `SMOKE_BASE`.
+Gli endpoint interni sono protetti, quindi passa la stessa password del server
+con `SMOKE_PASSWORD` (oppure `APP_PASSWORD`):
 
 ```bash
-SMOKE_BASE=http://localhost:3111 npm run smoke:api
+SMOKE_PASSWORD='la-tua-password' SMOKE_BASE=http://localhost:3111 npm run smoke:api
 ```
 
 ## 1. Test unitari (`npm run qa`, oppure `npm test`)
@@ -45,6 +47,7 @@ Runner: quello nativo di Node (`node:test`) con `tsx`, orchestrato da `scripts/r
 | `src/lib/opportunities.test.ts` | La coda delle opportunita': chi non ha un sito, chi e' contattabile, punteggio, ordinamento deterministico, filtri e statistiche. |
 | `src/lib/receipts.test.ts` | Le ricevute di pagamento: metodi e valori sconosciuti, etichette, numerazione `RICEVUTA-anno-NNN`, valore per gli input data, formattazione della valuta per locale, e l'assenza di riferimenti fiscali negli helper. |
 | `src/lib/auth.test.ts` | La sessione a password condivisa: soglia minima di 8 caratteri, confronto della password, token firmato valido, firma manomessa e invalidazione delle sessioni quando `APP_PASSWORD` cambia. |
+| `src/lib/api-auth.test.ts` | Il minimo privilegio delle nuove API key: permessi omessi, vuoti o composti solo da spazi producono `read`; `write`, `search` e `ai` non compaiono mai senza richiesta esplicita; gli scope validi espliciti vengono conservati. |
 | `src/lib/url-safety.test.ts` | La protezione SSRF: loopback, reti private, link-local, IPv6 e metadati cloud vengono rifiutati; solo URL http/https pubblici e senza credenziali passano. |
 | `src/lib/csv.test.ts` | L'export CSV: neutralizzazione delle formule (`=`, `+`, `-`, `@`), quoting di virgole/virgolette/newline e parsing delle righe vuote. |
 | `src/lib/contact-extract.test.ts` | L'arricchimento contatti dall'HTML reale di un sito: email da `mailto:` e dal testo, scarto di caselle automatiche e domini di esempio, profili Instagram e Facebook (scartando widget di condivisione, post singoli e pagine di login), pagina senza contatti -> nessun dato. |
@@ -86,6 +89,8 @@ Deve passare **tutto**: lo script esce con codice diverso da zero e stampa l'ele
 
 Serve a dimostrare che le fonti geografiche funzionano sul serio, non che rispondono dei finti:
 
+Lo script fa prima il login con `SMOKE_PASSWORD` (oppure `APP_PASSWORD`) e usa il cookie di sessione per gli endpoint interni; senza password gli endpoint protetti rispondono `401`/`503`.
+
 1. `POST /api/ricerca` con coordinate esplicite -> arrivano candidati veri da OpenStreetMap/Overpass (e da Geoapify quando la chiave e' configurata), senza warning sulle fonti;
 2. la **stessa** ricerca senza coordinate, indicando solo la citta' -> l'area viene risolta dal geocoding reale (Nominatim, con ripiego su Photon), quindi nessuna citta' e' scritta nel codice;
 3. `POST /api/v1/search` con una chiave API vera -> la ricerca pubblica restituisce attivita' reali e nessuna fonte va in timeout.
@@ -94,7 +99,7 @@ I mirror pubblici di Overpass limitano le raffiche dallo stesso IP: tra una rice
 
 ## 6. Controllo delle performance (`npm run perf:check`)
 
-Misura su un server acceso il tempo di risposta e i byte scaricati delle pagine e delle API piu' usate (dashboard, ricerca, CRM, coda delle opportunita', elenchi e notifiche) e fallisce se una misura supera il budget previsto: e' il controllo che tiene la promessa "l'app non deve laggare". Usa la stessa variabile `SMOKE_BASE` degli smoke, e i budget si allargano solo di proposito con `PERF_BUDGET_SCALE`.
+Misura su un server acceso il tempo di risposta e i byte scaricati delle pagine e delle API piu' usate (dashboard, ricerca, CRM, coda delle opportunita', elenchi e notifiche) e fallisce se una misura supera il budget previsto: e' il controllo che tiene la promessa "l'app non deve laggare". Usa la stessa variabile `SMOKE_BASE` degli smoke e fa il login con `SMOKE_PASSWORD`/`APP_PASSWORD`; i budget si allargano solo di proposito con `PERF_BUDGET_SCALE`.
 
 Oltre alle misure controlla quattro comportamenti che un tempo di risposta veloce non rivelerebbe:
 
@@ -119,7 +124,7 @@ L'arricchimento contatti (`Arricchisci contatti`) scarica la pagina del sito, es
 
 ## 8. Cosa NON e' coperto
 
-- **Controllo visivo e mobile**: nessun test automatico di rendering. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` (richiede Playwright installato con `npm run setup:screenshot` e un server avviato) e la resa a occhio si verifica nel browser.
+- **Controllo visivo e mobile**: nessun test automatico di rendering. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot` e un server avviato); la resa a occhio si verifica nel browser.
 - **Invio email reale**: senza `SMTP_HOST` configurato l'app scrive i file `.eml` in `./tmp/emails/` per scelta. L'invio via SMTP non e' esercitato dai test.
 - **Provider AI**: senza `GEMINI_API_KEY` o `GROQ_API_KEY` le funzioni AI rispondono `503`. Gli smoke non li interrogano (consumano quota).
 - **Servizi di terze parti**: disponibilita' e limiti di Overpass, Nominatim e Geoapify non dipendono da noi. L'app degrada con un warning e con i risultati delle altre fonti; gli smoke lo tollerano.
@@ -134,19 +139,19 @@ npm run build              # build di produzione (prisma generate + next build)
 npm run setup              # DB e seed su un database nuovo, se serve
 
 # con il server acceso su 3111:
-npm run smoke:api
-npm run smoke:geo
-npm run perf:check
+SMOKE_PASSWORD='la-tua-password' npm run smoke:api
+SMOKE_PASSWORD='la-tua-password' npm run smoke:geo
+SMOKE_PASSWORD='la-tua-password' npm run perf:check
 ```
 
 Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM con verifica e arricchimento, opportunita', ricevute, impostazioni, onboarding su un database vuoto).
 
-## 9. Cosa gira in CI
+## 10. Cosa gira in CI
 
 `.github/workflows/ci.yml`, a ogni push e pull request:
 
 - **job "app"**: `npm run qa` e poi `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
-- **job "smoke-api"**: prepara database e seed, avvia il server, lancia `npm run smoke:api` e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie);
+- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie);
 - **job "audit"** (solo settimanale): `npm audit` sulle dipendenze.
 
 `smoke:geo` e `perf:check` si lanciano in locale: `smoke:geo` dipende dai servizi esterni live, `perf:check` da una macchina con il server di produzione acceso (i budget sono calibrati su `npm start`, non sul server di sviluppo). Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.

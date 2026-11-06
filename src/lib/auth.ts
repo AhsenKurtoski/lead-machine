@@ -58,7 +58,9 @@ export async function verifySessionToken(token: string | undefined | null): Prom
     diff |= expected.charCodeAt(i) ^ parts[2].charCodeAt(i);
   }
   return diff === 0;
-}export function verifyPassword(input: string): boolean {
+}
+
+export function verifyPassword(input: string): boolean {
   const expected = authPassword();
   if (!expected || input.length !== expected.length) return false;
   let diff = 0;

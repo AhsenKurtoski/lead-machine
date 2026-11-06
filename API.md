@@ -711,10 +711,14 @@ The `X-Required-Scope` response header carries the same value.
 
 | Profile | `permissions` | Use case |
 |---|---|---|
-| Full integration | `read,write,search,ai` | Default for a website builder that needs everything |
+| Full integration | `read,write,search,ai` | A website builder that needs every capability (must be requested explicitly) |
 | Business search | `read,search` | Finds businesses and reads saved leads, cannot modify anything |
 | Read only | `read` | Dashboards and reporting, zero write access |
 | Insert only | `write` | A form that only creates leads |
+
+If `permissions` is omitted or blank, the key is created **read-only** (`read`).
+This is the least-privilege default: `write`, `search` and `ai` must always be
+requested explicitly.
 
 Create a key with a profile:
 
