@@ -19,7 +19,7 @@ jobs:
     env:
       DATABASE_URL: file:./dev.db
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -47,7 +47,7 @@ jobs:
       # autenticare gli endpoint interni, che senza APP_PASSWORD falliscono 503.
       APP_PASSWORD: smoke-ci-password-2026
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -91,7 +91,7 @@ jobs:
       DATABASE_URL: file:./dev.db
       APP_PASSWORD: live-ci-password-2026
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -128,7 +128,7 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 20
