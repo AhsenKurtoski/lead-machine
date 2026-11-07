@@ -1,6 +1,6 @@
 # 🚀 Product Hunt — kit di lancio
 
-> Tutto pronto da copiare e incollare. Screenshot e GIF sono già nel repo.
+> Tutto pronto da copiare e incollare. Screenshot, GIF e video sono già nel repo.
 
 ## Scheda prodotto
 
@@ -24,7 +24,7 @@ Find nearby businesses on OpenStreetMap, score them 0–100, verify their contac
 
 | # | File | Caption |
 |---|---|---|
-| 1 | `docs/assets/lead-machine-demo.gif` | *Lead Machine in 20 seconds: real leads, rule-based priority scoring and honestly labelled contact data.* |
+| 1 | `docs/assets/lead-machine-demo.gif` | *Lead Machine in 40 seconds: real leads, rule-based priority scoring and honestly labelled contact data.* |
 | 2 | `screenshots/dashboard-desktop.png` | *Dashboard: KPIs, productivity heatmap, top leads and upcoming follow-ups.* |
 | 3 | `screenshots/ricerca-desktop.png` | *Geographic search on OpenStreetMap: category + radius + city, with automatic deduplication and duplicate groups for manual review.* |
 | 4 | `screenshots/mappa-desktop.png` | *Map view with color-coded statuses — call, email or WhatsApp any pin.* |
