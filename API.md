@@ -11,6 +11,8 @@ All API routes live under `/api/*` and serve the single-user app that runs on `l
 ## 🔑 API keys: how to get one and what you need
 
 > **TL;DR (humans & AI agents)**: start the app → create a key in **Impostazioni → API Key & Integrazioni esterne** (or `POST /api/keys`) → call `/api/v1/*` with `x-api-key: lm_live_…`. The secret is shown **once**; only its SHA-256 hash is stored. Each key carries scopes (`read`, `write`, `search`, `ai`) that are enforced on every endpoint.
+>
+> **Practical guide (Italian)**: [docs/API-KEYS.md](./docs/API-KEYS.md) — always-on behaviour, suspended vs revoked keys, concrete use cases and safe operation.
 
 ### What you need
 
@@ -38,7 +40,7 @@ curl -X POST http://localhost:3000/api/keys \
   -d '{"name":"My AI Agent","permissions":"read,search"}'
 ```
 
-**Response (201)**
+**Response (200)**
 
 ```json
 {
@@ -53,7 +55,7 @@ curl -X POST http://localhost:3000/api/keys \
 ### Verify a key
 
 ```bash
-curl -s http://localhost:3000/api/v1/leads?take=1 \
+curl -s http://localhost:3000/api/v1/leads?limit=1 \
   -H "x-api-key: lm_live_…"
 ```
 
@@ -65,6 +67,24 @@ curl -s http://localhost:3000/api/v1/leads?take=1 \
 - Content type: `application/json` for POST/PATCH bodies.
 - Endpoints: `GET /api/v1/leads`, `GET /api/v1/leads/{id}`, `POST /api/v1/leads`, `POST /api/v1/search`, `POST /api/v1/demo/generate` — details in [20.6](#206-endpoints).
 - CORS is open (`*`): the key also works from browser apps on any domain.
+
+### Always on, suspended, or both?
+
+There is **no global API on/off switch**. `/api/v1/*` is available whenever the
+server is running; every key is created with `enabled: true` and has **no expiry**.
+It stays valid until you suspend it (`PATCH {"enabled": false}` → `403`), revoke it
+(`DELETE` → `401`), or remove its database row. Reactivating a suspended key is
+immediate and keeps the same secret.
+
+The web session and the API key are **independent channels**: the UI uses
+`APP_PASSWORD` and a 30-day session cookie, while `/api/v1/*` uses the key. Both
+can be active at the same time. A session expiring does not invalidate API keys;
+a key cannot access the UI, and a session cookie cannot authenticate `/api/v1/*`.
+
+For an always-on deployment, keep the server running under a process manager,
+keep SQLite on a persistent volume, set `APP_PASSWORD`, and use HTTPS if the app
+is reachable from outside. The key itself is always active by default; the only
+per-key switches are **suspend** and **revoke**.
 
 ### Machine-readable contract (for AI agents)
 

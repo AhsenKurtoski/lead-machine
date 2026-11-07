@@ -95,6 +95,8 @@ Everything is built-in — no plugins to buy:
 - Keys are stored **hashed (SHA-256)**; the secret is shown exactly once. Each key can be suspended or revoked with one click.
 - **Four access profiles** — full integration, business search, read only, insert only — plus a custom combination. Permissions are *really enforced* on every call: a key without the `search` permission gets a `403` with `requiredScope` in the body, it is not a decorative label.
 - Authenticate with `x-api-key: lm_live_…` or `Authorization: Bearer lm_live_…`. `CORS` is enabled, so it works from any browser domain or port.
+- **Always on by default**: a key is created enabled and has no expiry; it keeps working while the server is running until you suspend or revoke it. The web UI (password/session) and `/api/v1` (API key) can be active at the same time.
+- Practical guide (Italian): [docs/API-KEYS.md](./docs/API-KEYS.md) — status, use cases, always-on setup and security.
 - Endpoints: `GET /api/v1/leads` (filter by city, category, website presence, score), `GET /api/v1/leads/{id}`, `POST /api/v1/leads` (create), `POST /api/v1/search` (live OpenStreetMap search), `POST /api/v1/demo/generate` (AI website for a lead).
 - Requests are never left hanging: every source has a time budget and the response carries a `warnings` array explaining what was unavailable.
 - Rate limits are counted **per key** (not per IP), so several projects never block each other, and return `429` with `Retry-After`.
@@ -115,7 +117,7 @@ Everything is built-in — no plugins to buy:
 4. Call the API with either header:
 
 ```bash
-curl http://localhost:3000/api/v1/leads?take=1 -H "x-api-key: lm_live_…"
+curl http://localhost:3000/api/v1/leads?limit=1 -H "x-api-key: lm_live_…"
 # oppure: -H "Authorization: Bearer lm_live_…"
 ```
 
