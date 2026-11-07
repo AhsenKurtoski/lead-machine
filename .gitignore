@@ -44,6 +44,10 @@ next-env.d.ts
 .env.test
 .env.test.*
 
+# always-on deployment secrets and backups
+/deploy/.env
+/deploy/backups/
+
 # database
 /prisma/*.db
 /prisma/*.db-journal

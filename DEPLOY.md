@@ -8,6 +8,8 @@ Lead Machine is a standard Next.js app. It runs great:
 - **On Fly.io / Render / Railway** with a persistent volume (SQLite needs disk).
 - On **Vercel / Netlify / serverless** ⚠️ — read the caveats below; ephemeral storage will erase your DB on cold starts. Use Postgres or attach a real volume.
 
+> **Always-on, reproducible:** the ready-made [deploy/](./deploy/README.md) stack runs Docker Compose + Caddy (automatic HTTPS) + a named SQLite volume, with restart policies and healthchecks. Use it when you want the app and `/api/v1/*` to stay available 24/7.
+
 ---
 
 ## 1. Before you deploy: checklist
@@ -251,54 +253,18 @@ If you need:
 
 ## 5. Coolify / CapRover / Docker
 
-A minimal `Dockerfile` for the app:
+Per un deploy Docker sempre attivo e riproducibile usa lo stack pronto in [deploy/README.md](./deploy/README.md): contiene il `Dockerfile` alla root, Docker Compose, Caddy e il volume SQLite persistente.
 
-```dockerfile
-# syntax=docker/dockerfile:1.7
+Se una piattaforma (Coolify, CapRover, Dokku) costruisce un Dockerfile da sola, imposta:
 
-FROM node:20-alpine AS deps
-WORKDIR /app
-RUN apk add --no-cache libc6-compat openssl
-COPY package.json package-lock.json* ./
-RUN npm install --production=false
+- build context: root del repository;
+- Dockerfile: `Dockerfile`;
+- volume persistente: `/data`;
+- variabili: `APP_PASSWORD`, `NEXT_PUBLIC_BASE_URL`, `DATABASE_URL=file:/data/lead-machine.db`;
+- porta interna: `3000`;
+- `TRUST_PROXY=1` solo se la piattaforma è l'unico reverse proxy.
 
-FROM node:20-alpine AS builder
-WORKDIR /app
-RUN apk add --no-cache libc6-compat openssl
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-# Prisma expects the schema at prisma/schema.prisma relative to cwd.
-ENV DATABASE_URL=file:./data/prod.db
-RUN npx prisma generate
-RUN npm run build
-
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-RUN apk add --no-cache libc6-compat openssl sqlite tini tzdata
-ENV TZ=Europe/Rome
-
-# Copy build output
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/prisma ./prisma
-
-# Mount persistent volume HERE so the SQLite file survives deploys.
-RUN mkdir -p /app/prisma/data
-VOLUME ["/app/prisma/data"]
-
-EXPOSE 3000
-
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["sh", "-c", "npx prisma db push && exec npm start"]
-```
-
-Key points:
-- Volume: `/app/prisma/data`. **Never** let your platform rebuild without a persistent volume for this path.
-- `prisma db push` on start is idempotent.
-- For Coolify set the buildpack to "Dockerfile" and mount the volume in the project settings.
+Non usare `npm start` come comando del container: ascolta su `127.0.0.1`. L'entrypoint dello stack usa `next start -H 0.0.0.0` e inizializza il database al primo avvio.
 
 ---
 

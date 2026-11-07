@@ -1,0 +1,34 @@
+node_modules
+.next
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Local secrets and deployment environment
+.env
+.env.*
+deploy/.env
+deploy/backups
+
+# Generated media and docs not needed by the runtime image
+docs
+screenshots
+*.mp4
+*.gif
+audit-*.png
+
+# Local databases and test leftovers
+database.db
+prisma/*.db
+prisma/*.db-*
+prisma/*.backup-*
+tmp
+logs
+.ci-tmp
+coverage
+
+# Unrelated local projects
+restaurant-website
+C

@@ -1,0 +1,76 @@
+name: leadmachine
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BASE_URL: "${NEXT_PUBLIC_BASE_URL:?set NEXT_PUBLIC_BASE_URL in deploy/.env}"
+        NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Lead Machine}"
+        NEXT_PUBLIC_TZ: "${NEXT_PUBLIC_TZ:-Europe/Rome}"
+    image: leadmachine-app:local
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      DATABASE_URL: file:/data/lead-machine.db
+      TRUST_PROXY: "1"
+    volumes:
+      - leadmachine_data:/data
+    expose:
+      - "3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: "${DOMAIN:?set DOMAIN in deploy/.env}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  leadmachine_data:
+    name: leadmachine_data
+  caddy_data:
+    name: leadmachine_caddy_data
+  caddy_config:
+    name: leadmachine_caddy_config

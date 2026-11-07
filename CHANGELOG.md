@@ -3,6 +3,11 @@
 Tutte le modifiche rilevanti di Lead Machine.
 Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e il versionamento è [SemVer](https://semver.org/lang/it/).
 
+## [Unreleased]
+
+### Aggiunto
+- **Deploy always-on con Docker Compose + Caddy**: `Dockerfile` di produzione, stack in `deploy/`, HTTPS automatico, restart supervisionato, healthcheck, volume SQLite persistente e script di backup/ripristino. La guida operativa è in `deploy/README.md`.
+
 ## [1.1.0] - 2026-11-07
 
 ### Aggiunto

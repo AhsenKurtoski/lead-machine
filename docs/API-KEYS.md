@@ -238,3 +238,7 @@ Per il contratto completo, gli esempi e tutti i parametri: [API.md](../API.md).
 **La chiave è per un solo utente?** L'app è single-user: tutte le chiavi accedono agli stessi dati. Non usarla per separare clienti o tenant diversi.
 
 **Se sospendo la chiave per errore?** Puoi riattivarla subito da Impostazioni; la chiave originale torna a funzionare.
+
+---
+
+Per un'istanza always-on con HTTPS, processo supervisionato e SQLite persistente, usa lo stack pronto in [deploy/README.md](../deploy/README.md).

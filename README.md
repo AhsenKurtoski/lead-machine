@@ -351,11 +351,13 @@ lead-machine/
 │   ├── schema.prisma     # DB model (Lead, Tag, Location, Activity, FollowUp, Appointment, MessageTemplate, GeneratedMessage, Notification, Setting, Verification, Receipt, EmailLog, ApiKey)
 │   └── seed.ts           # Message templates, tags and neutral settings — no sample data (npm run db:seed)
 ├── public/               # Static assets (logo, favicon, og image)
+├── deploy/               # Docker Compose + Caddy always-on (HTTPS, persistent SQLite)
 ├── src/
 │   ├── app/              # App Router: pages + /api/* routes
 │   ├── components/       # UI: app-shell, charts, forms, cards, locale-switcher, theme-toggle…
 │   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, verify, receipts, onboarding, geocode, search-area, opportunities, security, i18n)
 ├── .env.example
+├── Dockerfile
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── SECURITY.md
@@ -378,6 +380,7 @@ For **localhost use**, nothing beyond the Quick Start above is needed.
 
 If you'd like to host Lead Machine on a VPS, Vercel (⚠️ note about ephemeral SQLite), Fly.io, Coolify, etc — see [DEPLOY.md](./DEPLOY.md). It covers:
 
+- **Always-on Docker Compose** with automatic Caddy HTTPS, restart policies and a persistent SQLite volume: [deploy/README.md](./deploy/README.md).
 - Reverse proxy with Caddy / Nginx (HTTPS, with optional Basic Auth as a second layer).
 - SQLite backups (cron + rclone to S3-compatible storage).
 - Moving to Postgres (single `DATABASE_URL` change, Prisma handles the rest).

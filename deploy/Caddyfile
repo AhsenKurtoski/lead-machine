@@ -1,0 +1,10 @@
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Do not advertise the server software.
+	header {
+		-Server
+	}
+
+	reverse_proxy app:3000
+}
