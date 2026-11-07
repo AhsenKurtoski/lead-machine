@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { rateLimitedResponse } from "@/lib/security";
 import { checkWebsite } from "@/lib/website-check";
-import { findWebsiteHeuristic } from "@/lib/website-finder";
+import { confirmWebsiteForLead, findWebsiteHeuristic } from "@/lib/website-finder";
 import { extractContactsFromHtml } from "@/lib/contact-extract";
 import { fetchPublicHtml } from "@/lib/url-safety";
 
@@ -57,8 +57,16 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     confidence = found.confidence;
     note = found.note;
     if (found.website) {
-      website = found.website;
-      updated.push("sito");
+      const confirmed = await confirmWebsiteForLead(found.website, lead);
+      if (confirmed) {
+        website = found.website;
+        updated.push("sito");
+      } else {
+        // Un candidato scartato non significa "sito assente": resta da
+        // verificare, altrimenti l'arricchimento direbbe una cosa non vera.
+        confidence = "media";
+        note = (note ? note + " " : "") + "Il dominio trovato non contiene la citta' o i contatti del lead: non lo salvo.";
+      }
     }
   }
 

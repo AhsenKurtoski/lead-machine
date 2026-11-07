@@ -29,6 +29,7 @@ import {
   emailDomain,
   isDisposableEmail,
   mxVerdictFromError,
+  preserveManualVerifications,
   summarizeVerification,
   type StoredVerification,
   type VerificationResult,
@@ -128,7 +129,14 @@ export async function verifyLead(leadId: string): Promise<VerifyOutcome | null> 
   let results: VerificationResult[] = [
     checkPhone({ phone: lead.phone, mobile: lead.mobile, whatsapp: lead.whatsapp }),
     checkEmail(email, mx),
-    checkWebsiteField({ website: lead.website }, http, false),
+    // Se una ricerca ufficiale ha gia' stabilito che il sito non esiste
+    // (`websiteStatus = assente`), il controllo puo' chiudere il campo come
+    // verificato: altrimenti resterebbe "da verificare" per sempre.
+    checkWebsiteField(
+      { website: lead.website },
+      http,
+      !url && lead.websiteStatus === "assente"
+    ),
     checkAddress({
       addressFull: lead.addressFull,
       city: lead.city,
@@ -146,10 +154,15 @@ export async function verifyLead(leadId: string): Promise<VerifyOutcome | null> 
   const checkedAt = new Date();
 
   // 3) Coda dei rinvii: si riparte dai tentativi gia' fatti per questo lead.
-  const alreadyQueued = await prisma.verificationRetry.findMany({
-    where: { leadId },
-    select: { field: true, attempts: true },
-  });
+  //    Insieme alla fotografia precedente, per non cancellare le verifiche
+  //    manuali di telefono e indirizzo quando il runner non le ha misurate.
+  const [alreadyQueued, previousRows] = await Promise.all([
+    prisma.verificationRetry.findMany({
+      where: { leadId },
+      select: { field: true, attempts: true },
+    }),
+    prisma.verification.findMany({ where: { leadId } }),
+  ]);
   const previousAttempts = new Map(alreadyQueued.map((r) => [r.field, r.attempts]));
 
   const scheduled: RetryQueueState["scheduled"] = [];
@@ -223,16 +236,30 @@ export async function verifyLead(leadId: string): Promise<VerifyOutcome | null> 
   // concorrenti -> 5 righe). Il controllo ripetibile e'
   // `node scripts/probe-verify-concurrency.mjs`; i doppioni nel database li
   // intercetta `npm run check:hygiene`.
+  //
+  // Telefono e indirizzo non hanno un controllo esterno: se il runner non li
+  // misura, conserva la verifica manuale precedente invece di cancellarla.
+  const snapshot = preserveManualVerifications(
+    results,
+    previousRows.map((row) => ({
+      field: row.field as VerificationResult["field"],
+      status: row.status as VerificationResult["status"],
+      source: row.source ?? "",
+      evidence: row.evidence ?? "",
+      checkedAt: row.checkedAt,
+    }))
+  );
+
   await prisma.$transaction([
     prisma.verification.deleteMany({ where: { leadId } }),
     prisma.verification.createMany({
-      data: results.map((r) => ({
+      data: snapshot.map((r) => ({
         leadId,
         field: r.field,
         status: r.status,
         source: r.source,
         evidence: r.evidence,
-        checkedAt,
+        checkedAt: r.checkedAt ?? checkedAt,
       })),
     }),
     ...queueOps,
@@ -253,7 +280,7 @@ export async function verifyLead(leadId: string): Promise<VerifyOutcome | null> 
     });
   }
 
-  const summary = summarizeVerification(results);
+  const summary = summarizeVerification(snapshot);
 
   await prisma.activity.create({
     data: {
@@ -277,7 +304,10 @@ export async function verifyLead(leadId: string): Promise<VerifyOutcome | null> 
   });
 
   return {
-    results: results.map((r) => ({ ...r, checkedAt: checkedAt.toISOString() })),
+    results: snapshot.map((r) => ({
+      ...r,
+      checkedAt: (r.checkedAt ?? checkedAt).toISOString(),
+    })),
     summary,
     queue: { scheduled, cleared },
   };

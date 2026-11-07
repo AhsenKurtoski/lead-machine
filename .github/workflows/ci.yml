@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
   schedule:
     # Audit settimanale delle dipendenze (lunedì 08:00 UTC)
     - cron: "0 8 * * 1"
@@ -77,6 +78,50 @@ jobs:
         # un errore; il controllo verifica che gli smoke test non lascino
         # dietro lead, chiavi, verifiche doppie o una coda incoerente.
         run: node --import tsx scripts/check-hygiene.mjs --require-db
+
+  live:
+    name: Live — smoke geo e performance
+    # Solo su schedule o avvio manuale: sono controlli che dipendono da servizi
+    # esterni (Overpass, Nominatim) e da una macchina con il server di
+    # produzione acceso. Non devono bloccare una pull request.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: file:./dev.db
+      APP_PASSWORD: live-ci-password-2026
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build di produzione
+        run: npm run build
+      - name: Database + seed
+        run: npm run setup
+      - name: Avvia il server di produzione
+        run: |
+          PORT=3111 npm start > /tmp/lead-machine-live.log 2>&1 &
+          ready=0
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3111/api/health || true)
+            if [ "$code" = "200" ]; then echo "server pronto (HTTP $code)"; ready=1; break; fi
+            sleep 2
+          done
+          if [ "$ready" != "1" ]; then
+            echo "server non pronto"
+            cat /tmp/lead-machine-live.log
+            exit 1
+          fi
+      - name: Smoke geografico live
+        run: SMOKE_BASE=http://localhost:3111 SMOKE_PASSWORD="$APP_PASSWORD" npm run smoke:geo
+      - name: Performance live
+        run: SMOKE_BASE=http://localhost:3111 SMOKE_PASSWORD="$APP_PASSWORD" npm run perf:check
+      - name: Log del server in caso di errore
+        if: failure()
+        run: cat /tmp/lead-machine-live.log
 
   audit:
     name: Audit dipendenze (settimanale)

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateWithSearch, hasGeminiKey } from "@/lib/ai";
 import { checkWebsite } from "@/lib/website-check";
-import { findWebsiteHeuristic } from "@/lib/website-finder";
+import { confirmWebsiteForLead, findWebsiteHeuristic } from "@/lib/website-finder";
 import { rateLimitedResponse } from "@/lib/security";
 
 export const runtime = "nodejs";
@@ -59,6 +59,10 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
     let confidence = "media";
     let note = "";
     const methods: string[] = [];
+    // Se Gemini ha risposto, il suo verdetto vale: non lo sostituiamo con un
+    // dominio generico pescato dal fallback gratuito. Il fallback serve solo
+    // quando l'AI non ha potuto rispondere.
+    let aiEvaluated = false;
 
     // 1) Gemini + Google Search (se la chiave e disponibile)
     if (await hasGeminiKey()) {
@@ -79,6 +83,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
         const r = await generateWithSearch({ prompt, maxTokens: 1024, temperature: 0.2 });
         const parsed = parseJsonLoose(r.text);
         if (parsed) {
+          aiEvaluated = true;
           const w = normalizeUrl(parsed.website);
           if (Boolean(parsed.hasWebsite) && w) website = w;
           instagram = normalizeUrl(parsed.instagram);
@@ -92,8 +97,10 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
       }
     }
 
-    // 2) Fallback GRATUITO con DuckDuckGo (nessuna API key) se manca un sito.
-    if (!website) {
+    // 2) Fallback GRATUITO con DuckDuckGo (nessuna API key) solo se l'AI non
+    // ha potuto rispondere. Se ha detto "nessun sito", non serve un ripiego
+    // che rischia di attribuire una directory all'attivita.
+    if (!website && !aiEvaluated) {
       try {
         const ddg = await findWebsiteHeuristic(name, city, category);
         if (ddg.website) {
@@ -104,6 +111,19 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
         methods.push("ricerca web");
       } catch {
         note = (note ? note + " " : "") + "Ricerca web gratuita non riuscita.";
+      }
+    }
+
+    // 3) Un dominio con il nome giusto ma in un'altra citta' non e' il sito
+    // dell'attivita'. La conferma usa citta', telefono o indirizzo reali.
+    if (website) {
+      const confirmed = await confirmWebsiteForLead(website, lead);
+      if (!confirmed) {
+        note =
+          (note ? note + " " : "") +
+          "Il dominio " + website + " non contiene la citta' o i contatti del lead: non lo salvo.";
+        website = null;
+        confidence = "media";
       }
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "lead-machine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": false,
   "description": "Open-source local lead generation platform — find, score and contact nearby businesses for free. 100% self-hosted, SQLite + Next.js.",
   "license": "MIT",

@@ -28,6 +28,13 @@ export type VerificationResult = {
 /** Esito salvato nel database: come sopra, piu quando e stato controllato. */
 export type StoredVerification = VerificationResult & { checkedAt: string };
 
+/**
+ * Fotografia pronta per il salvataggio: `checkedAt` e' la data della verifica
+ * precedente quando l'esito viene conservato, altrimenti `null` e il runner
+ * usa l'ora del controllo appena eseguito.
+ */
+export type VerificationSnapshot = VerificationResult & { checkedAt: Date | null };
+
 /** Fonte dei dati di base: OpenStreetMap (o inserimento manuale). */
 export const SOURCE_OSM = "openstreetmap";
 /** Verifica eseguita adesso dall'app (controllo diretto). */
@@ -363,6 +370,30 @@ export type VerificationSummary = {
   overall: "verificato" | "da_verificare" | "attenzione";
   label: string;
 };
+
+/**
+ * Un controllo live puo' solo confermare o smentire email e sito. Telefono e
+ * indirizzo, invece, non hanno un controllo esterno: il runner li rimette
+ * "da verificare" perche' non li ha misurati, ma questo non cancella una
+ * verifica manuale gia' fatta. Conserviamo quella fotografia (con la sua data)
+ * finche' un nuovo esito definitivo non la sostituisce. Se il dato viene
+ * modificato, la PATCH del lead elimina la vecchia verifica.
+ */
+export function preserveManualVerifications(
+  current: VerificationResult[],
+  previous: Array<VerificationResult & { checkedAt: Date | string }>
+): VerificationSnapshot[] {
+  const previousByField = new Map(previous.map((row) => [row.field, row]));
+  const manualFields = new Set<VerificationField>(["phone", "address"]);
+
+  return current.map((row) => {
+    const old = previousByField.get(row.field);
+    if (old && manualFields.has(row.field) && row.status === "da_verificare" && old.status === "verificato") {
+      return { ...old, checkedAt: new Date(old.checkedAt) };
+    }
+    return { ...row, checkedAt: null };
+  });
+}
 
 export function summarizeVerification(results: VerificationResult[]): VerificationSummary {
   const verified = results.filter((r) => r.status === "verificato").length;

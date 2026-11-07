@@ -124,7 +124,7 @@ L'arricchimento contatti (`Arricchisci contatti`) scarica la pagina del sito, es
 
 ## 8. Cosa NON e' coperto
 
-- **Controllo visivo e mobile**: nessun test automatico di rendering. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot` e un server avviato); la resa a occhio si verifica nel browser.
+- **Controllo visivo e mobile**: nessun test automatico di rendering. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot`, ffmpeg/ffprobe nel PATH e un server avviato). Il video esce a 1920×1080 con cursore, intro/outro, lower-third, dissolvenze e musica generata dal codice; la resa a occhio si verifica nel browser.
 - **Invio email reale**: senza `SMTP_HOST` configurato l'app scrive i file `.eml` in `./tmp/emails/` per scelta. L'invio via SMTP non e' esercitato dai test.
 - **Provider AI**: senza `GEMINI_API_KEY` o `GROQ_API_KEY` le funzioni AI rispondono `503`. Gli smoke non li interrogano (consumano quota).
 - **Servizi di terze parti**: disponibilita' e limiti di Overpass, Nominatim e Geoapify non dipendono da noi. L'app degrada con un warning e con i risultati delle altre fonti; gli smoke lo tollerano.
@@ -152,6 +152,7 @@ Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM 
 
 - **job "app"**: `npm run qa` e poi `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
 - **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie);
+- **job "live"** (solo schedulato o con `workflow_dispatch`): costruisce il server di produzione, prepara database e seed, avvia `next start` e lancia `npm run smoke:geo` e `npm run perf:check`. Non e' un job richiesto dalle pull request: dipende da Overpass/Nominatim e da una macchina con il server acceso, quindi un loro disservizio non deve bloccare una modifica. I budget di performance sono calibrati su `npm start`, non sul server di sviluppo. Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
 - **job "audit"** (solo settimanale): `npm audit` sulle dipendenze.
 
-`smoke:geo` e `perf:check` si lanciano in locale: `smoke:geo` dipende dai servizi esterni live, `perf:check` da una macchina con il server di produzione acceso (i budget sono calibrati su `npm start`, non sul server di sviluppo). Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
+`smoke:geo` e `perf:check` restano lanciabili anche in locale, con la stessa password e lo stesso `SMOKE_BASE` descritti sopra. `smoke:geo` dipende dai servizi esterni live, `perf:check` da una macchina con il server di produzione acceso.

@@ -15,7 +15,23 @@ const BLOCKED_HOSTS = [
   "g.co", "maps.app", "bing.", "duckduckgo.", "amazon.", "ebay.", "subito.",
   "kijiji.", "trovaprezzi.", "trustpilot.", "foursquare.", "2spaghi.",
   "prontopro.", "houzz.", "pinterest.", "wa.me", "whatsapp.", "t.me",
+  // Directory e marketplace che non sono il sito ufficiale dell'attivita.
+  "reteimprese.", "firmania.", "informazione-aziende.", "bepizzeria.",
+  "ricambicamper.", "paginegialle.it", "paginebianche.it",
 ];
+
+// Parole che descrivono la categoria, non il nome: da sole non bastano per
+// dire che un dominio appartiene all'attivita. Senza questo filtro un
+// risultato come "ricambicamper.it" veniva accettato perche' contiene
+// "camper", anche se non ha niente a che vedere con l'officina cercata.
+const GENERIC_TOKENS = new Set([
+  "auto", "autofficina", "officina", "camper", "service", "carrozzeria",
+  "autolavaggio", "azienda", "agricola", "studio", "estetica", "pizzeria",
+  "macelleria", "ristorante", "trattoria", "bar", "caffe", "hotel", "beb",
+  "affittacamere", "agriturismo", "panetteria", "gelateria", "parrucchiere",
+  "barbiere", "centro", "benessere", "spa", "palestra", "negozio", "market",
+  "supermarket", "gomme", "mediterraneo", "feltrino", "dental", "dentale",
+]);
 
 export type HeuristicResult = {
   website: string | null;
@@ -52,12 +68,60 @@ function decodeDdg(href: string): string | null {
   return null;
 }
 
-function nameTokens(name: string): string[] {
+function normalizedTokens(name: string): string[] {
   return name
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .split(" ")
     .filter((t) => t.length >= 4);
+}
+
+/** I token del nome che possono identificare davvero un dominio. */
+export function distinctiveNameTokens(name: string): string[] {
+  return normalizedTokens(name).filter((t) => !GENERIC_TOKENS.has(t));
+}
+
+/**
+ * Sceglie un candidato solo se il dominio contiene un token distintivo del
+ * nome. Un candidato generico viene restituito come `null`: meglio lasciare
+ * il dato da verificare che attribuire all'attivita il sito di un'altra.
+ */
+export function pickWebsiteCandidate(
+  name: string,
+  urls: string[],
+): { website: string | null; confidence: "alta" | "media"; note: string; candidates: string[] } {
+  const tokens = distinctiveNameTokens(name);
+  let best: string | null = null;
+  let bestScore = 0;
+
+  for (const url of urls) {
+    const host = hostOf(url);
+    if (isBlocked(host)) continue;
+    let score = 0;
+    for (const token of tokens) if (host.includes(token)) score += 1;
+    if (score > bestScore) {
+      bestScore = score;
+      best = url;
+    }
+  }
+
+  if (!best || tokens.length === 0) {
+    return {
+      website: null,
+      confidence: "media",
+      note: "Nessun sito ufficiale evidente trovato (solo portali, directory o domini non coerenti).",
+      candidates: urls,
+    };
+  }
+
+  return {
+    website: best,
+    confidence: "alta",
+    note: "Trovato un dominio coerente con il nome dell'attivita (verifica comunque che sia ufficiale).",
+    candidates: urls,
+  };
 }
 
 async function fetchText(url: string, timeoutMs: number): Promise<string> {
@@ -79,6 +143,56 @@ async function fetchText(url: string, timeoutMs: number): Promise<string> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Il dominio trovato parla davvero di questa attivita? Il solo nome non basta:
+ * un omonimo in un'altra citta' non e' il sito del lead. La conferma accetta
+ * la citta' nell'URL o nella pagina, oppure il telefono/indirizzo nella pagina.
+ * Se non c'e' nessun riscontro, il dominio non viene salvato.
+ */
+export function websiteMatchesLead(
+  input: { url: string; city?: string | null; phone?: string | null; addressFull?: string | null },
+  html: string,
+): boolean {
+  const raw = html || "";
+  const url = normalizeText(input.url);
+  const text = normalizeText(raw);
+  const city = normalizeText(input.city || "");
+  if (city.length >= 3 && (url.includes(city) || text.includes(city))) return true;
+
+  const digits = (input.phone || "").replace(/\D/g, "");
+  const phoneTail = digits.slice(-7);
+  // Il numero puo' stare in un attributo (href="tel:..."), che la
+  // normalizzazione dei tag rimuove: per il telefono si guarda l'HTML grezzo.
+  if (phoneTail.length >= 7 && raw.replace(/\D/g, "").includes(phoneTail)) return true;
+
+  const street = normalizeText((input.addressFull || "").split(",")[0]);
+  if (street.length >= 5 && text.includes(street)) return true;
+
+  return false;
+}
+
+/** Scarica la pagina del candidato e la confronta con i dati reali del lead. */
+export async function confirmWebsiteForLead(
+  website: string,
+  lead: { city?: string | null; phone?: string | null; mobile?: string | null; addressFull?: string | null },
+): Promise<boolean> {
+  const html = await fetchText(website, 12000);
+  return websiteMatchesLead(
+    { url: website, city: lead.city, phone: lead.phone || lead.mobile, addressFull: lead.addressFull },
+    html,
+  );
 }
 
 export async function findWebsiteHeuristic(
@@ -124,26 +238,6 @@ export async function findWebsiteHeuristic(
     };
   }
 
-  // Scelgo il dominio che assomiglia di piu al nome dell'attivita.
-  const tokens = nameTokens(name);
-  let best = urls[0];
-  let bestScore = -1;
-  for (const u of urls) {
-    const host = hostOf(u);
-    let score = 0;
-    for (const t of tokens) if (host.includes(t)) score += 2;
-    if (host.endsWith(".it")) score += 1;
-    if (score > bestScore) {
-      bestScore = score;
-      best = u;
-    }
-  }
-
-  const confidence: "alta" | "media" | "bassa" = bestScore >= 2 ? "alta" : "media";
-  const note =
-    confidence === "alta"
-      ? "Trovato un dominio coerente con il nome dell'attivita (verifica comunque che sia ufficiale)."
-      : "Trovato un possibile sito: controlla che sia il dominio ufficiale dell'attivita.";
-
-  return { website: best, confidence, note, candidates: urls };
+  // Scelgo solo un dominio che contiene un token distintivo del nome.
+  return pickWebsiteCandidate(name, urls);
 }

@@ -14,6 +14,7 @@
 [![Prisma + SQLite](https://img.shields.io/badge/Prisma-SQLite-2d3748?logo=prisma)](#)
 [![i18n — 7 languages](https://img.shields.io/badge/i18n-7_langs-7c3aed)](#)
 [![License: MIT](https://img.shields.io/github/license/AhsenKurtoski/lead-machine?color=0969da)](./LICENSE)
+[![Release](https://img.shields.io/github/v/release/AhsenKurtoski/lead-machine?color=2dd4bf)](https://github.com/AhsenKurtoski/lead-machine/releases)
 
 ---
 **👨‍💻 Created by Ahsen Kurtoski**
@@ -42,7 +43,7 @@
 |---|---|---|
 | ![Mappa](screenshots/mappa-desktop.png) | ![Ricerca lead](screenshots/ricerca-mobile.png) | ![Impostazioni](screenshots/impostazioni-desktop.png) |
 
-> Tutti gli screenshot e il video sono generati dal codice reale: con il server avviato, `APP_PASSWORD=… npm run screenshots` (PNG desktop + mobile) e `APP_PASSWORD=… npm run demo` (MP4 + GIF). Gli screenshot mostrano dashboard, ricerca, CRM, mappa, ricevute e impostazioni; il video aggiunge opportunità e stato sistema. Le versioni mobile sono in `screenshots/`.
+> Tutti gli screenshot e il video sono generati dal codice reale: con il server avviato, `APP_PASSWORD=… npm run screenshots` (PNG desktop + mobile) e `APP_PASSWORD=… npm run demo` (MP4 1080p con musica originale + GIF; richiede Playwright, ffmpeg e ffprobe). Gli screenshot mostrano dashboard, ricerca, CRM, mappa, ricevute e impostazioni; il video attraversa le stesse sezioni e la coda delle opportunità. Le versioni mobile sono in `screenshots/`.
 
 ---
 

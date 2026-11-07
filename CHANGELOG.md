@@ -3,9 +3,11 @@
 Tutte le modifiche rilevanti di Lead Machine.
 Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e il versionamento è [SemVer](https://semver.org/lang/it/).
 
-## [Unreleased]
+## [1.1.0] - 2026-11-07
 
 ### Aggiunto
+- **CI live per smoke geografico e performance**: nuovo job `live` in `.github/workflows/ci.yml`, eseguito solo su schedule settimanale o `workflow_dispatch`, che avvia il build di produzione e lancia `smoke:geo` e `perf:check`. Non blocca le pull request: dipende da servizi esterni e da una macchina con il server acceso.
+- **Video demo 1080p con colonna sonora originale**: `npm run demo` registra le scene reali a 1920×1080, mostra il cursore, applica intro/outro, lower-third, dissolvenze e musica generata proceduralmente (nessun campione esterno), e produce MP4 H.264/AAC + GIF. La scena Ricerca aspetta i risultati veri di OpenStreetMap/Geoapify invece di filmare il caricamento.
 - **Onboarding al primo avvio** (`/onboarding`): l'app non ha più una città o un brand "suoi". Al primo avvio chiede brand, nome e **città in cui cerchi i clienti**; la dashboard ricorda la configurazione finché non è completata, e si può saltare.
 - **Geocoding della città** (Nominatim / OpenStreetMap, nessuna chiave API): la città scritta in onboarding diventa coordinate, così ricerca, mappa e siti demo sono centrati dove lavori davvero.
 - **Risoluzione dell'area di ricerca** (`src/lib/search-area.ts`): coordinate esplicite nella richiesta → città geocodificata → coordinate salvate nelle impostazioni. Senza area configurata l'API risponde `400` con un messaggio chiaro invece di inventare una zona.
@@ -25,6 +27,8 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 - **Guard rail di igiene** (`npm run check:hygiene`, `scripts/check-hygiene.mjs`): fallisce se resta una **pagina vuota** (senza nessun elemento JSX, come un segnaposto con `return null`), un **link o una voce di menu** verso una rotta che non esiste più, una **pagina che nessuno può raggiungere**, un **layout senza pagina** o una **cartella vuota** sotto `src/`. Quando il database c'è controlla anche i **residui degli smoke test** (lead e chiavi lasciati dietro), le righe di verifica **orfane o doppie**, gli esiti o i campi che il codice non scrive più e la coda dei rinvii fuori regola. Fa parte di `npm run qa`, e la CI lo esegue anche **dopo** `smoke:api` con `--require-db`.
 
 ### Corretto
+- **La ricerca del sito non accetta più directory o omonimi**: `find-website` poteva salvare un portale o l'omonimo di un'altra città dopo un "nessun sito" dell'AI. Ora c'è una blocklist di directory, i token distintivi del nome devono comparire nel dominio, ogni candidato viene confermato da città/telefono/indirizzo e, se l'AI ha risposto che il sito non esiste, non parte nessun fallback. `enrich` applica la stessa conferma e `verify-runner` chiude come verificato un sito assente solo dopo la ricerca. Dieci test nuovi in `src/lib/website-finder.test.ts`.
+- **Le verifiche manuali di telefono e indirizzo non vengono cancellate** da una nuova verifica: il runner sostituiva l'intera fotografia e riportava a "da verificare" anche i dati già confermati a mano. Ora conserva le verifiche `verificato` di telefono e indirizzo (con fonte e data originali) quando il nuovo controllo non le misura; se il dato viene modificato dalla PATCH del lead, la vecchia verifica viene invalidata.
 - **Geocoding bloccato dal contatto segnaposto**: `OSM_CONTACT_EMAIL` finiva nello User-Agent con il valore di default `anonimo@example.com` e Nominatim rispondeva `403 Access denied` a **qualsiasi** città ("coordinate non trovate" per tutte). Ora il contatto viene validato (`src/lib/osm.ts`): un indirizzo segnaposto (`example.com`, `esempio.it`, `test.*`, `*.local`) viene ignorato e l'app si identifica con l'URL del progetto, sempre accettato.
 - **Geocoding con un secondo servizio reale**: se Nominatim non risponde la città viene cercata su **Photon** (komoot, OpenStreetMap, nessuna chiave), quindi la ricerca non resta senza area.
 - **Etichetta della provincia** letta dall'indirizzo strutturato (`format=jsonv2&addressdetails=1`): il nome esteso di Nominatim spesso non contiene più "Provincia di", quindi la provincia arriva dal campo `county` (oppure dal `county` di Photon) invece che da una regex sul nome.

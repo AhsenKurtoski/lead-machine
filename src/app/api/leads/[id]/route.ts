@@ -166,6 +166,29 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     if (b !== null) data.hasSocial = b;
   }
 
+  // Se cambia un dato verificabile, la vecchia fotografia non vale piu': il
+  // runner conserva le verifiche manuali di telefono e indirizzo, quindi senza
+  // questa pulizia un dato modificato resterebbe "verificato" per errore.
+  const changedVerificationFields = new Set<string>();
+  const verificationGroups: Array<[string, string[]]> = [
+    ["phone", ["phone", "mobile", "whatsapp"]],
+    ["email", ["email"]],
+    ["website", ["website", "websiteStatus", "hasWebsite"]],
+    ["address", ["addressFull", "city", "postalCode", "lat", "lng"]],
+    ["social", ["instagram", "facebook", "tiktok", "hasSocial"]],
+  ];
+  for (const [field, keys] of verificationGroups) {
+    if (
+      keys.some(
+        (key) =>
+          key in body &&
+          String(data[key] ?? "") !== String(existing[key as keyof typeof existing] ?? "")
+      )
+    ) {
+      changedVerificationFields.add(field);
+    }
+  }
+
   if (Array.isArray(body.tags)) {
     const rawTags = asArray(body.tags) || [];
     const names: string[] = rawTags
@@ -180,6 +203,12 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
   try {
     await prisma.lead.update({ where: { id }, data });
+
+    if (changedVerificationFields.size > 0) {
+      await prisma.verification.deleteMany({
+        where: { leadId: id, field: { in: [...changedVerificationFields] } },
+      });
+    }
 
     if (typeof data.status === "string" && data.status !== existing.status) {
       await prisma.activity.create({

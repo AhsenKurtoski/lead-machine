@@ -14,6 +14,7 @@ import {
   isDisposableEmail,
   mxVerdictFromError,
   phoneKind,
+  preserveManualVerifications,
   summarizeVerification,
   verifyLeadOffline,
 } from "./verify";
@@ -173,6 +174,39 @@ test("checkSocial: link presente ma non verificato, segnalato senza link, assent
 // ------------------------------------------------------------
 // Sintesi, invariate e doppioni
 // ------------------------------------------------------------
+
+test("preserveManualVerifications: non cancella telefono e indirizzo verificati a mano", () => {
+  const checkedAt = new Date("2026-10-13T12:00:00.000Z");
+  const previous = [
+    { field: "phone" as const, status: "verificato" as const, source: "ricerca_web", evidence: "Numero confermato sul sito ufficiale.", checkedAt },
+    { field: "address" as const, status: "verificato" as const, source: "ricerca_web", evidence: "Indirizzo confermato sul sito ufficiale.", checkedAt },
+  ];
+  const current = [
+    { field: "phone" as const, status: "da_verificare" as const, source: "openstreetmap", evidence: "Formato valido, raggiungibilita non confermata." },
+    { field: "address" as const, status: "da_verificare" as const, source: "openstreetmap", evidence: "Coerenza non verificata." },
+    { field: "email" as const, status: "da_verificare" as const, source: "openstreetmap", evidence: "MX non controllato." },
+    { field: "social" as const, status: "da_verificare" as const, source: "openstreetmap", evidence: "Profilo non aperto." },
+  ];
+
+  const merged = preserveManualVerifications(current, previous);
+  assert.equal(merged.find((r) => r.field === "phone")?.status, "verificato");
+  assert.equal(merged.find((r) => r.field === "address")?.status, "verificato");
+  assert.equal(merged.find((r) => r.field === "phone")?.evidence, "Numero confermato sul sito ufficiale.");
+  assert.equal(merged.find((r) => r.field === "phone")?.checkedAt?.toISOString(), checkedAt.toISOString());
+  assert.equal(merged.find((r) => r.field === "email")?.status, "da_verificare");
+  assert.equal(merged.find((r) => r.field === "social")?.status, "da_verificare");
+  assert.equal(merged.find((r) => r.field === "email")?.checkedAt, null);
+});
+
+test("preserveManualVerifications: un nuovo esito definitivo sostituisce quello vecchio", () => {
+  const merged = preserveManualVerifications(
+    [{ field: "phone", status: "non_valido", source: "controllo_diretto", evidence: "Numero troppo corto." }],
+    [{ field: "phone", status: "verificato", source: "ricerca_web", evidence: "Vecchio numero.", checkedAt: new Date("2026-10-13T12:00:00Z") }]
+  );
+  assert.equal(merged[0].status, "non_valido");
+  assert.equal(merged[0].evidence, "Numero troppo corto.");
+  assert.equal(merged[0].checkedAt, null);
+});
 
 test("summarizeVerification: verdetto coerente con gli esiti", () => {
   const ok = summarizeVerification([
