@@ -86,6 +86,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, messageId: res.messageId, provider: res.provider, file: res.file });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Errore durante l'invio dell'email";
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    const status = /SMTP non configurato/i.test(message) ? 503 : 500;
+    return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

@@ -7,8 +7,7 @@
 // segue i redirect uno alla volta e limita la dimensione del corpo letto.
 // ============================================================
 
-import { lookup } from "node:dns/promises";
-import net from "node:net";
+import { lookup as dnsLookup } from "node:dns";
 
 export type PublicFetchOptions = {
   timeoutMs?: number;
@@ -26,6 +25,34 @@ export type PublicFetchResult = {
 };
 
 const BLOCKED_HOST_SUFFIXES = [".localhost", ".local", ".internal", ".home.arpa", ".lan"];
+
+// Cloudflare Workers do not provide node:net, so these checks are pure JS.
+function isIPv4(value: string): boolean {
+  const parts = value.split(".");
+  return (
+    parts.length === 4 &&
+    parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) >= 0 && Number(part) <= 255)
+  );
+}
+
+function isIPv6(value: string): boolean {
+  const ip = value.replace(/^\[|\]$/g, "");
+  if (!ip.includes(":") || !/^[0-9a-f:.]+$/i.test(ip)) return false;
+  return ip.split("::").length <= 2;
+}
+
+function isIP(value: string): boolean {
+  return isIPv4(value) || isIPv6(value);
+}
+
+function lookupAll(hostname: string): Promise<{ address: string }[]> {
+  return new Promise((resolve, reject) => {
+    dnsLookup(hostname, { all: true, verbatim: true }, (error, addresses) => {
+      if (error) reject(error);
+      else resolve(addresses);
+    });
+  });
+}
 
 function ipv4ToInt(ip: string): number | null {
   const parts = ip.split(".").map((p) => Number(p));
@@ -62,11 +89,11 @@ const BLOCKED_V4 = [
 export function isPrivateAddress(address: string): boolean {
   const ip = address.trim().toLowerCase();
   if (!ip) return true;
-  if (net.isIPv4(ip)) {
+  if (isIPv4(ip)) {
     const value = ipv4ToInt(ip);
     return value === null || BLOCKED_V4.some((range) => inV4Range(value, range));
   }
-  if (net.isIPv6(ip)) {
+  if (isIPv6(ip)) {
     const compact = ip.replace(/^\[|\]$/g, "");
     if (compact === "::" || compact === "::1") return true;
     if (compact.startsWith("fc") || compact.startsWith("fd")) return true;
@@ -84,7 +111,7 @@ export function isBlockedHostname(hostname: string): boolean {
   if (!h) return true;
   if (h === "localhost" || h === "localhost.localdomain") return true;
   if (BLOCKED_HOST_SUFFIXES.some((suffix) => h.endsWith(suffix))) return true;
-  if (net.isIP(h)) return isPrivateAddress(h);
+  if (isIP(h)) return isPrivateAddress(h);
   return false;
 }
 
@@ -113,10 +140,10 @@ export async function assertPublicHttpUrl(
   if (isBlockedHostname(url.hostname)) {
     throw new Error("URL verso host locale o privato non consentito.");
   }
-  if (opts.resolveDns !== false && !net.isIP(url.hostname)) {
+  if (opts.resolveDns !== false && !isIP(url.hostname)) {
     let addresses: { address: string }[];
     try {
-      addresses = await lookup(url.hostname, { all: true, verbatim: true });
+      addresses = await lookupAll(url.hostname);
     } catch {
       throw new Error("Host non risolvibile.");
     }

@@ -50,6 +50,13 @@
     "build": "prisma generate && next build",
     "start": "next start -H 127.0.0.1",
     "start:public": "next start -H 0.0.0.0",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && wrangler dev",
+    "cf:deploy": "npm run cf:build && wrangler deploy",
+    "cf:migrate:local": "wrangler d1 migrations apply lead-machine --local",
+    "cf:migrate:remote": "wrangler d1 migrations apply lead-machine --remote",
+    "cf:seed:local": "wrangler d1 execute lead-machine --local --file=prisma/seed.sql",
+    "cf:seed:remote": "wrangler d1 execute lead-machine --remote --file=prisma/seed.sql",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
@@ -75,6 +82,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.16",
+    "@prisma/adapter-d1": "^5.22.0",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -98,6 +107,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261108.1",
     "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.2",
@@ -111,7 +121,8 @@
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.158.0"
   },
   "overrides": {
     "postcss": "^8.5.32",

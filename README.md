@@ -358,6 +358,9 @@ lead-machine/
 │   └── lib/              # Pure helpers + clients (prisma, mailer, ai, scoring, verify, receipts, onboarding, geocode, search-area, opportunities, security, i18n)
 ├── .env.example
 ├── Dockerfile
+├── wrangler.jsonc        # Cloudflare Workers + D1 (deploy gratuito)
+├── open-next.config.ts
+├── migrations/            # schema D1
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
 ├── SECURITY.md
@@ -374,17 +377,19 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for a deeper tour and the PR workflow.
 
 ---
 
-## 🐳 Deployment
+## ☁️ Deployment
 
 For **localhost use**, nothing beyond the Quick Start above is needed.
 
-If you'd like to host Lead Machine on a VPS, Vercel (⚠️ note about ephemeral SQLite), Fly.io, Coolify, etc — see [DEPLOY.md](./DEPLOY.md). It covers:
+**Gratis per sempre, senza carta:** [docs/CLOUDFLARE-FREE.md](./docs/CLOUDFLARE-FREE.md) spiega come pubblicare Lead Machine su **Cloudflare Workers + D1**, con HTTPS automatico e URL `workers.dev`. Non serve un VPS e non c'è un processo da supervisionare.
 
-- **Always-on Docker Compose** with automatic Caddy HTTPS, restart policies and a persistent SQLite volume: [deploy/README.md](./deploy/README.md).
-- Reverse proxy with Caddy / Nginx (HTTPS, with optional Basic Auth as a second layer).
-- SQLite backups (cron + rclone to S3-compatible storage).
-- Moving to Postgres (single `DATABASE_URL` change, Prisma handles the rest).
-- Vercel / serverless caveats (⚠️ you will lose your DB on cold restarts unless you attach a persistent volume).
+Se preferisci un host Docker (VPS, Coolify, ecc.), [DEPLOY.md](./DEPLOY.md) copre anche:
+
+- **Docker Compose + Caddy** con HTTPS automatico e volume SQLite persistente: [deploy/README.md](./deploy/README.md).
+- Reverse proxy con Caddy / Nginx (HTTPS, con Basic Auth opzionale come secondo livello).
+- Backup SQLite (cron + rclone su storage S3-compatible).
+- Passaggio a Postgres (cambia `DATABASE_URL`, Prisma gestisce il resto).
+- Vercel / serverless: ⚠️ il filesystem è effimero; usa un database gestito o un volume persistente.
 
 ---
 

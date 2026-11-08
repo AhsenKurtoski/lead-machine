@@ -123,14 +123,17 @@ export async function POST(req: Request) {
     const existing = new Set(existingRows.map((row) => normKey(row.name, row.city)));
 
     let created = 0;
-    await prisma.$transaction(async (tx) => {
-      for (const row of prepared) {
-        const key = normKey(row.name, row.city);
-        if (existing.has(key)) {
-          skipped++;
-          continue;
-        }
-        await tx.lead.create({
+    // D1 has no interactive transactions. Build the whole batch first so all
+    // rows (and their initial activity) are committed atomically.
+    const creates: Array<ReturnType<typeof prisma.lead.create>> = [];
+    for (const row of prepared) {
+      const key = normKey(row.name, row.city);
+      if (existing.has(key)) {
+        skipped++;
+        continue;
+      }
+      creates.push(
+        prisma.lead.create({
           data: {
             ...row,
             source: "import_csv",
@@ -138,11 +141,12 @@ export async function POST(req: Request) {
               create: { type: "sistema", description: "Lead importato da CSV" },
             },
           },
-        });
-        existing.add(key);
-        created++;
-      }
-    });
+        })
+      );
+      existing.add(key);
+      created++;
+    }
+    if (creates.length > 0) await prisma.$transaction(creates);
 
     return NextResponse.json({ ok: true, created, skipped });
   } catch (err) {

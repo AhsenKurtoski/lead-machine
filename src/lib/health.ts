@@ -627,7 +627,7 @@ async function integrationSection(settings: Record<string, string>): Promise<Hea
       ok(
         "integration.smtp",
         "Invio email",
-        "SMTP non configurato: l'app salva le email come file .eml in tmp/emails.",
+        "SMTP non configurato. In locale l'app salva le email come file .eml; su Cloudflare serve SMTP.",
         "Configura SMTP in Impostazioni per l'invio reale."
       )
     );

@@ -44,23 +44,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Lead non trovato" }, { status: 404 });
   }
 
-  // Numero progressivo per anno, calcolato e scritto nella stessa transazione.
-  // Il vincolo @unique su Receipt.number e' la garanzia finale: se due richieste
-  // concorrenti scelgono lo stesso numero, una fallisce con P2002 e riprova.
+  // Numero progressivo per anno. D1 non supporta transazioni interattive:
+  // leggiamo l'ultimo numero, poi creiamo ricevuta e attivita in un'unica
+  // transazione batch. Il vincolo @unique su Receipt.number resta la garanzia
+  // finale: se due richieste concorrenti scelgono lo stesso numero, una
+  // fallisce con P2002 e riprova.
   let receipt: Awaited<ReturnType<typeof prisma.receipt.create>> | null = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      receipt = await prisma.$transaction(async (tx) => {
-        const prefix = "RICEVUTA-" + new Date().getFullYear() + "-";
-        const last = await tx.receipt.findFirst({
-          where: { number: { startsWith: prefix } },
-          orderBy: { number: "desc" },
-          select: { number: true },
-        });
-        const lastSeq = last ? Number(last.number.slice(prefix.length)) : 0;
-        const number = generateReceiptNumber((Number.isFinite(lastSeq) ? lastSeq : 0) + 1);
+      const prefix = "RICEVUTA-" + new Date().getFullYear() + "-";
+      const last = await prisma.receipt.findFirst({
+        where: { number: { startsWith: prefix } },
+        orderBy: { number: "desc" },
+        select: { number: true },
+      });
+      const lastSeq = last ? Number(last.number.slice(prefix.length)) : 0;
+      const number = generateReceiptNumber((Number.isFinite(lastSeq) ? lastSeq : 0) + 1);
 
-        const created = await tx.receipt.create({
+      const [created] = await prisma.$transaction([
+        prisma.receipt.create({
           data: {
             leadId,
             number,
@@ -70,18 +72,16 @@ export async function POST(req: NextRequest) {
             paidAt,
             notes: notes || null,
           },
-        });
-
-        await tx.activity.create({
+        }),
+        prisma.activity.create({
           data: {
             leadId,
             type: "sistema",
             description: "Ricevuta di pagamento " + number + " registrata",
           },
-        });
-
-        return created;
-      });
+        }),
+      ]);
+      receipt = created;
       break;
     } catch (e) {
       const code = typeof e === "object" && e !== null && "code" in e ? (e as { code?: string }).code : null;

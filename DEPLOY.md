@@ -3,12 +3,15 @@
 Lead Machine is a standard Next.js app. It runs great:
 
 - **Locally** (default) on any laptop — `npm run dev` or `npm run build && npm start`.
+- **Gratis online su Cloudflare Workers + D1** — nessun VPS, nessuna carta, HTTPS e URL `workers.dev`: [docs/CLOUDFLARE-FREE.md](./docs/CLOUDFLARE-FREE.md).
 - **On a VPS** (Hetzner, DigitalOcean, OVH, Contabo, etc.) behind Caddy / Nginx.
 - **On Coolify / CapRover / Dokku** with a Dockerfile.
 - **On Fly.io / Render / Railway** with a persistent volume (SQLite needs disk).
 - On **Vercel / Netlify / serverless** ⚠️ — read the caveats below; ephemeral storage will erase your DB on cold starts. Use Postgres or attach a real volume.
 
-> **Always-on, reproducible:** the ready-made [deploy/](./deploy/README.md) stack runs Docker Compose + Caddy (automatic HTTPS) + a named SQLite volume, with restart policies and healthchecks. Use it when you want the app and `/api/v1/*` to stay available 24/7.
+> **Gratis, senza carta:** usa [docs/CLOUDFLARE-FREE.md](./docs/CLOUDFLARE-FREE.md) con Cloudflare Workers + D1. È la strada consigliata per un'istanza online sempre disponibile senza costi ricorrenti.
+>
+> **Docker/VPS (opzionale):** the ready-made [deploy/](./deploy/README.md) stack runs Docker Compose + Caddy (automatic HTTPS) + a named SQLite volume, with restart policies and healthchecks. Use it only if you already have a host; non è un servizio gratuito garantito.
 
 ---
 
@@ -22,7 +25,7 @@ Lead Machine is a standard Next.js app. It runs great:
 
 ---
 
-## 2. VPS + Caddy (recommended simple setup)
+## 2. VPS + Caddy (opzionale, host a pagamento)
 
 Target OS: **Debian 12 / Ubuntu 24.04 LTS x86_64**. Works on 1 vCPU / 1 GB RAM (the cheapest Hetzner CX11 or DigitalOcean Basic works fine).
 

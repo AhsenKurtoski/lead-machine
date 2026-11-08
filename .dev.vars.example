@@ -1,0 +1,5 @@
+# Copy this file to .dev.vars for local Wrangler previews.
+# .dev.vars is ignored by Git; never put a production password in this file.
+
+APP_PASSWORD=local-password-at-least-8-chars
+NEXT_PUBLIC_BASE_URL=http://localhost:8787

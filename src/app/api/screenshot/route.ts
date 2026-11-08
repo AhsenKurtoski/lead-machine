@@ -1,14 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { captureWebsite } from "@/lib/screenshot";
 import { rateLimitedResponse, asString } from "@/lib/security";
-import { assertPublicHttpUrl } from "@/lib/url-safety";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  // Playwright and the filesystem are not available in a Worker. Fail with a
+  // clear 501 before touching the database or the URL validator.
+  if (process.env.CLOUDFLARE_WORKERS === "1") {
+    return NextResponse.json(
+      {
+        ok: false,
+        needsInstall: true,
+        error:
+          "Gli screenshot dei siti non sono disponibili su Cloudflare Workers. Usa l'installazione locale per questa funzione.",
+      },
+      { status: 501 }
+    );
+  }
+
+  // Carica Playwright e il validatore URL solo nell'installazione locale:
+  // gli import statici farebbero fallire il modulo della route sul Worker.
+  const [{ captureWebsite }, { assertPublicHttpUrl }] = await Promise.all([
+    import("@/lib/screenshot"),
+    import("@/lib/url-safety"),
+  ]);
+
   const rl = await rateLimitedResponse(req, "screenshot:capture", 15, 60000);
   if (rl) return rl;
 

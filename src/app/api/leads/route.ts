@@ -200,13 +200,13 @@ export async function POST(req: Request) {
       }
 
       try {
-        await prisma.$transaction(async (tx) => {
-          // Nessuna citta inventata: se il candidato non ne ha una, resta null
-          // (l'utente la compila dopo, se serve).
-          const defaultsCity = c.city ||
-            (typeof process.env.NEXT_PUBLIC_SEARCH_CITY === "string" && process.env.NEXT_PUBLIC_SEARCH_CITY) ||
-            "";
-          const lead = await tx.lead.create({
+        // D1 does not support interactive transactions. A batch transaction is
+        // atomic, and the notification does not need the new lead's generated id.
+        const defaultsCity = c.city ||
+          (typeof process.env.NEXT_PUBLIC_SEARCH_CITY === "string" && process.env.NEXT_PUBLIC_SEARCH_CITY) ||
+          "";
+        await prisma.$transaction([
+          prisma.lead.create({
             data: {
               name: c.name,
               category: c.category,
@@ -234,19 +234,19 @@ export async function POST(req: Request) {
                 create: { type: "sistema", description: "Lead importato da ricerca OpenStreetMap" },
               },
             },
-          });
-          await tx.notification.create({
+          }),
+          prisma.notification.create({
             data: {
               type: "nuovo_lead",
-              title: `Nuovo lead: ${lead.name}`,
-              message: `${lead.subcategory ?? ""} - priorita ${lead.priorityScore}`,
+              title: `Nuovo lead: ${c.name}`,
+              message: `${c.categoryLabel ?? ""} - priorita ${c.priorityScore}`,
               link: "/crm",
             },
-          });
-          saved++;
-          if (c.osmId) existingByOsm.add(c.osmId);
-          existingByName.add(nameCity);
-        });
+          }),
+        ]);
+        saved++;
+        if (c.osmId) existingByOsm.add(c.osmId);
+        existingByName.add(nameCity);
       } catch {
         // Duplicato da race condition o errore: skip per non rompere tutto.
         skipped++;

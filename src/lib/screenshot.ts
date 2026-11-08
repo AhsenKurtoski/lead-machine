@@ -3,15 +3,32 @@
 // Modulo OPZIONALE: se Playwright non e installato restituisce un
 // errore chiaro, senza mai far crashare l'app. Solo lato server.
 // ============================================================
-import path from "path";
-import { promises as fs } from "fs";
 import { assertPublicHttpUrl, isBlockedHostname } from "@/lib/url-safety";
+
+// Cloudflare Workers have no filesystem or Chromium. The screenshot feature is
+// therefore local-only; loading it through an opaque dynamic import keeps the
+// optional Playwright dependency out of the Worker bundle.
+const dynamicImport = new Function("specifier", "return import(specifier)") as (
+  specifier: string
+) => Promise<any>;
+
+function isCloudflareRuntime(): boolean {
+  return process.env.CLOUDFLARE_WORKERS === "1" || process.env.DATABASE_PROVIDER === "d1";
+}
 
 export type ScreenshotResult =
   | { ok: true; publicPath: string }
   | { ok: false; error: string; needsInstall?: boolean };
 
 export async function captureWebsite(rawUrl: string, leadId: string): Promise<ScreenshotResult> {
+  if (isCloudflareRuntime()) {
+    return {
+      ok: false,
+      needsInstall: true,
+      error: "Gli screenshot dei siti non sono disponibili su Cloudflare Workers. Usa l'installazione locale per questa funzione.",
+    };
+  }
+
   let url = (rawUrl || "").trim();
   if (!url) return { ok: false, error: "Il lead non ha un sito web da catturare." };
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
@@ -24,10 +41,13 @@ export async function captureWebsite(rawUrl: string, leadId: string): Promise<Sc
 
   // Import dinamico: nessun errore a build-time se il pacchetto manca.
   let chromium: any;
+  let path: typeof import("node:path");
+  let fs: typeof import("node:fs/promises");
   try {
-    // @ts-ignore - dipendenza opzionale, potrebbe non essere installata
-    const pw: any = await import("playwright");
+    const pw: any = await dynamicImport("playwright");
     chromium = pw.chromium;
+    path = await dynamicImport("node:path");
+    fs = await dynamicImport("node:fs/promises");
   } catch {
     return {
       ok: false,

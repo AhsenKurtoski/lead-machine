@@ -6,7 +6,8 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 ## [Unreleased]
 
 ### Aggiunto
-- **Deploy always-on con Docker Compose + Caddy**: `Dockerfile` di produzione, stack in `deploy/`, HTTPS automatico, restart supervisionato, healthcheck, volume SQLite persistente e script di backup/ripristino. La guida operativa è in `deploy/README.md`.
+- **Deploy gratuito su Cloudflare Workers + D1**: adapter Prisma D1, migrazione e seed D1, build OpenNext/Wrangler, transazioni batch compatibili con D1 e guida `docs/CLOUDFLARE-FREE.md`. Il piano Workers Free non richiede carta di credito.
+- **Deploy always-on con Docker Compose + Caddy**: `Dockerfile` di produzione, stack in `deploy/`, HTTPS automatico, restart supervisionato, healthcheck, volume SQLite persistente e script di backup/ripristino. La guida operativa è in `deploy/README.md`; richiede un host Docker e non è la strada gratuita garantita.
 
 ## [1.1.0] - 2026-11-07
 

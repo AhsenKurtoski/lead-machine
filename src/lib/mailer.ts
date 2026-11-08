@@ -55,6 +55,10 @@ export type SendEmailInput = {
   attachments?: EmailAttachment[];
 };
 
+function isCloudflareRuntime(): boolean {
+  return process.env.CLOUDFLARE_WORKERS === "1" || process.env.DATABASE_PROVIDER === "d1";
+}
+
 export async function sendEmail(
   input: SendEmailInput,
 ): Promise<{ ok: true; messageId: string; provider: string; file?: string }> {
@@ -65,7 +69,14 @@ export async function sendEmail(
 
   // Fallback sicuro: senza SMTP scriviamo un file .eml in ./tmp/emails.
   // Cosi demo, sviluppo e test non richiedono credenziali e non inviano nulla.
+  // Su Workers non esiste un filesystem scrivibile: meglio un errore chiaro
+  // che un 500 opaco. Per inviare email online configura SMTP in Impostazioni.
   if (!c.host || !c.user || !c.pass) {
+    if (isCloudflareRuntime()) {
+      throw new Error(
+        "SMTP non configurato. Su Cloudflare il fallback .eml non è disponibile: configura host, utente e password SMTP in Impostazioni."
+      );
+    }
     const transporter = nodemailer.createTransport({
       streamTransport: true,
       buffer: true,

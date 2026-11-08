@@ -1,5 +1,7 @@
 # Lead Machine always-on
 
+> **Questa guida richiede un host Docker e non è un'opzione gratuita garantita.** Per il deploy online gratuito, senza carta e senza VPS, usa [docs/CLOUDFLARE-FREE.md](../docs/CLOUDFLARE-FREE.md) con Cloudflare Workers + D1.
+
 Questa cartella contiene un deploy riproducibile per tenere Lead Machine e la sua API sempre disponibili:
 
 - **Caddy** davanti all'app, con HTTPS automatico (Let's Encrypt);

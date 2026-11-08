@@ -20,7 +20,6 @@ const nextConfig = {
   outputFileTracingRoot: projectRoot,
   // In Next 15 la chiave e' passata da `experimental` a top-level: con il vecchio
   // nome Next la ignorava (e avvisava a ogni avvio).
-  serverExternalPackages: ["playwright"],
   experimental: {
     optimizePackageImports: [
       "lucide-react",
