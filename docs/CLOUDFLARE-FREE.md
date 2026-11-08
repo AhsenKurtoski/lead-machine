@@ -145,6 +145,28 @@ npx wrangler d1 export lead-machine --remote --output=lead-machine-backup.sql
 
 Conserva il file fuori dal repository e verifica che contenga i dati attesi. Il comando di importazione va usato solo su un database di prova o dopo aver letto la documentazione D1: un import non è un semplice “ripristino” automatico.
 
+### Backup automatico su Windows
+
+Il progetto include `npm run backup:d1`: crea un export nella cartella **`%USERPROFILE%\Lead-Machine-Backups`** (fuori dal repository), verifica che il file non sia vuoto e scrive l’esito in `backup.log`. Non elimina i backup precedenti.
+
+Per eseguirlo manualmente:
+
+```bash
+npm run backup:d1
+```
+
+Per programmarlo ogni giorno alle 03:00 con Windows Task Scheduler, dalla cartella del progetto:
+
+```powershell
+$project = (Get-Location).Path
+$action = New-ScheduledTaskAction -Execute 'C:\Program Files\nodejs\node.exe' -Argument ('"' + $project + '\scripts\backup-d1.mjs"') -WorkingDirectory $project
+$trigger = New-ScheduledTaskTrigger -Daily -At 3:00AM
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+Register-ScheduledTask -TaskName 'Lead Machine D1 Daily Backup' -Action $action -Trigger $trigger -Settings $settings -Force
+```
+
+L’attività gira con l’utente Windows corrente: se il computer è spento o l’utente non è disponibile, il backup parte alla successiva occasione grazie a `StartWhenAvailable`. Il file contiene dati e possibili impostazioni del database: conservalo in una cartella privata e, per una protezione maggiore, copialo anche su un supporto esterno.
+
 ---
 
 ## 8. Cosa non funziona su Workers

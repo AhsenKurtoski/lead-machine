@@ -57,6 +57,7 @@
     "cf:migrate:remote": "wrangler d1 migrations apply lead-machine --remote",
     "cf:seed:local": "wrangler d1 execute lead-machine --local --file=prisma/seed.sql",
     "cf:seed:remote": "wrangler d1 execute lead-machine --remote --file=prisma/seed.sql",
+    "backup:d1": "node scripts/backup-d1.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
