@@ -47,6 +47,30 @@
 
 ---
 
+## 📊 Project impact & development
+
+| Indicatore | Dato |
+|---|---|
+| **Tempo di sviluppo** | Circa **3 mesi** |
+| **Utilizzo dichiarato** | **17 persone** hanno utilizzato il progetto |
+| **Diffusione / notorietà** | Conosciuto da **centinaia di persone, potenzialmente migliaia** (stima di visibilità, non numero di utenti) |
+| **Costo del software** | **€0** — open source, MIT, senza abbonamenti |
+
+### Il problema che risolve
+
+Lead Machine riunisce in un'unica piattaforma attività che normalmente richiedono strumenti separati e molto lavoro manuale. Aiuta freelance e piccole agenzie a:
+
+- trovare attività e potenziali clienti in una determinata città o area geografica, senza dover cercare manualmente decine di siti;
+- individuare opportunità commerciali, ad esempio attività senza sito web o con una presenza online da migliorare;
+- organizzare e dare priorità ai contatti, invece di gestire informazioni sparse tra fogli, app e note;
+- controllare e verificare i dati disponibili prima di contattare un'attività;
+- preparare messaggi e script di contatto con il supporto AI opzionale;
+- seguire contatti, conversazioni e promemoria in un CRM integrato.
+
+**Nota sui numeri:** le 17 persone indicano l'utilizzo dichiarato; la notorietà è una stima di diffusione e non va interpretata come 17 o centinaia di utenti attivi.
+
+---
+
 ## Why Lead Machine?
 
 Freelancers and small web agencies waste dozens of hours per year on **subscription tools** just to find, contact, and follow up with local prospects. The typical stack costs €50–€200/mo and locks your data inside a SaaS.
