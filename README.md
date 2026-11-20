@@ -1,5 +1,7 @@
 # Lead Machine
 
+![Lead Machine — dashboard](screenshots/dashboard-desktop.png)
+
 > **Open-source, self-hosted, local-first lead generation platform for freelancers and small agencies.**
 > Find nearby businesses on OpenStreetMap, score them, verify their contact data and reach out — with optional AI help — **for €0 in subscriptions**.
 
@@ -225,11 +227,10 @@ See [SECURITY.md](./SECURITY.md) for the full policy, audit scope and disclosure
 
 ---
 
-## 🌐 Website & live demo
+## 🌐 Demo
 
-This repository contains **only Lead Machine, the app**. The public marketing site and the in-browser demo are maintained as a separate project.
+There is **no public demo**: Lead Machine runs on your own machine, with your own data. The video and the screenshots above come from the real app.
 
-- 🌍 **Live demo**: <https://website-mocha-one-59.vercel.app> — real OpenStreetMap search, rule-based lead scoring, cold-email generation in your browser.
 - 💻 **This repo**: everything you need to self-host Lead Machine (app + docs + CI).
 
 ---
