@@ -29,7 +29,7 @@
 
 <div align="center">
 
-[![Lead Machine — demo del prodotto](docs/assets/lead-machine-demo.gif)](docs/assets/lead-machine-demo.mp4)
+[![Lead Machine — dashboard, CRM e coda delle opportunità, registrati dall app in esecuzione](docs/assets/lead-machine-tour.gif)](docs/assets/lead-machine-demo.mp4)
 
 **▶ [Guarda il video demo completo (MP4)](docs/assets/lead-machine-demo.mp4)**
 
