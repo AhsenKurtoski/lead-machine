@@ -37,6 +37,83 @@ jobs:
       - name: Auth, CSRF, header e fail-closed
         run: npm run check:auth
 
+  workers:
+    name: Worker Cloudflare — build OpenNext e smoke con D1 locale
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Nessuna credenziale Cloudflare: build e wrangler dev girano in locale.
+    # Il job esiste perché il target online del progetto è Workers + D1 e il
+    # solo `next build` non prova il percorso di deploy: il build OpenNext si
+    # rompe a ogni bump di Next o dell'adapter, e lo si scoprirebbe solo al
+    # momento del deploy, con il database già migrato.
+    env:
+      # Prisma vuole un URL anche quando i dati vivono in D1: senza questa
+      # variabile `prisma generate` e il build falliscono.
+      DATABASE_URL: file:./dev.db
+      # Next incorpora questo valore nel bundle: va impostato prima del build.
+      NEXT_PUBLIC_BASE_URL: http://127.0.0.1:8799
+      CI: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Wrangler 4 richiede Node 22 o successivo: con Node 20 la migrazione
+          # D1 e `wrangler dev` si fermano prima di partire.
+          node-version: 22
+          cache: npm
+
+      - name: Installa dipendenze
+        run: npm ci
+
+      - name: Genera il client Prisma
+        run: npx prisma generate
+
+      - name: Build del Worker (OpenNext)
+        run: npm run cf:build
+
+      - name: Migrazioni e seed sul D1 locale
+        run: |
+          npm run cf:migrate:local
+          npm run cf:seed:local
+
+      - name: Smoke del Worker con binding D1
+        env:
+          # Password solo per il server effimero del job.
+          APP_PASSWORD: ci-worker-password-2026
+        run: |
+          printf 'APP_PASSWORD=%s\nNEXT_PUBLIC_BASE_URL=http://127.0.0.1:8799\n' "$APP_PASSWORD" > .dev.vars
+          npx wrangler dev --port 8799 --ip 127.0.0.1 > /tmp/worker.log 2>&1 &
+          ready=0
+          for i in $(seq 1 40); do
+            if curl -sf http://127.0.0.1:8799/api/health > /dev/null; then ready=1; break; fi
+            sleep 3
+          done
+          if [ "$ready" != "1" ]; then
+            echo "Worker non pronto su /api/health"
+            cat /tmp/worker.log
+            exit 1
+          fi
+          echo -n "health: "; curl -s http://127.0.0.1:8799/api/health; echo
+          dash=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8799/dashboard)
+          login=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8799/login)
+          echo "dashboard=$dash login=$login"
+          if [ "$dash" != "307" ]; then
+            echo "atteso 307 su /dashboard (fail-closed senza sessione)"
+            cat /tmp/worker.log
+            exit 1
+          fi
+          if [ "$login" != "200" ]; then
+            echo "atteso 200 su /login"
+            cat /tmp/worker.log
+            exit 1
+          fi
+
+      - name: Log del Worker in caso di errore
+        if: failure()
+        run: |
+          if [ -f /tmp/worker.log ]; then cat /tmp/worker.log; else echo "nessun log del Worker"; fi
+
   smoke-api:
     name: API key end-to-end (smoke:api)
     runs-on: ubuntu-latest
