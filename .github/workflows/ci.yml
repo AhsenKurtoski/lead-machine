@@ -58,7 +58,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Wrangler 4 richiede Node 22 o successivo: con Node 20 la migrazione
+          # D1 e `wrangler dev` si fermano prima di partire.
+          node-version: 22
           cache: npm
 
       - name: Installa dipendenze
@@ -109,7 +111,8 @@ jobs:
 
       - name: Log del Worker in caso di errore
         if: failure()
-        run: cat /tmp/worker.log
+        run: |
+          if [ -f /tmp/worker.log ]; then cat /tmp/worker.log; else echo "nessun log del Worker"; fi
 
   smoke-api:
     name: API key end-to-end (smoke:api)
