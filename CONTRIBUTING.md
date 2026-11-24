@@ -57,7 +57,7 @@ Useful scripts:
 | `npm run dev` | Next.js dev server with hot reload |
 | `npm run build` | Production build (also runs `prisma generate`) |
 | `npm start` | Runs the production build |
-| `npm run lint` | Lint with `next lint` (ESLint) |
+| `npm run lint` | Lint with `eslint .` (ESLint 9, flat config) |
 | `npm run typecheck` | Runs `tsc --noEmit` |
 | `npm test` | Unit tests (`node:test` + `tsx`) for the pure helpers in `src/lib/*.test.ts` |
 | `npm run qa` | The full gate: typecheck + lint + i18n parity + content and hygiene guard rails + tests |

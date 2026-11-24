@@ -70,7 +70,6 @@ export function ScreenshotCard({
           rel="noreferrer"
           className="block overflow-hidden rounded-lg border"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={shot} alt="Screenshot del sito" className="w-full" />
         </a>
       ) : !error ? (
