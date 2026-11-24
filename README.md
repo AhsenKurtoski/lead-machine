@@ -487,10 +487,12 @@ Nothing here is simulated: the checks below talk to the real services (OpenStree
 | `npm run check:ui` | console errors, hydration mismatches, `401`/`5xx` API calls, horizontal overflow and WCAG A/AA violations (axe-core) across 17 pages, in light and dark theme (Playwright, needs a running server) |
 | `npm run check:hygiene` | empty pages, links and menu entries pointing at removed routes, unreachable pages, `layout` files without a page, empty folders, and (when the DB exists) leftovers and inconsistent verification rows |
 | `npm run smoke:api` | end-to-end API-key behaviour against a running production server: access profiles, scope enforcement, `401/403/404`, CORS preflight |
+| `npm run test:flows` | the key flows against a running server: lead data and verification, CSV import, payment receipts, bulk actions — values saved, rejections, dedupe, cascades |
+| `npm run check:schema` | `migrations/*.sql` applied to an empty SQLite database produce exactly `prisma/schema.prisma` (no drift between local `db push` and D1) |
 | `npm run smoke:geo` | live geographic sources through the app: Overpass, Geoapify, real city geocoding without coordinates, public `/api/v1/search` |
 | `npm run perf:check` | real response time and payload size of the key pages/APIs, failing when a budget is exceeded |
 
-Smoke and perf checks need a server: `npm run build`, then `PORT=3111 npm start` (override the address with `SMOKE_BASE`). `smoke:api` also needs a session: pass the server's password with `SMOKE_PASSWORD` (CI sets `APP_PASSWORD` for its ephemeral server).
+Smoke and perf checks need a server: `npm run build`, then `PORT=3111 npm start` (override the address with `SMOKE_BASE`). `smoke:api` and `test:flows` also need a session: pass the server's password with `SMOKE_PASSWORD` (CI sets `APP_PASSWORD` for its ephemeral server). `test:flows` creates its own leads (prefixed `Flussi Test —`) and removes them again, so repeated runs leave nothing behind.
 
 ---
 
