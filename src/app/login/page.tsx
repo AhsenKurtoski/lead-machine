@@ -51,6 +51,17 @@ export default function LoginPage() {
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
+            {/* Campo utente nascosto: l'app ha una sola password, ma i password
+                manager (e il controllo di Chrome) cercano un campo username
+                associato al campo password. Nascosto, non compilabile. */}
+            <input
+              type="text"
+              name="username"
+              autoComplete="username"
+              defaultValue="lead-machine"
+              readOnly
+              hidden
+            />
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"

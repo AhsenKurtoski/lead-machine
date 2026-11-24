@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { priorityMarkerColor } from "@/lib/utils";
 
 export type MapLead = {
   id: string;
@@ -36,13 +37,6 @@ function centerFor(leads: MapLead[]): [number, number] {
 const OSM_TILE_URL =
   "https://" + "{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
-export function colorForScore(score: number): string {
-  if (score >= 80) return "#dc2626";
-  if (score >= 60) return "#ea580c";
-  if (score >= 40) return "#d97706";
-  return "#71717a";
-}
-
 export default function LeadsMap({ leads }: { leads: MapLead[] }) {
   const center = centerFor(leads);
   return (
@@ -57,7 +51,7 @@ export default function LeadsMap({ leads }: { leads: MapLead[] }) {
         url={OSM_TILE_URL}
       />
       {leads.map((l) => {
-        const color = colorForScore(l.priorityScore);
+        const color = priorityMarkerColor(l.priorityScore);
         const opts = { color, fillColor: color, fillOpacity: 0.75, weight: 2 };
         return (
           <CircleMarker key={l.id} center={[l.lat, l.lng]} radius={9} pathOptions={opts}>
