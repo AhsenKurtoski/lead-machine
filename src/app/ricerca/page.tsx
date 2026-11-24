@@ -496,7 +496,7 @@ export default function RicercaPage() {
                           </span>
                         ) : (
                           <span
-                            className="inline-flex items-center gap-1 text-amber-500"
+                            className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400"
                             title="Nessun sito rilevato su OpenStreetMap: da verificare"
                           >
                             <HelpCircle className="h-4 w-4" /> Da verificare
@@ -510,7 +510,7 @@ export default function RicercaPage() {
                           </span>
                         ) : (
                           <span
-                            className="inline-flex items-center gap-1 text-amber-500"
+                            className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400"
                             title="Nessun social rilevato su OpenStreetMap: da verificare"
                           >
                             <HelpCircle className="h-4 w-4" /> Da verificare
