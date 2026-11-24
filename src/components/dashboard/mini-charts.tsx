@@ -56,7 +56,10 @@ export function DonutChart({
           ))}
         </Pie>
         <Tooltip contentStyle={TOOLTIP_STYLE} />
-        <Legend />
+        {/* Recharts colora il testo della legenda con il colore della serie:
+            su fondo chiaro l'ambra e l'ambra-verde scendono sotto 2.5:1. Il
+            testo resta quindi nel colore del tema, il pallino in quello serie. */}
+        <Legend formatter={(value: string) => <span className="text-foreground">{value}</span>} />
       </PieChart>
     </ResponsiveContainer>
   );
