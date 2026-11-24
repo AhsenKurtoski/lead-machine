@@ -19,10 +19,10 @@ jobs:
     env:
       DATABASE_URL: file:./dev.db
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - name: Audit dipendenze (critical/high)
@@ -54,9 +54,9 @@ jobs:
       NEXT_PUBLIC_BASE_URL: http://127.0.0.1:8799
       CI: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           # Wrangler 4 richiede Node 22 o successivo: con Node 20 la migrazione
           # D1 e `wrangler dev` si fermano prima di partire.
@@ -124,10 +124,10 @@ jobs:
       # autenticare gli endpoint interni, che senza APP_PASSWORD falliscono 503.
       APP_PASSWORD: smoke-ci-password-2026
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - name: Build di produzione
@@ -168,10 +168,10 @@ jobs:
       DATABASE_URL: file:./dev.db
       APP_PASSWORD: live-ci-password-2026
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - name: Build di produzione
@@ -205,10 +205,10 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm audit --audit-level=critical
