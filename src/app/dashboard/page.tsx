@@ -157,10 +157,12 @@ export default async function DashboardPage() {
       </div>
 
       {/* `items-start`: la card del grafico resta alta quanto il suo contenuto
-          invece di essere stirata all'altezza della classifica accanto. */}
+          invece di essere stirata all'altezza della classifica accanto.
+          `min-w-0` sulle card: senza, il min-content di grafico e righe dei
+          lead allarga la colonna oltre lo schermo sui telefoni stretti. */}
       <div className="grid items-start gap-6 lg:grid-cols-2">
         {/* Funnel / pipeline */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Pipeline per stato</CardTitle>
           </CardHeader>
@@ -175,7 +177,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Top lead per priorita */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Top 5 per priorita</CardTitle>
           </CardHeader>
