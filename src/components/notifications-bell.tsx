@@ -119,18 +119,21 @@ export function NotificationsBell() {
         ref={btnRef}
         variant="ghost"
         size="icon"
-        aria-label={label}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         onClick={() => setOpen((o) => !o)}
       >
+        {/* Il nome accessibile e' questo testo, non un aria-label: il numero
+            visibile nel badge ("9+") non farebbe parte del nome e axe lo
+            segnala come nome che non corrisponde al testo visibile. */}
+        <span className="sr-only">{label}</span>
         <Bell className="h-5 w-5" aria-hidden="true" />
         {unread > 0 ? (
           <span
             role="status"
             aria-live="polite"
-            className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+            className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white"
           >
             <span className="sr-only">{unread} {t("notifications.unread")}</span>
             <span aria-hidden="true">{unread > 9 ? "9+" : unread}</span>

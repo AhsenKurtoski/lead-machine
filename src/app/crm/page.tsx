@@ -319,13 +319,23 @@ export default function CrmPage() {
             onChange={(e) => setQ(e.target.value)}
             className="max-w-xs"
           />
-          <select className={selectClass} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            className={selectClass}
+            aria-label="Filtra per stato"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="">Tutti gli stati</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>{statusLabel(s)}</option>
             ))}
           </select>
-          <select className={selectClass} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+          <select
+            className={selectClass}
+            aria-label="Filtra per categoria"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
             <option value="">Tutte le categorie</option>
             {CATEGORIES.map((c) => (
               <option key={c.id} value={c.id}>{c.label}</option>
@@ -347,7 +357,12 @@ export default function CrmPage() {
       {selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-card p-3 animate-fade-in">
           <span className="text-sm font-medium">{selected.size} selezionati</span>
-          <select className={selectClass} value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)}>
+          <select
+            className={selectClass}
+            aria-label="Cambia lo stato dei lead selezionati"
+            value={bulkStatus}
+            onChange={(e) => setBulkStatus(e.target.value)}
+          >
             <option value="">Cambia stato in...</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>{statusLabel(s)}</option>
@@ -406,6 +421,7 @@ export default function CrmPage() {
                     <th className="w-10 p-3">
                       <input
                         type="checkbox"
+                        aria-label="Seleziona tutti i lead"
                         checked={selected.size === leads.length && leads.length > 0}
                         onChange={toggleAll}
                         className="h-4 w-4 rounded border-input"
@@ -417,7 +433,9 @@ export default function CrmPage() {
                     <th className="p-3">Web</th>
                     <th className="p-3">Social</th>
                     <th className="p-3 text-right">Prio.</th>
-                    <th className="w-10 p-3"></th>
+                    <th className="w-10 p-3">
+                      <span className="sr-only">Azioni</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -426,6 +444,7 @@ export default function CrmPage() {
                       <td className="p-3">
                         <input
                           type="checkbox"
+                          aria-label={`Seleziona ${l.name}`}
                           checked={selected.has(l.id)}
                           onChange={() => toggle(l.id)}
                           className="h-4 w-4 rounded border-input"
@@ -453,6 +472,7 @@ export default function CrmPage() {
                       <td className="p-3">
                         <select
                           className={cn(selectClass, "h-8")}
+                          aria-label={`Stato di ${l.name}`}
                           value={l.status}
                           onChange={(e) => changeStatus(l.id, e.target.value)}
                         >
@@ -481,7 +501,11 @@ export default function CrmPage() {
                         </span>
                       </td>
                       <td className="p-3">
-                        <Link href={"/crm/" + l.id} className="text-muted-foreground hover:text-foreground">
+                        <Link
+                          href={"/crm/" + l.id}
+                          aria-label={`Apri la scheda di ${l.name}`}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
                           <ChevronRight className="h-4 w-4" />
                         </Link>
                       </td>

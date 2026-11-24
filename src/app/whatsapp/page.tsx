@@ -122,7 +122,7 @@ export default function WhatsAppPage() {
           </Button>
           <Button
             size="sm"
-            className="bg-green-600 text-white hover:bg-green-700"
+            className="bg-green-700 text-white hover:bg-green-800"
             onClick={sendNext}
             disabled={loading || pending === 0}
             title="Apre WhatsApp per il primo lead non ancora contattato. Premi di nuovo per il successivo."
@@ -164,7 +164,7 @@ export default function WhatsAppPage() {
                     <CardTitle className="flex items-center gap-2 text-base">
                       {l.name}
                       {isSent ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 dark:text-green-400">
                           <CheckCircle2 className="h-4 w-4" /> Inviato
                         </span>
                       ) : null}
@@ -191,6 +191,7 @@ export default function WhatsAppPage() {
                 <CardContent className="space-y-3">
                   <Textarea
                     rows={5}
+                    aria-label={`Messaggio WhatsApp per ${l.name}`}
                     value={bodies[l.leadId] ?? l.body}
                     onChange={(e) =>
                       setBodies((b) => Object.assign({}, b, { [l.leadId]: e.target.value }))
@@ -199,7 +200,7 @@ export default function WhatsAppPage() {
                   <div className="flex flex-wrap gap-2">
                     <Button
                       onClick={() => openAndSend(l)}
-                      className="bg-green-600 text-white hover:bg-green-700"
+                      className="bg-green-700 text-white hover:bg-green-800"
                     >
                       <Send className="mr-1 h-4 w-4" />
                       {isSent ? "Riapri WhatsApp" : "Apri WhatsApp e invia"}

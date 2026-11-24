@@ -37,8 +37,10 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
   const description =
     receipt.description || "Prestazione professionale - pagamento ricevuto";
 
+  // Pagina stampabile a tutta pagina: il landmark e l'ancora dello skip-link
+  // servono anche qui (senza, il primo tab non porta da nessuna parte).
   return (
-    <div className="min-h-screen bg-zinc-100 py-8">
+    <main id="main-content" className="min-h-screen bg-zinc-100 py-8">
       <div className="no-print mx-auto mb-4 flex max-w-[820px] items-center justify-between px-4">
         <Link
           href="/ricevuta"
@@ -145,6 +147,6 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

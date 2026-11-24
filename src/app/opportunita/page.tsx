@@ -235,7 +235,7 @@ export default async function OpportunitaPage({
                             </Badge>
                           )}
                           <Badge variant="outline">{opportunityStatusLabel(l.status)}</Badge>
-                          <span className={cn("ml-1 text-sm font-bold tabular-nums", it.score >= 80 ? "text-emerald-600 dark:text-emerald-400" : "")}>
+                          <span className={cn("ml-1 text-sm font-bold tabular-nums", it.score >= 80 ? "text-emerald-700 dark:text-emerald-400" : "")}>
                             {it.score}
                           </span>
                         </div>

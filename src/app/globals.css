@@ -15,7 +15,9 @@
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    /* Un gradino piu' scuro: sul bianco il vecchio valore passava (4.83:1) ma
+       su card tinteggiate stava a 4.06:1. */
+    --muted-foreground: 240 4% 40%;
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
@@ -33,7 +35,10 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 5.5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 243 75% 65%;
+    /* Un filo piu' chiara del viola della 1.2.0: come testo su fondo scuro
+       stava a 4.22:1 (sotto il minimo AA di 4.5:1). Con questo valore sia il
+       testo sia i pulsanti (testo scuro sopra) superano 4.5:1. */
+    --primary: 243 100% 73%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
