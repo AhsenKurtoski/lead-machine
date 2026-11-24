@@ -36,10 +36,10 @@ Target OS: **Debian 12 / Ubuntu 24.04 LTS x86_64**. Works on 1 vCPU / 1 GB RAM (
 apt update && apt upgrade -y
 apt install -y curl git ufw
 
-# Node 20 LTS (nodesource, pinned)
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+# Node 22 LTS (nodesource, pinned)
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
-node -v   # 20.x
+node -v   # 22.x
 npm -v    # 10.x
 
 # Non-root user for the app
