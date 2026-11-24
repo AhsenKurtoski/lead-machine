@@ -175,6 +175,8 @@ L’attività gira con l’utente Windows corrente: se il computer è spento o l
 - **Fallback email `.eml`**: su Workers non c'è un filesystem scrivibile. Senza SMTP configurato l'invio restituisce un errore chiaro `503`; configura SMTP in Impostazioni per inviare email.
 - **Transazioni interattive Prisma**: D1 non le supporta. Il codice usa transazioni batch (`$transaction([...])`) per lead, import e ricevute.
 - **Database locale**: su Cloudflare i dati sono in D1, non in `prisma/dev.db`. Usa l'export per i backup.
+- **Rate limit in memoria**: i contatori di `src/lib/security.ts` e `src/lib/api-auth.ts` vivono nel processo dell'isolate. Su Workers ogni isolate ha i suoi e li azzera al cold start, quindi il limite su login e API e' piu' debole che in locale e non ferma un attacco distribuito. Il login resta protetto dalla password, ma non contare su questo limite come difesa.
+- **Nessun processo in background**: non c'e' un cron. La coda di riprova delle verifiche e i promemoria automatici avanzano solo quando arriva una richiesta (l'app li processa all'apertura), quindi su un'istanza che nessuno apre non succede nulla.
 
 ---
 

@@ -5,15 +5,24 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-24
+
 ### Aggiunto
+- **Controllo dell'interfaccia in CI** (`npm run check:ui`, `scripts/check-ui.mjs`): Chromium apre le 17 pagine autenticate in tema chiaro e scuro e fallisce su errori o warning in console, errori di idratazione, risposte API `401`/`5xx` e overflow orizzontale. Sono le regressioni che erano gia' capitate a mano (i due `401` sulla pagina di login, la card della dashboard che sfondava a 320 px); ora la CI le intercetta. Opzioni `--theme`, `--mobile` e `--contrast`; gira nel job `smoke-api` sulla build di produzione.
+- **Job Docker in CI**: a ogni push l'immagine viene costruita, avviata con un database nuovo, e si verifica che `/api/health` risponda, che `/login` dia `200` e che `/data/lead-machine.db` esista. Il percorso sempre acceso di `deploy/` non puo' piu' rompersi in silenzio.
+- **Test su punteggio e follow-up**: `src/lib/scoring.test.ts` fissa i pesi del punteggio 0-100 (sito assente/offline/datato, social, recensioni, contattabilita', limiti e arrotondamento) e `src/lib/followups.test.ts` i bucket scaduto/oggi/prossimi, le date vuote e le etichette nelle 7 lingue.
 - **Deploy gratuito su Cloudflare Workers + D1**: adapter Prisma D1, migrazione e seed D1, build OpenNext/Wrangler, transazioni batch compatibili con D1 e guida `docs/CLOUDFLARE-FREE.md`. Il piano Workers Free non richiede carta di credito.
 - **Deploy always-on con Docker Compose + Caddy**: `Dockerfile` di produzione, stack in `deploy/`, HTTPS automatico, restart supervisionato, healthcheck, volume SQLite persistente e script di backup/ripristino. La guida operativa è in `deploy/README.md`; richiede un host Docker e non è la strada gratuita garantita.
 
 ### Modificato
+- **Versione 1.2.0**: raccoglie il lavoro non rilasciato dalla 1.1.0 (Next 16, Workers/D1, Docker, i fix di console e tema chiaro).
+- **Screenshot rigenerati dall'app aggiornata** (desktop e mobile, tema scuro): risalivano al 6 novembre, prima di Next 16 e dei fix di tema. Il video demo non e' stato rigenerato (richiede ffmpeg, non disponibile nell'ambiente di verifica): `npm run demo` resta il comando per farlo in locale.
+- **Limiti del deploy Workers documentati** (`docs/CLOUDFLARE-FREE.md`): il rate limit in memoria e' per isolate e si azzera al cold start, e senza un cron la coda di riprova delle verifiche e i promemoria automatici avanzano solo quando arriva una richiesta.
 - **Next.js 16, React 19 e Recharts 3**: `next` passa a 16, `react`/`react-dom` a 19, `recharts` a 3, `next-themes` a 0.4 e `react-leaflet` a 5 (le versioni con peer dependency React 19). `src/middleware.ts` diventa `src/proxy.ts` con export `proxy`, la convenzione di Next 16. Requisito minimo Node.js portato a 20.9.
 - **Flat config nativa di `eslint-config-next` 16**: rimossi `FlatCompat` e `@eslint/eslintrc`. ESLint resta alla 9 (l'ultima con i plugin di Next dentro il peer range dichiarato: `eslint-plugin-import`, `jsx-a11y` e `react` non supportano ancora la 10); `react-hooks/set-state-in-effect` è disattivata con motivazione nel config, perché segnala i pattern di idratazione differita e caricamento dati usati di proposito dall'app. Il logout naviga con `router.replace` invece di ricaricare la pagina.
 
 ### Corretto
+- **Etichette dei follow-up tradotte**: `bucketLabel()` usava una chiave inesistente nel dizionario e ricadeva su "In ritardo / Oggi / Prossimi" scritti in italiano, quindi restavano italiane in tutte le lingue. Ora sono tre chiavi vere (`followup.bucket.*`) presenti nelle 7 lingue, coperte da `npm run i18n:check` e da un test.
 - **Nessuna richiesta autenticata dal login**: `AppShell` sta nel root layout e lanciava `/api/settings` e `POST /api/leads/verify/retry` anche sulla pagina di accesso, dove non c'è sessione: due `401` in console a ogni visita. Ora le pagine a tutta pagina (login, demo, ricevute, portfolio) non eseguono nulla.
 - **Legenda della mappa leggibile**: le fasce 60-79 e 40-59 usavano due arancioni quasi identici e la legenda aveva colori copiati a mano. La fascia 40-59 è ora gialla e marker e legenda leggono la stessa funzione (`priorityMarkerColor`).
 - **Dashboard**: la card "Pipeline per stato" non viene più stirata all'altezza della classifica accanto, quindi il grafico non lascia più spazio vuoto sotto.

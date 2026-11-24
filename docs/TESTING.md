@@ -12,6 +12,7 @@ Come si controlla che Lead Machine funzioni davvero.
 | `npm test` | solo i test unitari (`src/**/*.test.ts`) | no |
 | `npm run check:hygiene` | pagine vuote, link e voci di menu verso rotte rimosse, pagine non raggiungibili, `layout` senza pagina, cartelle vuote, e residui nel database (se c'e') | no |
 | `npm run check:auth` | login, cookie di sessione, CSRF, header di sicurezza e fail-closed senza `APP_PASSWORD`; avvia da solo due server di produzione | no (richiede `npm run build` e `npm run setup`) |
+| `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 17 pagine, in tema chiaro e scuro (Playwright) | si' |
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
 | `npm run smoke:geo` | sorgenti geografiche reali, geocoding reale senza coordinate e API pubblica di ricerca | si' |
 | `npm run perf:check` | tempi di risposta reali e peso in byte delle pagine e delle API chiave | si' |
@@ -109,7 +110,24 @@ Oltre alle misure controlla quattro comportamenti che un tempo di risposta veloc
 
 I byte misurati sono quelli non compressi (quello che il browser deve analizzare); sulla rete viaggiano compressi.
 
-## 7. Il motore di verifica fa controlli reali
+## 7. Controllo dell'interfaccia (`npm run check:ui`)
+
+Apre con Chromium le 17 pagine autenticate dell'app su un server di **produzione** e, per ogni pagina e per ogni tema (chiaro e scuro), fallisce se trova:
+
+- un messaggio di **errore o warning in console**, compresi gli errori di idratazione di React;
+- una **risposta API `401`, `403` o `5xx`** su una pagina gia' autenticata (e' cosi' che sono stati scoperti i due `401` sulla pagina di login);
+- **overflow orizzontale** della pagina (e' cosi' che e' stata scoperta la card della dashboard che sfondava a 320 px);
+- il tema richiesto **non applicato** (`<html class="light">` o `"dark"`).
+
+```bash
+npm run build
+APP_PASSWORD='la-tua-password' PORT=3111 npm start
+APP_PASSWORD='la-tua-password' npm run check:ui
+```
+
+Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844; gli overflow li' sono avvisi, non errori) e `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi: non e' un audit WCAG). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
+
+## 8. Il motore di verifica fa controlli reali
 
 Quando premi **Verifica ora** su un lead non viene simulato niente:
 
@@ -122,16 +140,16 @@ L'arricchimento contatti (`Arricchisci contatti`) scarica la pagina del sito, es
 
 **Un controllo che non si e' potuto fare non e' un verdetto: si riprova.** Se il resolver DNS non risponde o il sito non da' nessuna risposta (errore di rete, tempo scaduto), il dato resta **da verificare** e il campo entra in una coda (modello `VerificationRetry`, regole pure in `src/lib/verify-queue.ts`). L'app riprova da sola: quando si apre chiede al server di processare i controlli scaduti (`POST /api/leads/verify/retry`, al massimo 5 lead per chiamata), con attese crescenti — 5 minuti, 10, 20, 40 — e un tetto di 6 ore, per un massimo di 5 tentativi. La spiegazione accanto al campo dice sempre che il controllo e' rinviato e fra quanto («Controllo non riuscito (il resolver DNS non ha risposto): lo riprovo tra 5 minuti (tentativo 2 di 5)»), quindi «da verificare» non resta mai un'etichetta senza motivo. Esauriti i tentativi il dato resta **da verificare** senza altre riprove automatiche. `GET /api/leads/verify/retry` mostra la coda con il prossimo tentativo di ogni campo.
 
-## 8. Cosa NON e' coperto
+## 9. Cosa NON e' coperto
 
-- **Controllo visivo e mobile**: nessun test automatico di rendering. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot`, ffmpeg/ffprobe nel PATH e un server avviato). Il video esce a 1920×1080 con cursore, intro/outro, lower-third, dissolvenze e musica generata dal codice; la resa a occhio si verifica nel browser.
+- **Resa visiva e mobile**: `npm run check:ui` intercetta errori di console, idratazione, richieste fallite e overflow, ma **non** giudica l'aspetto: colori, spaziature e leggibilita' si guardano a occhio. Con `--mobile` controlla anche 390x844, dove gli overflow restano avvisi. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot`, ffmpeg/ffprobe nel PATH e un server avviato). Il video esce a 1920×1080 con cursore, intro/outro, lower-third, dissolvenze e musica generata dal codice.
 - **Invio email reale**: senza `SMTP_HOST` configurato l'app scrive i file `.eml` in `./tmp/emails/` per scelta. L'invio via SMTP non e' esercitato dai test.
 - **Provider AI**: senza `GEMINI_API_KEY` o `GROQ_API_KEY` le funzioni AI rispondono `503`. Gli smoke non li interrogano (consumano quota).
 - **Servizi di terze parti**: disponibilita' e limiti di Overpass, Nominatim e Geoapify non dipendono da noi. L'app degrada con un warning e con i risultati delle altre fonti; gli smoke lo tollerano.
 - **Accessibilita' automatica**: non c'e' un audit axe o Lighthouse in CI: i controlli di base (skip-link, landmark, ARIA, focus visibile) sono fatti a mano.
 - **Componenti React**: non ci sono test di rendering (nessun testing library): la logica e' nei moduli puri di `src/lib/` proprio per poterla testare senza browser.
 
-## 9. Prima di una release
+## 10. Prima di una release
 
 ```bash
 npm run qa                 # typecheck + lint + i18n + guard + test unitari
@@ -146,12 +164,13 @@ SMOKE_PASSWORD='la-tua-password' npm run perf:check
 
 Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM con verifica e arricchimento, opportunita', ricevute, impostazioni, onboarding su un database vuoto).
 
-## 10. Cosa gira in CI
+## 11. Cosa gira in CI
 
 `.github/workflows/ci.yml`, a ogni push e pull request:
 
 - **job "app"**: `npm run qa` e poi `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
-- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie);
+- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui`: 17 pagine in tema chiaro e scuro, console e layout;
+- **job "docker"**: costruisce l'immagine dal `Dockerfile`, la avvia con un volume nuovo, attende `/api/health` e verifica che `/login` risponda `200` e che il database sia stato creato in `/data`. Serve a non scoprire a release fatta che il percorso Docker si e' rotto;
 - **job "live"** (solo schedulato o con `workflow_dispatch`): costruisce il server di produzione, prepara database e seed, avvia `next start` e lancia `npm run smoke:geo` e `npm run perf:check`. Non e' un job richiesto dalle pull request: dipende da Overpass/Nominatim e da una macchina con il server acceso, quindi un loro disservizio non deve bloccare una modifica. I budget di performance sono calibrati su `npm start`, non sul server di sviluppo. Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
 - **job "audit"** (solo settimanale): `npm audit` sulle dipendenze.
 

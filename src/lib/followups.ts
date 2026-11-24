@@ -49,25 +49,15 @@ export function dueBucket(dueDate: Date | string): DueBucket {
   return "prossimi";
 }
 
-export function bucketLabel(bucket: DueBucket, locale?: LocaleCode | null): string {
-  const l = locale || DEFAULT_LOCALE;
-  const keys: Record<DueBucket, string> = {
-    scaduto: "Follow-up: bucket labels not in dict - fallback",
-    oggi: "Follow-up: bucket labels not in dict - fallback",
-    prossimi: "Follow-up: bucket labels not in dict - fallback",
-  };
-  const fallbacks: Record<DueBucket, string> = {
-    scaduto: "In ritardo",
-    oggi: "Oggi",
-    prossimi: "Prossimi",
-  };
-  const tr = translate(l, keys[bucket]);
-  if (tr !== keys[bucket]) return tr;
-  return fallbacks[bucket];
-}
-
-export const BUCKET_LABELS: Record<DueBucket, string> = {
-  scaduto: "In ritardo",
-  oggi: "Oggi",
-  prossimi: "Prossimi",
+// Le etichette dei bucket sono testi di interfaccia: vivono nel dizionario,
+// come tutte le altre, cosi' `npm run i18n:check` le copre e nessuna lingua
+// ricade sull'italiano. Prima erano scritte a mano qui.
+const BUCKET_KEYS: Record<DueBucket, string> = {
+  scaduto: "followup.bucket.overdue",
+  oggi: "followup.bucket.today",
+  prossimi: "followup.bucket.upcoming",
 };
+
+export function bucketLabel(bucket: DueBucket, locale?: LocaleCode | null): string {
+  return translate(locale || DEFAULT_LOCALE, BUCKET_KEYS[bucket]);
+}

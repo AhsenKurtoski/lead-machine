@@ -104,7 +104,7 @@ export default function WhatsAppPage() {
             Per ogni attivita il messaggio giusto e gia pronto. Tu apri WhatsApp e premi invio: al resto pensa il CRM.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant={onlyNew ? "default" : "outline"}
             size="sm"

@@ -11,7 +11,7 @@ import {
   FOLLOWUP_CHANNEL_LABELS,
   formatDateTime,
   dueBucket,
-  BUCKET_LABELS,
+  bucketLabel,
   type DueBucket,
 } from "@/lib/followups";
 import {
@@ -312,7 +312,7 @@ export default function CalendarioPage() {
                   <div key={b} className="space-y-2">
                     <div className="flex items-center gap-2 text-sm font-medium">
                       <span className={"h-2 w-2 rounded-full " + BUCKET_DOT[b]} />
-                      {BUCKET_LABELS[b]}
+                      {bucketLabel(b)}
                     </div>
                     {grouped[b].map((f) => (
                       <Card key={f.id}>

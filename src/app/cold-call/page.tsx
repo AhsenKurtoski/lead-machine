@@ -137,7 +137,7 @@ export default function ColdCallPage() {
             Per ogni lead hai uno script pronto e su misura. Chiami, leggi e fissi l'appuntamento.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {items.length > 0 ? (
             <Button size="sm" onClick={() => (seqMode ? setSeqMode(false) : startSeq())}>
               <PhoneCall className="h-4 w-4" /> {seqMode ? "Esci dalla sequenza" : "Modalita sequenza"}

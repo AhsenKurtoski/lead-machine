@@ -1,6 +1,6 @@
 {
   "name": "lead-machine",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": false,
   "description": "Open-source local lead generation platform — find, score and contact nearby businesses for free. 100% self-hosted, SQLite + Next.js.",
   "license": "MIT",
@@ -73,6 +73,7 @@
     "check:content": "node scripts/check-content.mjs",
     "check:hygiene": "node --import tsx scripts/check-hygiene.mjs",
     "check:pages": "node scripts/check-pages.mjs",
+    "check:ui": "node scripts/check-ui.mjs",
     "qa": "npm run typecheck && npm run lint && npm run i18n:check && npm run check:content && npm run check:hygiene && npm test",
     "setup": "prisma db push && tsx prisma/seed.ts",
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
