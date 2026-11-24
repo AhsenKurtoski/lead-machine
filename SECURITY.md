@@ -60,8 +60,8 @@ A quick reference for auditors:
 
 | Layer | Where | What |
 |---|---|---|
-| Session authentication | `src/lib/auth.ts`, `src/middleware.ts` | `APP_PASSWORD` → HMAC-signed HttpOnly cookie, constant-time comparison, 30-day expiry; protected routes fail closed with `503` when unset. |
-| CSRF protection | `src/middleware.ts` → `sameOrigin` | Cookie-authenticated mutations reject cross-origin `Origin` / `Sec-Fetch-Site`; `/api/v1/*` uses bearer keys instead. |
+| Session authentication | `src/lib/auth.ts`, `src/proxy.ts` | `APP_PASSWORD` → HMAC-signed HttpOnly cookie, constant-time comparison, 30-day expiry; protected routes fail closed with `503` when unset. |
+| CSRF protection | `src/proxy.ts` → `sameOrigin` | Cookie-authenticated mutations reject cross-origin `Origin` / `Sec-Fetch-Site`; `/api/v1/*` uses bearer keys instead. |
 | Security headers | `next.config.mjs` | CSP, HSTS in production, `X-Frame-Options`, `nosniff`, Referrer-Policy, Permissions-Policy; remote image hosts disabled. |
 | SSRF protection | `src/lib/url-safety.ts` | Resolves hostnames and rejects loopback, private, link-local and metadata targets before fetching or navigating. |
 | Demo sandbox | `src/app/demo/[id]/page.tsx` | AI HTML runs in an iframe with `sandbox="allow-forms allow-popups"`, no scripts and `referrerPolicy="no-referrer"`. |

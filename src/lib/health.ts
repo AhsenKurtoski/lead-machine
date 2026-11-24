@@ -107,7 +107,7 @@ function readPackage(): PackageJson | null {
 
 function readText(relativePath: string): string | null {
   try {
-    return readFileSync(path.join(ROOT, relativePath), "utf8");
+    return readFileSync(path.join(/*turbopackIgnore: true*/ ROOT, relativePath), "utf8");
   } catch {
     return null;
   }
@@ -158,7 +158,7 @@ function packageInstalled(name: string): boolean {
 
 function directoryWritable(relativePath: string): boolean {
   try {
-    accessSync(path.join(ROOT, relativePath), constants.W_OK);
+    accessSync(path.join(/*turbopackIgnore: true*/ ROOT, relativePath), constants.W_OK);
     return true;
   } catch {
     return false;
@@ -167,7 +167,9 @@ function directoryWritable(relativePath: string): boolean {
 
 function countFiles(relativeDir: string, extension: string): number {
   let count = 0;
-  walkFiles(path.join(ROOT, relativeDir), (file) => {
+  // `turbopackIgnore`: la cartella e' decisa a runtime, senza questo commento
+  // Turbopack traccia l'intero progetto (public compresa) dentro il bundle.
+  walkFiles(path.join(/*turbopackIgnore: true*/ ROOT, relativeDir), (file) => {
     if (file.endsWith(extension)) count += 1;
   });
   return count;
@@ -464,27 +466,28 @@ async function securitySection(): Promise<HealthSection> {
         ),
   ];
 
-  const middleware = readText("src/middleware.ts");
-  if (!middleware) {
+  // Da Next 16 il file si chiama `proxy.ts` ed esporta `proxy`.
+  const proxy = readText("src/proxy.ts");
+  if (!proxy) {
     checks.push(
       warn(
         "security.middleware",
-        "Middleware di autenticazione",
+        "Proxy di autenticazione",
         "File non leggibile (possibile deployment standalone).",
-        "Verifica che il middleware sia incluso nella build."
+        "Verifica che il proxy sia incluso nella build."
       )
     );
   } else {
     const required = ["SESSION_COOKIE", "verifySessionToken", "sameOrigin"];
-    const missing = required.filter((token) => !middleware.includes(token));
+    const missing = required.filter((token) => !proxy.includes(token));
     checks.push(
       missing.length === 0
-        ? ok("security.middleware", "Middleware di autenticazione", "Sessione, verifica token e controllo same-origin presenti.")
+        ? ok("security.middleware", "Proxy di autenticazione", "Sessione, verifica token e controllo same-origin presenti.")
         : fail(
             "security.middleware",
-            "Middleware di autenticazione",
+            "Proxy di autenticazione",
             "Mancano: " + missing.join(", ") + ".",
-            "Non esporre l'app finché il middleware non è completo."
+            "Non esporre l'app finché il proxy non è completo."
           )
     );
   }

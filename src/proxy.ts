@@ -30,7 +30,7 @@ function sameOrigin(req: NextRequest): boolean {
   return true;
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Asset statici e file pubblici non sensibili.

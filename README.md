@@ -9,7 +9,7 @@
 
 **✨ [Features](#-features) · 🚀 [Quick start](#-quick-start) · 🌍 [Locales supported](#-multilingual-support--locales) · ✅ [Testing](#-testing--verification) · 🛡️ [Security](./SECURITY.md) · 🤝 [Contributing](./CONTRIBUTING.md)**
 
-[![Made with Next.js 15](https://img.shields.io/badge/Next.js_15-000?logo=next.js&logoColor=fff)](#)
+[![Made with Next.js 16](https://img.shields.io/badge/Next.js_16-000?logo=next.js&logoColor=fff)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?logo=typescript&logoColor=fff)](#)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38bdf8?logo=tailwindcss&logoColor=000)](#)
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000?logo=shadcnui&logoColor=fff)](#)
@@ -241,7 +241,7 @@ There is **no public demo**: Lead Machine runs on your own machine, with your ow
 
 | Tool | Minimum version | Notes |
 |---|---|---|
-| **Node.js** | `18.18 LTS` (or `20 LTS`, `22`) | `node -v` to check. We recommend 20 LTS. |
+| **Node.js** | `20.9` (Next.js 16 minimum; `22 LTS` recommended) | `node -v` to check. |
 | **npm** (or pnpm / yarn) | Comes with Node | `npm -v` ≥ 10 works. |
 | That's it. | — | SQLite is file-based — **no Postgres / MySQL install needed**. |
 
@@ -354,7 +354,7 @@ Edit `.env` (created from `.env.example`). `DATABASE_URL` points to your SQLite 
 
 | Layer | Choice | Why |
 |---|---|---|
-| **Framework** | **Next.js 15 App Router** | File-based routing + SSR + API routes in one process; great cold start even on hobby deploy. |
+| **Framework** | **Next.js 16 App Router** | File-based routing + SSR + API routes in one process; great cold start even on hobby deploy. |
 | **Language** | **TypeScript strict** | Catches most bugs at compile-time. |
 | **Styling** | **Tailwind CSS 3 + shadcn/ui** | Consistent, accessible, hackable UI primitives. |
 | **Data layer** | **Prisma ORM + SQLite** | Zero-DB-admin, file-portable, great DX. |

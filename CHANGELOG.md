@@ -9,6 +9,13 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 - **Deploy gratuito su Cloudflare Workers + D1**: adapter Prisma D1, migrazione e seed D1, build OpenNext/Wrangler, transazioni batch compatibili con D1 e guida `docs/CLOUDFLARE-FREE.md`. Il piano Workers Free non richiede carta di credito.
 - **Deploy always-on con Docker Compose + Caddy**: `Dockerfile` di produzione, stack in `deploy/`, HTTPS automatico, restart supervisionato, healthcheck, volume SQLite persistente e script di backup/ripristino. La guida operativa è in `deploy/README.md`; richiede un host Docker e non è la strada gratuita garantita.
 
+### Modificato
+- **Next.js 16, React 19 e Recharts 3**: `next` passa a 16, `react`/`react-dom` a 19, `recharts` a 3, `next-themes` a 0.4 e `react-leaflet` a 5 (le versioni con peer dependency React 19). `src/middleware.ts` diventa `src/proxy.ts` con export `proxy`, la convenzione di Next 16. Requisito minimo Node.js portato a 20.9.
+- **Flat config nativa di `eslint-config-next` 16**: rimossi `FlatCompat` e `@eslint/eslintrc`. ESLint resta alla 9 (l'ultima con i plugin di Next dentro il peer range dichiarato: `eslint-plugin-import`, `jsx-a11y` e `react` non supportano ancora la 10); `react-hooks/set-state-in-effect` è disattivata con motivazione nel config, perché segnala i pattern di idratazione differita e caricamento dati usati di proposito dall'app. Il logout naviga con `router.replace` invece di ricaricare la pagina.
+
+### Corretto
+- **Build Turbopack di Next 16**: il route segment config non viene più ri-esportato da `api/v1/demo/route.ts` e le letture a runtime di `health.ts` sono marcate `turbopackIgnore`, così il build non traccia l'intero progetto dentro il bundle del server.
+
 ## [1.1.0] - 2026-11-07
 
 ### Aggiunto
