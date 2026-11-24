@@ -212,7 +212,7 @@ export default async function HealthPage() {
                           <p className="text-sm font-medium">{item.label}</p>
                           <p className="text-xs text-muted-foreground">{item.detail}</p>
                           {item.hint ? (
-                            <p className="mt-1 text-xs text-muted-foreground/80">{item.hint}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{item.hint}</p>
                           ) : null}
                         </div>
                       </div>

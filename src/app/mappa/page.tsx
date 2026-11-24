@@ -72,13 +72,23 @@ export default function MappaPage() {
 
       <Card>
         <CardContent className="flex flex-wrap items-center gap-3 p-4">
-          <select className={selectClass} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            className={selectClass}
+            aria-label="Filtra per stato"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option value="">Tutti gli stati</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>{statusLabel(s)}</option>
             ))}
           </select>
-          <select className={selectClass} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+          <select
+            className={selectClass}
+            aria-label="Filtra per categoria"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
             <option value="">Tutte le categorie</option>
             {CATEGORIES.map((c) => (
               <option key={c.id} value={c.id}>{c.label}</option>

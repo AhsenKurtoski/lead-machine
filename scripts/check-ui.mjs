@@ -18,9 +18,18 @@
 //   --mobile                  aggiunge il giro a 390x844 (solo avvisi)
 //   --contrast                aggiunge il controllo del contrasto del testo
 //                             (solo avvisi: e' una stima, non un audit WCAG)
+//   --no-axe                  salta l'audit di accessibilita' (axe-core)
+//
+// Accessibilita': axe-core gira su ogni pagina con le regole WCAG 2.0/2.1 A e
+// AA. Le violazioni gravi e critiche bloccano il controllo, le altre restano
+// avvisi. E' un audit automatico: non sostituisce una revisione a mano.
 //
 // Esce con codice 1 se trova un problema bloccante. Gli avvisi non fanno
 // fallire il controllo: sono cose da guardare, non regressioni certe.
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { chromium } from "playwright";
 
 const BASE_URL = (process.env.BASE_URL || process.env.SMOKE_BASE || "http://127.0.0.1:3111").replace(/\/$/, "");
@@ -30,6 +39,21 @@ const themeArg = [...args].find((a) => a.startsWith("--theme="))?.split("=")[1] 
 const themes = themeArg === "both" ? ["light", "dark"] : [themeArg];
 const withMobile = args.has("--mobile");
 const withContrast = args.has("--contrast");
+const withAxe = !args.has("--no-axe");
+
+// axe-core arriva dalle devDependencies: se manca, il controllo lo dice e
+// continua con il resto invece di fallire per un pacchetto assente.
+const axePath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "node_modules",
+  "axe-core",
+  "axe.min.js"
+);
+const axeSource = withAxe && fs.existsSync(axePath) ? fs.readFileSync(axePath, "utf8") : "";
+if (withAxe && !axeSource) {
+  console.warn("axe-core non installato: audit di accessibilita' saltato (npm ci lo include).");
+}
 
 if (!password) {
   console.error("APP_PASSWORD non impostata: il controllo deve partire da una sessione autenticata.");
@@ -199,6 +223,30 @@ try {
 
           for (const issue of consoleIssues) {
             record(true, name, theme, "console", issue);
+          }
+
+          if (axeSource) {
+            await page.addScriptTag({ content: axeSource });
+            const violations = await page.evaluate(async () => {
+              const result = await window.axe.run(document, {
+                runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
+              });
+              return result.violations.map((v) => ({
+                id: v.id,
+                impact: v.impact,
+                nodes: v.nodes.length,
+                help: v.help,
+              }));
+            });
+            for (const v of violations) {
+              record(
+                v.impact === "critical" || v.impact === "serious",
+                name,
+                theme,
+                "a11y",
+                `${v.id} (${v.impact}, ${v.nodes} nod${v.nodes === 1 ? "o" : "i"}): ${v.help}`
+              );
+            }
           }
 
           if (withContrast) {

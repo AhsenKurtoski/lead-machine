@@ -117,7 +117,8 @@ Apre con Chromium le 17 pagine autenticate dell'app su un server di **produzione
 - un messaggio di **errore o warning in console**, compresi gli errori di idratazione di React;
 - una **risposta API `401`, `403` o `5xx`** su una pagina gia' autenticata (e' cosi' che sono stati scoperti i due `401` sulla pagina di login);
 - **overflow orizzontale** della pagina (e' cosi' che e' stata scoperta la card della dashboard che sfondava a 320 px);
-- il tema richiesto **non applicato** (`<html class="light">` o `"dark"`).
+- il tema richiesto **non applicato** (`<html class="light">` o `"dark"`);
+- una violazione **WCAG 2.0/2.1 A e AA** trovata da `axe-core` (le gravi e critiche bloccano, le altre sono avvisi). L'audit gira su ogni pagina e in ogni tema, quindi copre anche il contrasto reale dei colori, non solo dei token.
 
 ```bash
 npm run build
@@ -125,7 +126,7 @@ APP_PASSWORD='la-tua-password' PORT=3111 npm start
 APP_PASSWORD='la-tua-password' npm run check:ui
 ```
 
-Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844; gli overflow li' sono avvisi, non errori) e `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi: non e' un audit WCAG). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
+Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844; gli overflow li' sono avvisi, non errori), `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi) e `--no-axe` (salta l'audit di accessibilita'). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
 
 ## 8. Il motore di verifica fa controlli reali
 

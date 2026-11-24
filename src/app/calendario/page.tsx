@@ -217,8 +217,13 @@ export default function CalendarioPage() {
               <Bell className="h-5 w-5" /> Nuovo promemoria
             </h2>
             <div className="space-y-1.5">
-              <Label>Lead da ricontattare</Label>
-              <select className={SELECT_CLASS} value={fLead} onChange={(e) => setFLead(e.target.value)}>
+              <Label htmlFor="followup-lead">Lead da ricontattare</Label>
+              <select
+                id="followup-lead"
+                className={SELECT_CLASS}
+                value={fLead}
+                onChange={(e) => setFLead(e.target.value)}
+              >
                 <option value="">Seleziona un lead...</option>
                 {leads.map((l) => (
                   <option key={l.id} value={l.id}>{l.name}</option>
@@ -227,12 +232,22 @@ export default function CalendarioPage() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Quando</Label>
-                <Input type="datetime-local" value={fDue} onChange={(e) => setFDue(e.target.value)} />
+                <Label htmlFor="followup-due">Quando</Label>
+                <Input
+                  id="followup-due"
+                  type="datetime-local"
+                  value={fDue}
+                  onChange={(e) => setFDue(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
-                <Label>Canale</Label>
-                <select className={SELECT_CLASS} value={fChannel} onChange={(e) => setFChannel(e.target.value)}>
+                <Label htmlFor="followup-channel">Canale</Label>
+                <select
+                  id="followup-channel"
+                  className={SELECT_CLASS}
+                  value={fChannel}
+                  onChange={(e) => setFChannel(e.target.value)}
+                >
                   {Object.keys(FOLLOWUP_CHANNEL_LABELS).map((c) => (
                     <option key={c} value={c}>{FOLLOWUP_CHANNEL_LABELS[c]}</option>
                   ))}
@@ -240,8 +255,13 @@ export default function CalendarioPage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Nota (opzionale)</Label>
-              <Textarea value={fNote} onChange={(e) => setFNote(e.target.value)} placeholder="Es. richiamare dopo la pausa estiva" />
+              <Label htmlFor="followup-note">Nota (opzionale)</Label>
+              <Textarea
+                id="followup-note"
+                value={fNote}
+                onChange={(e) => setFNote(e.target.value)}
+                placeholder="Es. richiamare dopo la pausa estiva"
+              />
             </div>
             <Button onClick={createFollowUp} disabled={savingF || !fLead || !fDue}>
               {savingF ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
@@ -257,22 +277,42 @@ export default function CalendarioPage() {
               <CalendarDays className="h-5 w-5" /> Nuovo appuntamento
             </h2>
             <div className="space-y-1.5">
-              <Label>Titolo</Label>
-              <Input value={aTitle} onChange={(e) => setATitle(e.target.value)} placeholder="Es. Sopralluogo / call demo" />
+              <Label htmlFor="appointment-title">Titolo</Label>
+              <Input
+                id="appointment-title"
+                value={aTitle}
+                onChange={(e) => setATitle(e.target.value)}
+                placeholder="Es. Sopralluogo / call demo"
+              />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Inizio</Label>
-                <Input type="datetime-local" value={aStart} onChange={(e) => setAStart(e.target.value)} />
+                <Label htmlFor="appointment-start">Inizio</Label>
+                <Input
+                  id="appointment-start"
+                  type="datetime-local"
+                  value={aStart}
+                  onChange={(e) => setAStart(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
-                <Label>Fine (opzionale)</Label>
-                <Input type="datetime-local" value={aEnd} onChange={(e) => setAEnd(e.target.value)} />
+                <Label htmlFor="appointment-end">Fine (opzionale)</Label>
+                <Input
+                  id="appointment-end"
+                  type="datetime-local"
+                  value={aEnd}
+                  onChange={(e) => setAEnd(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Lead collegato (opzionale)</Label>
-              <select className={SELECT_CLASS} value={aLead} onChange={(e) => setALead(e.target.value)}>
+              <Label htmlFor="appointment-lead">Lead collegato (opzionale)</Label>
+              <select
+                id="appointment-lead"
+                className={SELECT_CLASS}
+                value={aLead}
+                onChange={(e) => setALead(e.target.value)}
+              >
                 <option value="">Nessuno</option>
                 {leads.map((l) => (
                   <option key={l.id} value={l.id}>{l.name}</option>
@@ -280,8 +320,13 @@ export default function CalendarioPage() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label>Note (opzionale)</Label>
-              <Textarea value={aNotes} onChange={(e) => setANotes(e.target.value)} placeholder="Dettagli, luogo, link alla call..." />
+              <Label htmlFor="appointment-notes">Note (opzionale)</Label>
+              <Textarea
+                id="appointment-notes"
+                value={aNotes}
+                onChange={(e) => setANotes(e.target.value)}
+                placeholder="Dettagli, luogo, link alla call..."
+              />
             </div>
             <Button onClick={createAppointment} disabled={savingA || !aTitle || !aStart}>
               {savingA ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}

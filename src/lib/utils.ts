@@ -36,18 +36,21 @@ export function statusLabel(status: string, locale?: LocaleCode | null): string 
   return t(locale, key);
 }
 
+// Le tinte -600 su fondo chiaro stavano sotto il minimo AA (4.5:1) per il
+// testo piccolo dei badge: il blu era a 4.34:1 e l'ambra a 3.55:1. Le -700
+// superano la soglia senza cambiare il colore percepito.
 export const STATUS_COLORS: Record<string, string> = {
-  NUOVO: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
-  CONTATTATO: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-  IN_TRATTATIVA: "bg-purple-500/15 text-purple-600 dark:text-purple-400",
-  CLIENTE: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  SCARTATO: "bg-zinc-500/15 text-zinc-500 dark:text-zinc-400",
+  NUOVO: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
+  CONTATTATO: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+  IN_TRATTATIVA: "bg-purple-500/15 text-purple-700 dark:text-purple-400",
+  CLIENTE: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+  SCARTATO: "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400",
 };
 
 export function priorityColor(score: number): string {
   if (score >= 80) return "text-red-600 dark:text-red-400";
-  if (score >= 60) return "text-orange-600 dark:text-orange-400";
-  if (score >= 40) return "text-amber-600 dark:text-amber-400";
+  if (score >= 60) return "text-orange-700 dark:text-orange-400";
+  if (score >= 40) return "text-amber-700 dark:text-amber-400";
   return "text-zinc-500";
 }
 

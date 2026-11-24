@@ -290,7 +290,7 @@ export default function ColdCallPage() {
                     <span className="text-muted-foreground">
                       {(it.category || "-") + (it.city ? " \u00B7 " + it.city : "")}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-amber-500">
+                    <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400">
                       <Star className="h-3 w-3 fill-amber-500" /> {it.priorityScore}
                     </span>
                   </div>

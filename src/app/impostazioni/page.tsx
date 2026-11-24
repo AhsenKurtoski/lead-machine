@@ -1173,6 +1173,7 @@ export default function ImpostazioniPage() {
           <input
             ref={fileRef}
             type="file"
+            aria-label="File CSV dei lead da importare"
             accept=".csv,text/csv"
             onChange={onImportFile}
             disabled={importing}

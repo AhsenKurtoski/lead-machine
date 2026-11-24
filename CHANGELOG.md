@@ -5,6 +5,19 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 
 ## [Unreleased]
 
+### Aggiunto
+- **Audit di accessibilita' automatico** (`npm run check:ui` + `axe-core`): ogni pagina e ogni tema vengono controllati con le regole WCAG 2.0/2.1 A e AA; le violazioni gravi e critiche fanno fallire la CI. Prima la promessa "WCAG 2.1 AA aware" del README non era verificata da niente.
+- **Screenshot con dati reali**: le immagini in `screenshots/` mostrano 10 pasticcerie di Milano importate da OpenStreetMap (nome, posizione e punteggio veri), non record inventati. Il repository promette che nessun dato finto viene mostrato: ora vale anche per i media.
+
+### Corretto
+- **Contrasto sotto il minimo AA** in tema chiaro e scuro, trovato da axe: il viola `primary` in tema scuro stava a 4.22:1 come testo e a 3.85:1 sui pulsanti; i badge di stato blu/ambra/verde a 4.34:1, 3.55:1 e 3.76:1; il testo secondario su card tinteggiate a 4.06:1; il pulsante verde di WhatsApp a 3.29:1; il punteggio ambra del cold call a 2.14:1; il suggerimento di `/health` al 70% di opacita' a 3.29:1. Ora tutte le combinazioni superano 4.5:1.
+- **Controlli senza nome accessibile**: select dei filtri (CRM, mappa), select di stato per riga, checkbox di selezione, link con sola icona, textarea dei messaggi WhatsApp e input file dell'import CSV ora hanno un nome che dice cosa fanno; nel CRM l'ultima intestazione vuota ha un testo per gli screen reader.
+- **Campi senza etichetta associata** nel Calendario: le `Label` ora puntano ai campi con `htmlFor`/`id`.
+- **Landmark mancante su `/ricevuta/[id]`**: come per `/portfolio`, la pagina stampabile non aveva `<main>`, quindi lo skip-link non portava da nessuna parte.
+
+### Modificato
+- `axe-core` aggiunto alle devDependencies (solo per il controllo, non finisce nel bundle).
+
 ## [1.2.0] - 2026-11-24
 
 ### Aggiunto

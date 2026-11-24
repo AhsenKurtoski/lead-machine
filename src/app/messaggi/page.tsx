@@ -388,17 +388,29 @@ export default function MessaggiPage() {
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">{t.channel === "email" ? "Email" : "WhatsApp"}</Badge>
                     {t.isDefault && (
-                      <span className="inline-flex items-center gap-1 text-xs text-amber-500">
+                      <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400">
                         <Star className="h-3 w-3 fill-amber-500" /> Predefinito
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => startEdit(t)}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8"
+                    aria-label={`Modifica il template ${t.name}`}
+                    onClick={() => startEdit(t)}
+                  >
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(t.id)}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-destructive"
+                    aria-label={`Elimina il template ${t.name}`}
+                    onClick={() => setDeleteId(t.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
