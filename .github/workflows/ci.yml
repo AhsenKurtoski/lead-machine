@@ -115,8 +115,9 @@ jobs:
           if [ -f /tmp/worker.log ]; then cat /tmp/worker.log; else echo "nessun log del Worker"; fi
 
   smoke-api:
-    name: API key end-to-end (smoke:api)
+    name: API key end-to-end (smoke:api) e controllo interfaccia
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: app
     env:
       DATABASE_URL: file:./dev.db
@@ -150,11 +151,65 @@ jobs:
           fi
       - name: Smoke test API key
         run: SMOKE_BASE=http://localhost:3111 npm run smoke:api
+      - name: Installa Chromium per il controllo dell'interfaccia
+        run: npx playwright install --with-deps chromium
+
+      - name: Console e layout su ogni pagina, tema chiaro e scuro
+        # Riusa il server di produzione gia' acceso da questo job: apre tutte
+        # le pagine e fallisce su errori in console, idratazione, 401/5xx e
+        # overflow orizzontale. Sono le regressioni gia' capitate a mano.
+        env:
+          APP_PASSWORD: smoke-ci-password-2026
+          BASE_URL: http://127.0.0.1:3111
+        run: npm run check:ui
+
       - name: Nessun residuo di test nel database
         # `--require-db`: qui il database c'e' per davvero, quindi assente e'
         # un errore; il controllo verifica che gli smoke test non lascino
         # dietro lead, chiavi, verifiche doppie o una coda incoerente.
         run: node --import tsx scripts/check-hygiene.mjs --require-db
+
+  docker:
+    name: Docker — build dell'immagine e primo avvio
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Senza un job che costruisca l'immagine, `Dockerfile` e `deploy/` possono
+    # rompersi in silenzio: chi prova l'installazione sempre accesa lo scopre
+    # solo allora. Qui l'immagine viene costruita e avviata davvero.
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build dell'immagine
+        run: docker build -t lead-machine:ci .
+
+      - name: Primo avvio, database e healthcheck
+        run: |
+          docker run -d --name lead-machine-ci -p 3010:3000 \
+            -e APP_PASSWORD=docker-ci-password-2026 lead-machine:ci
+          ready=0
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3010/api/health || true)
+            if [ "$code" = "200" ]; then echo "healthcheck pronto (HTTP $code)"; ready=1; break; fi
+            sleep 3
+          done
+          if [ "$ready" != "1" ]; then
+            echo "il container non risponde su /api/health"
+            docker logs lead-machine-ci || true
+            exit 1
+          fi
+          login=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3010/login)
+          echo "login=$login"
+          if [ "$login" != "200" ]; then
+            echo "atteso 200 su /login dopo il primo avvio"
+            docker logs lead-machine-ci || true
+            exit 1
+          fi
+          docker exec lead-machine-ci node -e "const fs=require('fs'); process.exit(fs.existsSync('/data/lead-machine.db')?0:1)"
+          echo "database creato in /data"
+
+      - name: Log del container in caso di errore
+        if: failure()
+        run: docker logs lead-machine-ci || true
 
   live:
     name: Live — smoke geo e performance

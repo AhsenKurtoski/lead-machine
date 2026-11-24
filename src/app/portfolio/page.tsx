@@ -30,8 +30,10 @@ export default async function PortfolioPage() {
     { n: "03", title: "Online in pochi giorni", text: "Pubblichiamo il sito e ti seguiamo nel tempo." },
   ];
 
+  // Pagina a tutta pagina (senza guscio): il landmark e l'ancora dello
+  // skip-link devono esserci anche qui, come nelle altre pagine.
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40">
+    <main id="main-content" className="min-h-screen bg-gradient-to-b from-background to-muted/40">
       {/* Hero */}
       <header className="mx-auto max-w-5xl px-6 py-20 text-center">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
@@ -124,6 +126,6 @@ export default async function PortfolioPage() {
           {brand}{owner ? " - " + owner : ""} - {new Date().getFullYear()}
         </p>
       </section>
-    </div>
+    </main>
   );
 }

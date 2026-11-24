@@ -176,6 +176,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
 
     // Follow-up
     "followup.scheduled": "Follow-up programmato per il {date}",
+    "followup.bucket.overdue": "In ritardo",
+    "followup.bucket.today": "Oggi",
+    "followup.bucket.upcoming": "Prossimi",
 
     // Email logs
     "email.status.INVIATO": "Inviato",
@@ -435,6 +438,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Follow-up geplant für den {date}",
+    "followup.bucket.overdue": "Überfällig",
+    "followup.bucket.today": "Heute",
+    "followup.bucket.upcoming": "Demnächst",
 
     "email.status.INVIATO": "Gesendet",
     "email.status.RISPOSTO": "Geantwortet",
@@ -693,6 +699,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Suivi programmé pour le {date}",
+    "followup.bucket.overdue": "En retard",
+    "followup.bucket.today": "Aujourd'hui",
+    "followup.bucket.upcoming": "À venir",
 
     "email.status.INVIATO": "Envoyé",
     "email.status.RISPOSTO": "Répondu",
@@ -951,6 +960,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Nadzor načrtovan za {date}",
+    "followup.bucket.overdue": "Zapadlo",
+    "followup.bucket.today": "Danes",
+    "followup.bucket.upcoming": "Prihajajoče",
 
     "email.status.INVIATO": "Poslano",
     "email.status.RISPOSTO": "Odgovorjeno",
@@ -1209,6 +1221,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Follow-up scheduled for {date}",
+    "followup.bucket.overdue": "Overdue",
+    "followup.bucket.today": "Today",
+    "followup.bucket.upcoming": "Upcoming",
 
     "email.status.INVIATO": "Sent",
     "email.status.RISPOSTO": "Replied",
@@ -1467,6 +1482,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Seguimiento programado para el {date}",
+    "followup.bucket.overdue": "Atrasado",
+    "followup.bucket.today": "Hoy",
+    "followup.bucket.upcoming": "Próximos",
 
     "email.status.INVIATO": "Enviado",
     "email.status.RISPOSTO": "Respondido",
@@ -1725,6 +1743,9 @@ export const DICTIONARIES: Record<LocaleCode, Dict> = {
     "csv.cityDefault": "{city}",
 
     "followup.scheduled": "Follow-up agendado para {date}",
+    "followup.bucket.overdue": "Atrasado",
+    "followup.bucket.today": "Hoje",
+    "followup.bucket.upcoming": "Próximos",
 
     "email.status.INVIATO": "Enviado",
     "email.status.RISPOSTO": "Respondido",
