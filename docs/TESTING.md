@@ -14,6 +14,8 @@ Come si controlla che Lead Machine funzioni davvero.
 | `npm run check:auth` | login, cookie di sessione, CSRF, header di sicurezza e fail-closed senza `APP_PASSWORD`; avvia da solo due server di produzione | no (richiede `npm run build` e `npm run setup`) |
 | `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 17 pagine, in tema chiaro e scuro (Playwright) | si' |
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
+| `npm run test:flows` | flussi chiave sul server vero: dati del lead e verifica, import CSV, ricevute, azioni massive | si' |
+| `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma | no |
 | `npm run smoke:geo` | sorgenti geografiche reali, geocoding reale senza coordinate e API pubblica di ricerca | si' |
 | `npm run perf:check` | tempi di risposta reali e peso in byte delle pagine e delle API chiave | si' |
 | `node scripts/probe-mirrors.mjs` | quali mirror Overpass sono ancora vivi, con quale copertura e in quanto tempo | no (va in rete) |
@@ -85,6 +87,30 @@ SMOKE_PASSWORD='la-stessa-password' npm run smoke:api
 ```
 
 Deve passare **tutto**: lo script esce con codice diverso da zero e stampa l'elenco dei controlli falliti se anche uno solo non torna.
+
+## 4b. Flussi chiave (`npm run test:flows`)
+
+I percorsi che l'utente tocca ogni giorno, provati contro il server acceso con gli stessi endpoint dell'interfaccia. Non sono test unitari su funzioni pure: qui si crea, si legge, si modifica e si cancella davvero, e si controlla cosa resta nel database.
+
+- **Dati del lead**: creazione con deduplica su `osmId` e su nome + citta, campi salvati come inviati, email non valida respinta (`400`) e non applicata, cambio di stato che lascia una riga nel diario.
+- **Verifica dati**: una fotografia per campo (`phone`, `email`, `website`, `address`, `social`), zero problemi su un lead vuoto, sito assente confermato, indirizzo con coordinate lasciato `da_verificare` (nessun geocoder ha confermato la posizione), e una seconda verifica che **sostituisce** la fotografia invece di duplicare le righe. Il lead usato non ha email ne sito, quindi il test non tocca la rete ed e' deterministico anche in CI.
+- **Import CSV**: 5 righe in cui 2 sono valide e 3 vanno scartate (duplicato nel file, riga senza nome, stato inesistente); voto `4.56` arrotondato a `4.6`, coordinate con la virgola (`45,07`) accettate, voto `9` e `lat` `999` scartati, punteggio `150` limitato a `100`; un secondo import non crea doppioni.
+- **Ricevute**: numero `RICEVUTA-<anno>-NNN` progressivo, importo arrotondato ai centesimi, metodo sconosciuto ricondotto a `contanti`, `400` su importo non positivo o lead mancante, `404` su lead inesistente, elenco per lead in ordine di data, modifica, data non valida respinta, cancellazione effettiva.
+- **Azioni massive**: cambio di stato su piu' lead con una riga di diario per ciascuno, stato/azione inesistenti respinti, id inesistenti che non sono un errore (`0` eliminati), eliminazione del lead e **cascata** sulle ricevute collegate.
+
+```bash
+SMOKE_PASSWORD='la-tua-password' npm run test:flows
+```
+
+I lead creati hanno tutti il prefisso `Flussi Test —`: lo script li cancella a fine corsa e anche all'inizio, se una run precedente si e' interrotta a meta' (il controllo di igiene in CI non trova residui).
+
+## 4c. Allineamento D1 ↔ Prisma (`npm run check:schema`)
+
+Il progetto ha due sorgenti di verita' per il database: `prisma/schema.prisma` per lo sviluppo locale (`prisma db push`) e `migrations/*.sql` per D1, dove il database nasce con `wrangler d1 migrations apply`. Se divergono, tutto funziona in locale e in produzione le API rispondono `no such column` solo dopo il deploy.
+
+Il controllo applica tutte le migrazioni, in ordine, a un database SQLite temporaneo e le confronta con lo schema Prisma usando `prisma migrate diff --exit-code`: qualunque differenza di tabella, colonna, indice o vincolo fa fallire il comando e stampa l'SQL mancante. Il database temporaneo viene cancellato a fine corsa e non serve nessun servizio esterno.
+
+Quando il controllo fallisce, la correzione e' una **nuova** migrazione (es. `migrations/0002_....sql`) con l'SQL stampato: `0001_init.sql` e' gia' stata applicata sui database esistenti e non va modificata.
 
 ## 5. Smoke test geografici (`npm run smoke:geo`)
 
@@ -169,8 +195,8 @@ Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM 
 
 `.github/workflows/ci.yml`, a ogni push e pull request:
 
-- **job "app"**: `npm run qa` e poi `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
-- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui`: 17 pagine in tema chiaro e scuro, console e layout;
+- **job "app"**: `npm run qa`, poi `npm run check:schema` (migrazioni D1 contro schema Prisma) e infine `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
+- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` e `npm run test:flows` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui`: 17 pagine in tema chiaro e scuro, console e layout;
 - **job "docker"**: costruisce l'immagine dal `Dockerfile`, la avvia con un volume nuovo, attende `/api/health` e verifica che `/login` risponda `200` e che il database sia stato creato in `/data`. Serve a non scoprire a release fatta che il percorso Docker si e' rotto;
 - **job "live"** (solo schedulato o con `workflow_dispatch`): costruisce il server di produzione, prepara database e seed, avvia `next start` e lancia `npm run smoke:geo` e `npm run perf:check`. Non e' un job richiesto dalle pull request: dipende da Overpass/Nominatim e da una macchina con il server acceso, quindi un loro disservizio non deve bloccare una modifica. I budget di performance sono calibrati su `npm start`, non sul server di sviluppo. Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
 - **job "audit"** (solo settimanale): `npm audit` sulle dipendenze.

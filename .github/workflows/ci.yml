@@ -30,6 +30,13 @@ jobs:
       - run: npx prisma generate
       - name: Test unitari, typecheck, lint e parità i18n (7 lingue)
         run: npm run qa
+
+      - name: Migrazioni D1 allineate allo schema Prisma
+        # Il database online nasce da migrations/*.sql, quello locale da
+        # prisma/schema.prisma: se divergono le API si rompono solo dopo il
+        # deploy. Il controllo applica le migrazioni a un SQLite temporaneo e
+        # confronta lo schema con `prisma migrate diff`.
+        run: npm run check:schema
       - name: Build di produzione
         run: npm run build
       - name: Database per auth smoke
@@ -151,6 +158,15 @@ jobs:
           fi
       - name: Smoke test API key
         run: SMOKE_BASE=http://localhost:3111 npm run smoke:api
+
+      - name: Flussi chiave — dati, import CSV, ricevute, azioni massive
+        # Stesso server: crea i propri lead, verifica i valori salvati e le
+        # validazioni, e ripulisce da solo (il controllo di igiene qui sotto
+        # fallirebbe se restasse qualcosa).
+        env:
+          SMOKE_BASE: http://localhost:3111
+          SMOKE_PASSWORD: smoke-ci-password-2026
+        run: npm run test:flows
       - name: Installa Chromium per il controllo dell'interfaccia
         run: npx playwright install --with-deps chromium
 
