@@ -69,10 +69,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const [searchRadiusM, setSearchRadiusM] = React.useState(5000);
 
+  // Pagine "a tutta pagina" senza sidebar: login, sito demo, ricevuta
+  // stampabile, portfolio. Su queste il guscio non deve fare nulla, nemmeno
+  // chiedere dati: sul login non c'e' ancora una sessione e le fetch
+  // finirebbero 401 nella console del browser.
+  const barePage =
+    pathname === "/login" ||
+    pathname?.startsWith("/demo/") ||
+    pathname?.startsWith("/ricevuta/") ||
+    pathname?.startsWith("/portfolio");
+
   // Il raggio configurato e' nel database, non nel layout: una query nel root
   // layout renderebbe statico/dinamico l'intero albero e potrebbe rompere il
   // build in CI senza database. Lo leggiamo dal client una volta sola.
   React.useEffect(() => {
+    if (barePage) return;
     let cancelled = false;
     fetch("/api/settings")
       .then((res) => (res.ok ? res.json() : null))
@@ -84,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [barePage]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -98,6 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // all'apertura dell'app si chiede al server di processare la coda scaduta.
   // E' un lavoro di sottofondo: nessun errore puo' bloccare la pagina.
   React.useEffect(() => {
+    if (barePage) return;
     try {
       const last = Number(window.sessionStorage.getItem(RETRY_SWEEP_KEY) || 0);
       if (Number.isFinite(last) && Date.now() - last < RETRY_SWEEP_EVERY_MS) return;
@@ -106,15 +118,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       // Senza sessionStorage (o con lo storage bloccato) si prova comunque.
     }
     void fetch("/api/leads/verify/retry", { method: "POST" }).catch(() => {});
-  }, []);
+  }, [barePage]);
 
-  // Pagine "a tutta pagina" senza sidebar: sito demo, ricevuta stampabile, portfolio.
-  if (
-    pathname === "/login" ||
-    pathname?.startsWith("/demo/") ||
-    pathname?.startsWith("/ricevuta/") ||
-    pathname?.startsWith("/portfolio")
-  ) {
+  if (barePage) {
     return <>{children}</>;
   }
 

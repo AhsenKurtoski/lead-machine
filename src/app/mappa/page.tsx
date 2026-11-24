@@ -4,7 +4,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import { CATEGORIES } from "@/lib/categories";
 import { Card, CardContent } from "@/components/ui/card";
-import { STATUS_LABELS, statusLabel } from "@/lib/utils";
+import { STATUS_LABELS, statusLabel, priorityMarkerColor } from "@/lib/utils";
 import { Loader2, MapPin } from "lucide-react";
 import type { MapLead } from "@/components/map/leads-map";
 
@@ -22,11 +22,12 @@ const LeadsMap = dynamic(() => import("@/components/map/leads-map"), {
 
 type Lead = MapLead & { lat: number | null; lng: number | null };
 
+// La legenda usa la stessa funzione dei marker: i colori non possono divergere.
 const LEGEND = [
-  { label: "80-100 (altissima)", color: "#dc2626" },
-  { label: "60-79 (alta)", color: "#ea580c" },
-  { label: "40-59 (media)", color: "#d97706" },
-  { label: "0-39 (bassa)", color: "#71717a" },
+  { label: "80-100 (altissima)", color: priorityMarkerColor(90) },
+  { label: "60-79 (alta)", color: priorityMarkerColor(70) },
+  { label: "40-59 (media)", color: priorityMarkerColor(50) },
+  { label: "0-39 (bassa)", color: priorityMarkerColor(20) },
 ];
 
 export default function MappaPage() {

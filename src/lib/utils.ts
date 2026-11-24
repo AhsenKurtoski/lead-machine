@@ -12,6 +12,17 @@ export function t(locale: LocaleCode | undefined | null, key: string, vars?: Rec
   return translate(l, key, vars);
 }
 
+// Colore (esadecimale) del marker sulla mappa in base al punteggio di
+// priorita (0-100). Unica fonte: la usano i marker e la legenda, cosi' i due
+// non possono divergere. La `priorityColor` piu' sotto resta per le classi
+// Tailwind dei badge, che non vanno su una mappa Leaflet.
+export function priorityMarkerColor(score: number): string {
+  if (score >= 80) return "#dc2626";
+  if (score >= 60) return "#ea580c";
+  if (score >= 40) return "#eab308";
+  return "#71717a";
+}
+
 export const STATUS_LABELS: Record<string, string> = {
   NUOVO: "status.NUOVO",
   CONTATTATO: "status.CONTATTATO",

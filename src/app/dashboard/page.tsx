@@ -156,7 +156,9 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* `items-start`: la card del grafico resta alta quanto il suo contenuto
+          invece di essere stirata all'altezza della classifica accanto. */}
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         {/* Funnel / pipeline */}
         <Card>
           <CardHeader>

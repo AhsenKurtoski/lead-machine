@@ -14,6 +14,10 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 - **Flat config nativa di `eslint-config-next` 16**: rimossi `FlatCompat` e `@eslint/eslintrc`. ESLint resta alla 9 (l'ultima con i plugin di Next dentro il peer range dichiarato: `eslint-plugin-import`, `jsx-a11y` e `react` non supportano ancora la 10); `react-hooks/set-state-in-effect` è disattivata con motivazione nel config, perché segnala i pattern di idratazione differita e caricamento dati usati di proposito dall'app. Il logout naviga con `router.replace` invece di ricaricare la pagina.
 
 ### Corretto
+- **Nessuna richiesta autenticata dal login**: `AppShell` sta nel root layout e lanciava `/api/settings` e `POST /api/leads/verify/retry` anche sulla pagina di accesso, dove non c'è sessione: due `401` in console a ogni visita. Ora le pagine a tutta pagina (login, demo, ricevute, portfolio) non eseguono nulla.
+- **Legenda della mappa leggibile**: le fasce 60-79 e 40-59 usavano due arancioni quasi identici e la legenda aveva colori copiati a mano. La fascia 40-59 è ora gialla e marker e legenda leggono la stessa funzione (`priorityMarkerColor`).
+- **Dashboard**: la card "Pipeline per stato" non viene più stirata all'altezza della classifica accanto, quindi il grafico non lascia più spazio vuoto sotto.
+- **Form di accesso**: aggiunto il campo utente nascosto per i password manager, che elimina anche l'avviso di Chrome sui form con sola password.
 - **Build Turbopack di Next 16**: il route segment config non viene più ri-esportato da `api/v1/demo/route.ts` e le letture a runtime di `health.ts` sono marcate `turbopackIgnore`, così il build non traccia l'intero progetto dentro il bundle del server.
 
 ## [1.1.0] - 2026-11-07
