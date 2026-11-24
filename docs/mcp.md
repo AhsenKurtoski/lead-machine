@@ -14,7 +14,7 @@ Funzionano con VS Code (Cline), Claude Desktop e qualsiasi client MCP.
 
 ## Setup
 
-1. Node.js 18.17+ o 20 LTS.
+1. Node.js 20.9+ o 22 LTS.
 2. Nessuna installazione manuale: i server partono via `npx -y` al primo uso.
 3. Solo `github` richiede un token:
    - Crea un PAT su https://github.com/settings/tokens (scope `repo`).

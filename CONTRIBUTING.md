@@ -35,7 +35,7 @@ Anything in this non-exhaustive list is welcome:
 git clone https://github.com/AhsenKurtoski/lead-machine.git
 cd lead-machine
 
-# 2. Install (Node 18.17+ or 20 LTS recommended)
+# 2. Install (Node 20.9+ required by Next.js 16; 22 LTS recommended)
 npm install
 
 # 3. Env

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Search,
@@ -65,6 +65,7 @@ const RETRY_SWEEP_EVERY_MS = 10 * 60_000;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [searchRadiusM, setSearchRadiusM] = React.useState(5000);
 
@@ -87,7 +88,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    window.location.href = "/login";
+    // Navigazione client-side: `refresh` invalida il payload RSC in cache, cosi'
+    // il proxy ricalcola la sessione senza ricaricare tutto il documento.
+    router.replace("/login");
+    router.refresh();
   }
 
   // I controlli di verifica rinviati per un errore di rete si riprovano da soli:
