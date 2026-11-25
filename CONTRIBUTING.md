@@ -60,7 +60,7 @@ Useful scripts:
 | `npm run lint` | Lint with `eslint .` (ESLint 9, flat config) |
 | `npm run typecheck` | Runs `tsc --noEmit` |
 | `npm test` | Unit tests (`node:test` + `tsx`) for the pure helpers in `src/lib/*.test.ts` |
-| `npm run qa` | The full gate: typecheck + lint + i18n parity + content and hygiene guard rails + tests |
+| `npm run qa` | The full gate: typecheck + lint + i18n parity + content and hygiene guard rails + D1 migration/schema alignment + tests |
 | `npm run i18n:check` | Verifies every locale has exactly the same key set |
 | `npm run check:content` | Fails if a removed module (quotes / price list) or a fiscal/age wording creeps back in |
 | `npm run check:hygiene` | Fails on an empty page, a dead internal link, an unreachable page, a `layout` without a `page`, an empty folder — and, when the DB exists, on smoke-test leftovers or inconsistent verification rows |
@@ -72,7 +72,7 @@ Useful scripts:
 
 > **Before opening a PR**, run:
 > ```bash
-> npm run qa          # typecheck + lint + i18n parity + content and hygiene guard rails + tests
+> npm run qa          # typecheck + lint + i18n parity + guard rails + D1/Prisma alignment + tests
 > ```
 > and make sure it passes (it is the same command the CI runs).
 

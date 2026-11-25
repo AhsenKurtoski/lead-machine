@@ -17,6 +17,7 @@ Il formato segue [Keep a Changelog](https://keepachangelog.com/it/IT/1.1.0/) e i
 
 ### Modificato
 - `axe-core` aggiunto alle devDependencies (solo per il controllo, non finisce nel bundle).
+- **Allineamento D1 ↔ Prisma dentro `npm run qa`**: `check:schema` ora fa parte del gate locale, non solo di un passo della CI. Una divergenza tra `migrations/*.sql` e `prisma/schema.prisma` si vede alla prima esecuzione di `qa` sul proprio computer, invece di comparire al primo deploy sulle API. In CI il passo separato e' stato tolto: lo esegue `qa`.
 
 ## [1.2.0] - 2026-11-24
 

@@ -8,14 +8,14 @@ Come si controlla che Lead Machine funzioni davvero.
 
 | Comando | Cosa verifica | Serve un server attivo |
 |---|---|---|
-| `npm run qa` | typecheck, lint, parita' delle 7 lingue, guard su contenuti e igiene e test unitari | no |
+| `npm run qa` | typecheck, lint, parita' delle 7 lingue, guard su contenuti e igiene, allineamento D1 ↔ Prisma e test unitari | no |
 | `npm test` | solo i test unitari (`src/**/*.test.ts`) | no |
 | `npm run check:hygiene` | pagine vuote, link e voci di menu verso rotte rimosse, pagine non raggiungibili, `layout` senza pagina, cartelle vuote, e residui nel database (se c'e') | no |
 | `npm run check:auth` | login, cookie di sessione, CSRF, header di sicurezza e fail-closed senza `APP_PASSWORD`; avvia da solo due server di produzione | no (richiede `npm run build` e `npm run setup`) |
 | `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 17 pagine, in tema chiaro e scuro (Playwright) | si' |
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
 | `npm run test:flows` | flussi chiave sul server vero: dati del lead e verifica, import CSV, ricevute, azioni massive | si' |
-| `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma | no |
+| `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma (fa parte di `npm run qa`) | no |
 | `npm run smoke:geo` | sorgenti geografiche reali, geocoding reale senza coordinate e API pubblica di ricerca | si' |
 | `npm run perf:check` | tempi di risposta reali e peso in byte delle pagine e delle API chiave | si' |
 | `node scripts/probe-mirrors.mjs` | quali mirror Overpass sono ancora vivi, con quale copertura e in quanto tempo | no (va in rete) |
@@ -112,6 +112,8 @@ Il controllo applica tutte le migrazioni, in ordine, a un database SQLite tempor
 
 Quando il controllo fallisce, la correzione e' una **nuova** migrazione (es. `migrations/0002_....sql`) con l'SQL stampato: `0001_init.sql` e' gia' stata applicata sui database esistenti e non va modificata.
 
+Il controllo fa parte di `npm run qa`: una divergenza si vede sul computer di chi scrive il codice, alla prima esecuzione del gate, e non al primo deploy. In CI non c'e' un passo separato, lo esegue `qa`.
+
 ## 5. Smoke test geografici (`npm run smoke:geo`)
 
 Serve a dimostrare che le fonti geografiche funzionano sul serio, non che rispondono dei finti:
@@ -173,13 +175,13 @@ L'arricchimento contatti (`Arricchisci contatti`) scarica la pagina del sito, es
 - **Invio email reale**: senza `SMTP_HOST` configurato l'app scrive i file `.eml` in `./tmp/emails/` per scelta. L'invio via SMTP non e' esercitato dai test.
 - **Provider AI**: senza `GEMINI_API_KEY` o `GROQ_API_KEY` le funzioni AI rispondono `503`. Gli smoke non li interrogano (consumano quota).
 - **Servizi di terze parti**: disponibilita' e limiti di Overpass, Nominatim e Geoapify non dipendono da noi. L'app degrada con un warning e con i risultati delle altre fonti; gli smoke lo tollerano.
-- **Accessibilita' automatica**: non c'e' un audit axe o Lighthouse in CI: i controlli di base (skip-link, landmark, ARIA, focus visibile) sono fatti a mano.
+- **Accessibilita'**: `check:ui` esegue `axe-core` su ogni pagina e ogni tema (WCAG 2.0/2.1 A e AA) e intercetta skip-link, landmark, nomi accessibili e contrasto dei colori, ma non sostituisce la prova con uno screen reader ne' un audit manuale; Lighthouse non e' in CI.
 - **Componenti React**: non ci sono test di rendering (nessun testing library): la logica e' nei moduli puri di `src/lib/` proprio per poterla testare senza browser.
 
 ## 10. Prima di una release
 
 ```bash
-npm run qa                 # typecheck + lint + i18n + guard + test unitari
+npm run qa                 # typecheck + lint + i18n + guard + allineamento D1/Prisma + test unitari
 npm run build              # build di produzione (prisma generate + next build)
 npm run setup              # DB e seed su un database nuovo, se serve
 
@@ -195,7 +197,7 @@ Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM 
 
 `.github/workflows/ci.yml`, a ogni push e pull request:
 
-- **job "app"**: `npm run qa`, poi `npm run check:schema` (migrazioni D1 contro schema Prisma) e infine `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
+- **job "app"**: `npm run qa` — che al suo interno esegue anche `check:schema`, cioe' le migrazioni D1 contro lo schema Prisma — e infine `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
 - **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` e `npm run test:flows` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui`: 17 pagine in tema chiaro e scuro, console e layout;
 - **job "docker"**: costruisce l'immagine dal `Dockerfile`, la avvia con un volume nuovo, attende `/api/health` e verifica che `/login` risponda `200` e che il database sia stato creato in `/data`. Serve a non scoprire a release fatta che il percorso Docker si e' rotto;
 - **job "live"** (solo schedulato o con `workflow_dispatch`): costruisce il server di produzione, prepara database e seed, avvia `next start` e lancia `npm run smoke:geo` e `npm run perf:check`. Non e' un job richiesto dalle pull request: dipende da Overpass/Nominatim e da una macchina con il server acceso, quindi un loro disservizio non deve bloccare una modifica. I budget di performance sono calibrati su `npm start`, non sul server di sviluppo. Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
