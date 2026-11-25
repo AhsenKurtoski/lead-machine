@@ -28,15 +28,13 @@ jobs:
       - name: Audit dipendenze (critical/high)
         run: npm audit --omit=dev --audit-level=high
       - run: npx prisma generate
-      - name: Test unitari, typecheck, lint e parità i18n (7 lingue)
+      - name: "QA: test unitari, typecheck, lint, i18n e allineamento D1/Prisma"
+        # `npm run qa` include `check:schema`, lo stesso comando che si lancia
+        # in locale: le migrazioni in migrations/*.sql, applicate a un SQLite
+        # temporaneo, devono dare esattamente prisma/schema.prisma. Il database
+        # online nasce dalle migrazioni, quello locale da `prisma db push`: se
+        # divergono le API si rompono solo dopo il deploy.
         run: npm run qa
-
-      - name: Migrazioni D1 allineate allo schema Prisma
-        # Il database online nasce da migrations/*.sql, quello locale da
-        # prisma/schema.prisma: se divergono le API si rompono solo dopo il
-        # deploy. Il controllo applica le migrazioni a un SQLite temporaneo e
-        # confronta lo schema con `prisma migrate diff`.
-        run: npm run check:schema
       - name: Build di produzione
         run: npm run build
       - name: Database per auth smoke
