@@ -97,6 +97,12 @@ wrangler.jsonc         configurazione Workers + binding D1 (DB)
 job pianificati `live`/`audit`. Un fallimento in `qa` va risolto alla causa:
 non si allentano i controlli per farlo passare.
 
+`codeql.yml` analizza JavaScript/TypeScript su push, pull request e ogni
+lunedì. Gli alert aperti hanno una decisione scritta in
+[`docs/CODEQL_TRIAGE.md`](docs/CODEQL_TRIAGE.md) — corretto, falso positivo,
+scelta voluta o solo test — con il punto esatto del codice. Un alert non si
+dismette senza quella riga, e un alert nuovo va spiegato lì prima di chiuderlo.
+
 ## Trappole note (verificate)
 
 - `wrangler.jsonc` contiene un `database_id` segnaposto finché non si crea il
@@ -118,6 +124,10 @@ non si allentano i controlli per farlo passare.
   rispondono 401, con scope insufficiente 403. CORS ristretto.
 - Rate limit sulle rotte sensibili (`rateLimit` in `src/lib/api-auth.ts`).
 - Nessun token nei log, nelle risposte o nei file committati.
+- `check:ui --theme=both --mobile` deve restare a **0 problemi e 0 avvisi**:
+  un avviso è una cosa da guardare, non rumore. L'ultimo risolto era lo scroll
+  orizzontale di `/crm` a 390 px (overflow della tabella che risaliva al
+  documento: `contain: layout` sul wrapper).
 
 ## Cosa non fare
 
