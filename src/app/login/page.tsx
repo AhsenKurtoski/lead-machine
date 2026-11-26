@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LockKeyhole, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { safeNextPath } from "@/lib/auth";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -28,8 +30,16 @@ export default function LoginPage() {
         setError(data.error || "Accesso non riuscito.");
         return;
       }
+      // Doppia difesa: `safeNextPath` scarta `//host` e gli schemi, poi il
+      // confronto esplicito dell'origine rende evidente (anche a un'analisi
+      // statica) che la destinazione resta sullo stesso sito.
       const params = new URLSearchParams(window.location.search);
-      window.location.href = safeNextPath(params.get("next"));
+      const target = new URL(safeNextPath(params.get("next")), window.location.origin);
+      if (target.origin === window.location.origin) {
+        router.push(target.pathname + target.search + target.hash);
+      } else {
+        router.push("/dashboard");
+      }
     } catch {
       setError("Impossibile contattare il server. Riprova.");
     } finally {
