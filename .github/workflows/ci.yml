@@ -269,6 +269,25 @@ jobs:
         if: failure()
         run: cat /tmp/lead-machine-live.log
 
+  secret-scan:
+    name: Segreti nella storia (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Tutta la storia: un segreto committato mesi fa resta leggibile
+          # anche dopo la rimozione dal file attuale.
+          fetch-depth: 0
+      - name: gitleaks
+        shell: bash
+        run: |
+          if ! command -v gitleaks >/dev/null 2>&1; then
+            version=8.24.3
+            curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz" \
+              | tar -xz -C /usr/local/bin gitleaks
+          fi
+          gitleaks detect --source . --redact --no-banner --exit-code 1
+
   audit:
     name: Audit dipendenze (settimanale)
     if: github.event_name == 'schedule'
