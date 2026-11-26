@@ -528,6 +528,14 @@ function writeMusic(file, duration, transitions) {
   fs.writeFileSync(file, buffer);
 }
 
+// ffmpeg legge `subtitles=filename=...` come un filtro: dentro il valore la
+// barra rovescia, i due punti e l'apostrofo aprono/chiudono la sintassi. Prima
+// si normalizzano i separatori di Windows, poi si proteggono i caratteri in un
+// solo passaggio: due replace in sequenza possono annidare le barre.
+function escapeFilterPath(file) {
+  return file.replace(/\\/g, "/").replace(/[\\:']/g, (ch) => `\\${ch}`);
+}
+
 function buildVideo(clips, music, assFile) {
   const inputs = clips.flatMap((clip) => ["-i", clip.file]);
   const parts = clips.map((_, i) => `[${i}:v]setpts=PTS-STARTPTS,format=yuv420p[v${i}]`);
@@ -541,7 +549,7 @@ function buildVideo(clips, music, assFile) {
     last = `x${i}`;
     end = offset + clips[i].duration;
   }
-  const assPath = assFile.replace(/\\/g, "/").replace(/:/g, "\\:").replace(/'/g, "\\'");
+  const assPath = escapeFilterPath(assFile);
   parts.push(
     `[${last}]fade=t=in:st=0:d=0.8,fade=t=out:st=${Math.max(0, end - 0.9).toFixed(3)}:d=0.9,subtitles=filename='${assPath}'[vout]`
   );

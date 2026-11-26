@@ -12,6 +12,7 @@
 
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -22,7 +23,11 @@ const NEXT_BIN = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
 const BUILD_ID = path.join(ROOT, ".next", "BUILD_ID");
 const PORT = Number(process.env.AUTH_CHECK_PORT || 3211);
 const NO_PASSWORD_PORT = PORT + 1;
-const PASSWORD = process.env.AUTH_CHECK_PASSWORD || `auth-check-${Math.random().toString(36).slice(2)}-pass`;
+// Password effimera del server di prova: `randomBytes` invece di Math.random
+// perché finisce in una variabile d'ambiente di un processo, e un PRNG
+// prevedibile lì non ha motivo di esistere.
+const PASSWORD =
+  process.env.AUTH_CHECK_PASSWORD || `auth-check-${randomBytes(12).toString("hex")}-pass`;
 
 let passes = 0;
 let failures = 0;
