@@ -414,7 +414,11 @@ export default function CrmPage() {
               <p>Nessun lead. Vai su "Ricerca lead" per trovarne e salvarli qui.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            // `contain: layout` ferma il scroll orizzontale della tabella al
+            // suo contenitore: senza, a 390 px il documento scorreva di 235 px
+            // (misurato con check:ui) mentre la tabella scorreva già dentro il
+            // wrapper. Il contenimento non cambia il layout interno.
+            <div className="overflow-x-auto [contain:layout]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase text-muted-foreground">
