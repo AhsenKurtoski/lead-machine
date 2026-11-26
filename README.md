@@ -16,6 +16,7 @@
 [![Prisma + SQLite](https://img.shields.io/badge/Prisma-SQLite-2d3748?logo=prisma)](#)
 [![i18n — 7 languages](https://img.shields.io/badge/i18n-7_langs-7c3aed)](#)
 [![License: MIT](https://img.shields.io/github/license/AhsenKurtoski/lead-machine?color=0969da)](./LICENSE)
+[![CodeQL](https://github.com/AhsenKurtoski/lead-machine/actions/workflows/codeql.yml/badge.svg)](https://github.com/AhsenKurtoski/lead-machine/actions/workflows/codeql.yml)
 [![Release](https://img.shields.io/github/v/release/AhsenKurtoski/lead-machine?color=2dd4bf)](https://github.com/AhsenKurtoski/lead-machine/releases)
 
 ---

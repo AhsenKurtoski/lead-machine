@@ -1,0 +1,43 @@
+name: CodeQL
+
+# Analisi statica di sicurezza (SAST) per il codice JavaScript/TypeScript di
+# Lead Machine. Non sostituisce `npm run qa`: cerca pattern pericolosi
+# (injection, path traversal, gestione di segreti e input) che i test unitari
+# non vedono. I risultati compaiono in Security → Code scanning.
+#
+# Il repository è pubblico, quindi CodeQL è gratuito. La schedulazione
+# settimanale serve perché nuove query vengono aggiunte anche quando il codice
+# non cambia.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  analyze:
+    name: Analisi JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Inizializza CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+
+      # Nessun build necessario: per JS/TS CodeQL estrae direttamente i file
+      # sorgente. Il build di Next.js resta nel job `app` della CI.
+      - name: Analizza
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"
