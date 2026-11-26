@@ -12,6 +12,20 @@
 export const SESSION_COOKIE = "lm_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 giorni
 
+/**
+ * Percorso interno sicuro per il redirect dopo il login.
+ *
+ * `startsWith("/")` da solo non basta: `//evil.com` è un URL
+ * protocollo-relativo che il browser interpreta come sito esterno, e `\/\`
+ * viene normalizzato in `//` da alcuni browser. Accettiamo solo percorsi che
+ * iniziano con una sola barra e restano sul sito.
+ */
+export function safeNextPath(next: string | null | undefined, fallback = "/dashboard"): string {
+  if (!next || !next.startsWith("/")) return fallback;
+  if (next.startsWith("//") || next.startsWith("/\\")) return fallback;
+  return next;
+}
+
 export function authPassword(): string {
   return (process.env.APP_PASSWORD || "").trim();
 }

@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LockKeyhole, Loader2 } from "lucide-react";
 
+import { safeNextPath } from "@/lib/auth";
+
 export default function LoginPage() {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
@@ -27,8 +29,7 @@ export default function LoginPage() {
         return;
       }
       const params = new URLSearchParams(window.location.search);
-      const next = params.get("next");
-      window.location.href = next && next.startsWith("/") ? next : "/dashboard";
+      window.location.href = safeNextPath(params.get("next"));
     } catch {
       setError("Impossibile contattare il server. Riprova.");
     } finally {
