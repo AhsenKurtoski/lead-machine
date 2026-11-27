@@ -167,71 +167,62 @@ const browser = await chromium.launch();
 // Usa il primo lead del seed (la CI esegue `npm run setup`) e, se il database
 // e' vuoto, ne crea uno temporaneo con il marker degli smoke test. La ricevuta
 // e' sempre temporanea: anche con un lead del seed non deve restare niente.
-// Entrambi i record vengono cancellati alla fine.
+// Ogni record creato finisce in `cleanup` e viene cancellato nel finally.
 const pages = [...PAGES];
-let createdLeadId = null;
-let createdReceiptId = null;
+const cleanup = [];
 const prep = await browser.newContext();
 let prepPage = null;
-let leadId = null;
+let stage = "scheda-lead";
+
 try {
   prepPage = await prep.newPage();
   await login(prepPage);
   // Le API si chiamano dalla pagina autenticata: stesso cookie di sessione e
   // stessa origine del browser vero (l'API rifiuta le mutazioni cross-origin).
-  const readLeads = async () => {
-    const result = await prepPage.evaluate(async () => {
-      const res = await fetch("/api/leads");
+  const api = async (path, init) =>
+    prepPage.evaluate(async (args) => {
+      const res = await fetch(args.path, args.init);
       return { status: res.status, body: await res.json().catch(() => ({})) };
-    });
-    if (result.status !== 200) throw new Error(`GET /api/leads: HTTP ${result.status}`);
-    return result.body.leads || [];
-  };
-  leadId = (await readLeads())[0]?.id ?? null;
+    }, { path, init });
+
+  const list = await api("/api/leads");
+  if (list.status !== 200) throw new Error(`GET /api/leads: HTTP ${list.status}`);
+  let leadId = list.body.leads?.[0]?.id ?? null;
   if (!leadId) {
     const name = "Smoke Test check:ui " + Date.now();
-    const result = await prepPage.evaluate(async (payload) => {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ candidates: [payload] }),
-      });
-      return { status: res.status };
-    }, { name, city: "Belluno", source: "check-ui" });
-    if (result.status !== 200) throw new Error(`POST /api/leads: HTTP ${result.status}`);
-    leadId = (await readLeads()).find((lead) => lead.name === name)?.id ?? null;
-    createdLeadId = leadId;
+    const created = await api("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ candidates: [{ name, city: "Belluno", source: "check-ui" }] }),
+    });
+    if (created.status !== 200) throw new Error(`POST /api/leads: HTTP ${created.status}`);
+    const after = await api("/api/leads");
+    leadId = after.body.leads?.find((lead) => lead.name === name)?.id ?? null;
+    if (!leadId) throw new Error("lead creato ma non rileggibile");
+    cleanup.push({ label: "lead temporaneo", path: "/api/leads/", id: leadId, page: "scheda-lead" });
   }
-  if (!leadId) throw new Error("nessun lead disponibile per /crm/{id}");
   pages.push(["scheda-lead", "/crm/" + leadId]);
-} catch (error) {
-  record(true, "scheda-lead", "-", "seed", `impossibile preparare il lead: ${error.message}`);
-}
 
-if (leadId && prepPage) {
-  try {
-    const result = await prepPage.evaluate(async (targetLeadId) => {
-      const res = await fetch("/api/receipts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          leadId: targetLeadId,
-          amount: 1,
-          description: "Smoke Test check:ui",
-          method: "contanti",
-        }),
-      });
-      return { status: res.status, body: await res.json().catch(() => ({})) };
-    }, leadId);
-    const receiptId = result.body?.receipt?.id ?? null;
-    if (result.status !== 201 || !receiptId) {
-      throw new Error(`POST /api/receipts: HTTP ${result.status}`);
-    }
-    createdReceiptId = receiptId;
-    pages.push(["ricevuta-scheda", "/ricevuta/" + createdReceiptId]);
-  } catch (error) {
-    record(true, "ricevuta-scheda", "-", "seed", `impossibile preparare la ricevuta: ${error.message}`);
+  stage = "ricevuta-scheda";
+  const receipt = await api("/api/receipts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      leadId,
+      amount: 1,
+      description: "Smoke Test check:ui",
+      method: "contanti",
+    }),
+  });
+  const receiptId = receipt.body?.receipt?.id ?? null;
+  if (receipt.status !== 201 || !receiptId) {
+    throw new Error(`POST /api/receipts: HTTP ${receipt.status}`);
   }
+  cleanup.push({ label: "ricevuta temporanea", path: "/api/receipts/", id: receiptId, page: "ricevuta-scheda" });
+  pages.push(["ricevuta-scheda", "/ricevuta/" + receiptId]);
+} catch (error) {
+  const what = stage === "scheda-lead" ? "il lead" : "la ricevuta";
+  record(true, stage, "-", "seed", `impossibile preparare ${what}: ${error.message}`);
 }
 
 try {
@@ -306,20 +297,40 @@ try {
             const panel = await page.evaluate(() => {
               // Selettore stabile: il pannello espone data-testid, non dipende
               // piu' dal testo del pulsante o dalle classi Tailwind.
-              const card = document.querySelector('[data-testid="verification-panel"]');
-              if (!card) return { missing: true };
+              const cards = document.querySelectorAll('[data-testid="verification-panel"]');
+              if (cards.length !== 1) return { missing: true, count: cards.length };
+              const card = cards[0];
               const rect = card.getBoundingClientRect();
               return {
                 missing: false,
                 left: Math.round(rect.left),
                 right: Math.round(rect.right),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
                 viewport: window.innerWidth,
                 scrollWidth: card.scrollWidth,
                 clientWidth: card.clientWidth,
               };
             });
             if (panel.missing) {
-              record(true, name, theme, "pannello", 'pannello "Dati verificati" non trovato');
+              record(
+                true,
+                name,
+                theme,
+                "pannello",
+                `pannello "Dati verificati" assente o non unico (${panel.count} nel DOM)`
+              );
+            } else if (panel.width < 100 || panel.height < 40) {
+              // Un pannello nascosto (display:none, contenitore collassato) ha
+              // geometria nulla: senza questo controllo passerebbe come "dentro
+              // il viewport" e senza overflow.
+              record(
+                true,
+                name,
+                theme,
+                "pannello",
+                `pannello non visibile (${panel.width}x${panel.height})`
+              );
             } else {
               if (panel.left < -1 || panel.right > panel.viewport + 1) {
                 record(
@@ -390,34 +401,17 @@ try {
     }
   }
 } finally {
-  if (createdReceiptId && prepPage) {
+  // Ordine inverso: prima la ricevuta, poi il lead (se e' temporaneo).
+  for (const item of cleanup.reverse()) {
     try {
-      const status = await prepPage.evaluate(async (id) => {
-        const res = await fetch("/api/receipts/" + id, { method: "DELETE" });
+      const status = await prepPage.evaluate(async (args) => {
+        const res = await fetch(args.path + args.id, { method: "DELETE" });
         return res.status;
-      }, createdReceiptId);
-      if (status === 200) {
-        console.log(`🧹 ricevuta temporanea ${createdReceiptId} cancellata`);
-      } else {
-        record(true, "ricevuta-scheda", "-", "pulizia", `ricevuta temporanea non cancellata (HTTP ${status})`);
-      }
+      }, { path: item.path, id: item.id });
+      if (status !== 200) throw new Error(`HTTP ${status}`);
+      console.log(`🧹 pulizia completata: ${item.label} ${item.id}`);
     } catch (error) {
-      record(true, "ricevuta-scheda", "-", "pulizia", `ricevuta temporanea non cancellata: ${error.message}`);
-    }
-  }
-  if (createdLeadId && prepPage) {
-    try {
-      const status = await prepPage.evaluate(async (id) => {
-        const res = await fetch("/api/leads/" + id, { method: "DELETE" });
-        return res.status;
-      }, createdLeadId);
-      if (status === 200) {
-        console.log(`🧹 lead temporaneo ${createdLeadId} cancellato`);
-      } else {
-        record(true, "scheda-lead", "-", "pulizia", `lead temporaneo non cancellato (HTTP ${status})`);
-      }
-    } catch (error) {
-      record(true, "scheda-lead", "-", "pulizia", `lead temporaneo non cancellato: ${error.message}`);
+      record(true, item.page, "-", "pulizia", `pulizia non riuscita: ${item.label} ${item.id} (${error.message})`);
     }
   }
   await prep.close();
