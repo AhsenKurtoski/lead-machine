@@ -61,10 +61,9 @@ if (!password) {
   process.exit(1);
 }
 
-// Pagine autenticate dell'app. La scheda di un lead (/crm/{id}) non ha un URL
-// fisso: viene aggiunta a runtime con il primo lead del seed (o con un lead
-// temporaneo, cancellato alla fine). /ricevuta/{id} resta coperta dagli smoke
-// test delle API.
+// Pagine autenticate dell'app. Le schede /crm/{id} e /ricevuta/{id} non hanno
+// un URL fisso: vengono aggiunte a runtime con il primo lead del seed (o con
+// un lead temporaneo) e con una ricevuta temporanea, cancellati alla fine.
 const PAGES = [
   ["dashboard", "/dashboard"],
   ["ricerca", "/ricerca"],
@@ -164,15 +163,17 @@ const CONTRAST_PROBE = `(() => {
 
 const browser = await chromium.launch();
 
-// La scheda di un lead (/crm/{id}) non e' un URL fisso: serve un record.
+// Le schede /crm/{id} e /ricevuta/{id} non hanno un URL fisso: servono record.
 // Usa il primo lead del seed (la CI esegue `npm run setup`) e, se il database
-// e' vuoto, ne crea uno temporaneo con il marker degli smoke test, cancellato
-// alla fine. Senza questo la scheda e il suo pannello non verrebbero mai
-// controllati, ne' a desktop ne' a 390 px.
+// e' vuoto, ne crea uno temporaneo con il marker degli smoke test. La ricevuta
+// e' sempre temporanea: anche con un lead del seed non deve restare niente.
+// Entrambi i record vengono cancellati alla fine.
 const pages = [...PAGES];
 let createdLeadId = null;
+let createdReceiptId = null;
 const prep = await browser.newContext();
 let prepPage = null;
+let leadId = null;
 try {
   prepPage = await prep.newPage();
   await login(prepPage);
@@ -186,7 +187,7 @@ try {
     if (result.status !== 200) throw new Error(`GET /api/leads: HTTP ${result.status}`);
     return result.body.leads || [];
   };
-  let leadId = (await readLeads())[0]?.id ?? null;
+  leadId = (await readLeads())[0]?.id ?? null;
   if (!leadId) {
     const name = "Smoke Test check:ui " + Date.now();
     const result = await prepPage.evaluate(async (payload) => {
@@ -205,6 +206,32 @@ try {
   pages.push(["scheda-lead", "/crm/" + leadId]);
 } catch (error) {
   record(true, "scheda-lead", "-", "seed", `impossibile preparare il lead: ${error.message}`);
+}
+
+if (leadId && prepPage) {
+  try {
+    const result = await prepPage.evaluate(async (targetLeadId) => {
+      const res = await fetch("/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId: targetLeadId,
+          amount: 1,
+          description: "Smoke Test check:ui",
+          method: "contanti",
+        }),
+      });
+      return { status: res.status, body: await res.json().catch(() => ({})) };
+    }, leadId);
+    const receiptId = result.body?.receipt?.id ?? null;
+    if (result.status !== 201 || !receiptId) {
+      throw new Error(`POST /api/receipts: HTTP ${result.status}`);
+    }
+    createdReceiptId = receiptId;
+    pages.push(["ricevuta-scheda", "/ricevuta/" + createdReceiptId]);
+  } catch (error) {
+    record(true, "ricevuta-scheda", "-", "seed", `impossibile preparare la ricevuta: ${error.message}`);
+  }
 }
 
 try {
@@ -277,15 +304,9 @@ try {
           // viewport e che non abbia scorrimento orizzontale interno.
           if (name === "scheda-lead") {
             const panel = await page.evaluate(() => {
-              const button = [...document.querySelectorAll("button")].find((b) =>
-                /Verifica ora/i.test(b.textContent || "")
-              );
-              if (!button) return { missing: true };
-              let card = button;
-              while (card && card !== document.body) {
-                if (card.tagName === "DIV" && /rounded-xl/.test(String(card.className))) break;
-                card = card.parentElement;
-              }
+              // Selettore stabile: il pannello espone data-testid, non dipende
+              // piu' dal testo del pulsante o dalle classi Tailwind.
+              const card = document.querySelector('[data-testid="verification-panel"]');
               if (!card) return { missing: true };
               const rect = card.getBoundingClientRect();
               return {
@@ -369,6 +390,21 @@ try {
     }
   }
 } finally {
+  if (createdReceiptId && prepPage) {
+    try {
+      const status = await prepPage.evaluate(async (id) => {
+        const res = await fetch("/api/receipts/" + id, { method: "DELETE" });
+        return res.status;
+      }, createdReceiptId);
+      if (status === 200) {
+        console.log(`🧹 ricevuta temporanea ${createdReceiptId} cancellata`);
+      } else {
+        record(true, "ricevuta-scheda", "-", "pulizia", `ricevuta temporanea non cancellata (HTTP ${status})`);
+      }
+    } catch (error) {
+      record(true, "ricevuta-scheda", "-", "pulizia", `ricevuta temporanea non cancellata: ${error.message}`);
+    }
+  }
   if (createdLeadId && prepPage) {
     try {
       const status = await prepPage.evaluate(async (id) => {

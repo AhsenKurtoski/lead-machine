@@ -89,7 +89,7 @@ export function VerificationPanel({ leadId }: { leadId: string }) {
   const overall = summary?.overall ?? "da_verificare";
 
   return (
-    <Card>
+    <Card data-testid="verification-panel">
       <CardHeader>
         <CardTitle className="flex flex-wrap items-center gap-2 text-base">
           <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
