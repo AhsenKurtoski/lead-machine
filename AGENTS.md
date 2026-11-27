@@ -125,9 +125,10 @@ dismette senza quella riga, e un alert nuovo va spiegato lì prima di chiuderlo.
 - Rate limit sulle rotte sensibili (`rateLimit` in `src/lib/api-auth.ts`).
 - Nessun token nei log, nelle risposte o nei file committati.
 - `check:ui --theme=both --mobile` deve restare a **0 problemi e 0 avvisi**:
-  un avviso è una cosa da guardare, non rumore. L'ultimo risolto era lo scroll
-  orizzontale di `/crm` a 390 px (overflow della tabella che risaliva al
-  documento: `contain: layout` sul wrapper).
+  un avviso è una cosa da guardare, non rumore. Lo scroll orizzontale della
+  pagina è **bloccante anche a 390 px** (non più un avviso). L'ultimo caso
+  risolto era `/crm`: l'overflow della tabella risaliva al documento per 235 px
+  e `contain: layout` sul wrapper lo tiene dentro la tabella.
 
 ## Cosa non fare
 

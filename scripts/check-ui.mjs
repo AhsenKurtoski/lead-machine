@@ -15,7 +15,8 @@
 //
 // Opzioni:
 //   --theme=light|dark|both   temi da controllare (default both)
-//   --mobile                  aggiunge il giro a 390x844 (solo avvisi)
+//   --mobile                  aggiunge il giro a 390x844 (stessi controlli,
+//                             overflow orizzontale compreso)
 //   --contrast                aggiunge il controllo del contrasto del testo
 //                             (solo avvisi: e' una stima, non un audit WCAG)
 //   --no-axe                  salta l'audit di accessibilita' (axe-core)
@@ -218,7 +219,10 @@ try {
             return doc.scrollWidth - doc.clientWidth;
           });
           if (overflow > 1) {
-            record(!viewport.mobile, name, theme, "overflow", `${overflow}px di scorrimento orizzontale a ${viewport.width}px`);
+            // Bloccante anche a 390 px: lo scorrimento orizzontale della
+            // pagina non e' un dettaglio estetico, sposta i contenuti fuori
+            // dallo schermo. Il caso scoperto qui era /crm (235 px).
+            record(true, name, theme, "overflow", `${overflow}px di scorrimento orizzontale a ${viewport.width}px`);
           }
 
           for (const issue of consoleIssues) {

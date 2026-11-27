@@ -154,7 +154,7 @@ APP_PASSWORD='la-tua-password' PORT=3111 npm start
 APP_PASSWORD='la-tua-password' npm run check:ui
 ```
 
-Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844; gli overflow li' sono avvisi, non errori), `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi) e `--no-axe` (salta l'audit di accessibilita'). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
+Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844 con gli stessi controlli: anche li' l'overflow orizzontale della pagina e' bloccante), `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi) e `--no-axe` (salta l'audit di accessibilita'). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
 
 ## 8. Il motore di verifica fa controlli reali
 
@@ -171,7 +171,7 @@ L'arricchimento contatti (`Arricchisci contatti`) scarica la pagina del sito, es
 
 ## 9. Cosa NON e' coperto
 
-- **Resa visiva e mobile**: `npm run check:ui` intercetta errori di console, idratazione, richieste fallite e overflow, ma **non** giudica l'aspetto: colori, spaziature e leggibilita' si guardano a occhio. Con `--mobile` controlla anche 390x844, dove gli overflow restano avvisi. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot`, ffmpeg/ffprobe nel PATH e un server avviato). Il video esce a 1920×1080 con cursore, intro/outro, lower-third, dissolvenze e musica generata dal codice.
+- **Resa visiva e mobile**: `npm run check:ui` intercetta errori di console, idratazione, richieste fallite e overflow, ma **non** giudica l'aspetto: colori, spaziature e leggibilita' si guardano a occhio. Con `--mobile` controlla anche 390x844, dove l'overflow orizzontale della pagina blocca come a desktop. Gli screenshot si generano con `APP_PASSWORD=… npm run screenshots` e il video con `APP_PASSWORD=… npm run demo` (richiedono Playwright installato con `npm run setup:screenshot`, ffmpeg/ffprobe nel PATH e un server avviato). Il video esce a 1920×1080 con cursore, intro/outro, lower-third, dissolvenze e musica generata dal codice.
 - **Invio email reale**: senza `SMTP_HOST` configurato l'app scrive i file `.eml` in `./tmp/emails/` per scelta. L'invio via SMTP non e' esercitato dai test.
 - **Provider AI**: senza `GEMINI_API_KEY` o `GROQ_API_KEY` le funzioni AI rispondono `503`. Gli smoke non li interrogano (consumano quota).
 - **Servizi di terze parti**: disponibilita' e limiti di Overpass, Nominatim e Geoapify non dipendono da noi. L'app degrada con un warning e con i risultati delle altre fonti; gli smoke lo tollerano.
