@@ -48,7 +48,7 @@ npm run check:auth     # login, cookie, CSRF, header, fail-closed senza APP_PASS
 npm run check:pages    # pagine e rotte raggiungibili
 npm run check:content  # testi e dati coerenti
 npm run check:hygiene  # pagine vuote, link morti, residui nel database
-npm run check:ui       # 17 pagine in chiaro/scuro con Playwright (serve il server)
+npm run check:ui       # 17 pagine in chiaro/scuro, + mobile con --mobile (serve il server)
 npm run smoke:api      # chiavi, permessi, 401/403/404, preflight CORS
 npm run test:flows     # flussi reali sul server (dati lead, CSV, ricevute, bulk)
 npm run smoke:geo      # sorgenti geografiche e geocoding reali
