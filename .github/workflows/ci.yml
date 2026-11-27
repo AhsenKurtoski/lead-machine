@@ -168,14 +168,17 @@ jobs:
       - name: Installa Chromium per il controllo dell'interfaccia
         run: npx playwright install --with-deps chromium
 
-      - name: Console e layout su ogni pagina, tema chiaro e scuro
+      - name: Console e layout su desktop e mobile, tema chiaro e scuro
         # Riusa il server di produzione gia' acceso da questo job: apre tutte
         # le pagine e fallisce su errori in console, idratazione, 401/5xx e
         # overflow orizzontale. Sono le regressioni gia' capitate a mano.
+        # `--mobile` aggiunge il giro a 390x844: senza, la regola bloccante
+        # sullo scroll orizzontale mobile non verrebbe mai eseguita in CI
+        # (e' cosi' che /crm sfondava di 235 px).
         env:
           APP_PASSWORD: smoke-ci-password-2026
           BASE_URL: http://127.0.0.1:3111
-        run: npm run check:ui
+        run: npm run check:ui -- --mobile
 
       - name: Nessun residuo di test nel database
         # `--require-db`: qui il database c'e' per davvero, quindi assente e'
