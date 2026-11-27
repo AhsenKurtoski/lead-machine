@@ -61,8 +61,10 @@ if (!password) {
   process.exit(1);
 }
 
-// Pagine autenticate dell'app. Le pagine di dettaglio (/crm/{id},
-// /ricevuta/{id}) richiedono un record e sono coperte dai test delle API.
+// Pagine autenticate dell'app. La scheda di un lead (/crm/{id}) non ha un URL
+// fisso: viene aggiunta a runtime con il primo lead del seed (o con un lead
+// temporaneo, cancellato alla fine). /ricevuta/{id} resta coperta dagli smoke
+// test delle API.
 const PAGES = [
   ["dashboard", "/dashboard"],
   ["ricerca", "/ricerca"],
@@ -161,6 +163,50 @@ const CONTRAST_PROBE = `(() => {
 })()`;
 
 const browser = await chromium.launch();
+
+// La scheda di un lead (/crm/{id}) non e' un URL fisso: serve un record.
+// Usa il primo lead del seed (la CI esegue `npm run setup`) e, se il database
+// e' vuoto, ne crea uno temporaneo con il marker degli smoke test, cancellato
+// alla fine. Senza questo la scheda e il suo pannello non verrebbero mai
+// controllati, ne' a desktop ne' a 390 px.
+const pages = [...PAGES];
+let createdLeadId = null;
+const prep = await browser.newContext();
+let prepPage = null;
+try {
+  prepPage = await prep.newPage();
+  await login(prepPage);
+  // Le API si chiamano dalla pagina autenticata: stesso cookie di sessione e
+  // stessa origine del browser vero (l'API rifiuta le mutazioni cross-origin).
+  const readLeads = async () => {
+    const result = await prepPage.evaluate(async () => {
+      const res = await fetch("/api/leads");
+      return { status: res.status, body: await res.json().catch(() => ({})) };
+    });
+    if (result.status !== 200) throw new Error(`GET /api/leads: HTTP ${result.status}`);
+    return result.body.leads || [];
+  };
+  let leadId = (await readLeads())[0]?.id ?? null;
+  if (!leadId) {
+    const name = "Smoke Test check:ui " + Date.now();
+    const result = await prepPage.evaluate(async (payload) => {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidates: [payload] }),
+      });
+      return { status: res.status };
+    }, { name, city: "Belluno", source: "check-ui" });
+    if (result.status !== 200) throw new Error(`POST /api/leads: HTTP ${result.status}`);
+    leadId = (await readLeads()).find((lead) => lead.name === name)?.id ?? null;
+    createdLeadId = leadId;
+  }
+  if (!leadId) throw new Error("nessun lead disponibile per /crm/{id}");
+  pages.push(["scheda-lead", "/crm/" + leadId]);
+} catch (error) {
+  record(true, "scheda-lead", "-", "seed", `impossibile preparare il lead: ${error.message}`);
+}
+
 try {
   const contexts = [{ label: "desktop", width: 1280, height: 800, mobile: false }];
   if (withMobile) contexts.push({ label: "mobile", width: 390, height: 844, mobile: true });
@@ -202,7 +248,7 @@ try {
         continue;
       }
 
-      for (const [name, route] of PAGES) {
+      for (const [name, route] of pages) {
         consoleIssues.length = 0;
         try {
           await page.goto(BASE_URL + route, { waitUntil: "domcontentloaded", timeout: 30000 });
@@ -223,6 +269,56 @@ try {
             // pagina non e' un dettaglio estetico, sposta i contenuti fuori
             // dallo schermo. Il caso scoperto qui era /crm (235 px).
             record(true, name, theme, "overflow", `${overflow}px di scorrimento orizzontale a ${viewport.width}px`);
+          }
+
+          // La scheda lead deve mostrare il pannello "Dati verificati" intero:
+          // il controllo generico dell'overflow non vede un contenuto tagliato
+          // da un contenitore che lo nasconde. Verifica che la card sia nel
+          // viewport e che non abbia scorrimento orizzontale interno.
+          if (name === "scheda-lead") {
+            const panel = await page.evaluate(() => {
+              const button = [...document.querySelectorAll("button")].find((b) =>
+                /Verifica ora/i.test(b.textContent || "")
+              );
+              if (!button) return { missing: true };
+              let card = button;
+              while (card && card !== document.body) {
+                if (card.tagName === "DIV" && /rounded-xl/.test(String(card.className))) break;
+                card = card.parentElement;
+              }
+              if (!card) return { missing: true };
+              const rect = card.getBoundingClientRect();
+              return {
+                missing: false,
+                left: Math.round(rect.left),
+                right: Math.round(rect.right),
+                viewport: window.innerWidth,
+                scrollWidth: card.scrollWidth,
+                clientWidth: card.clientWidth,
+              };
+            });
+            if (panel.missing) {
+              record(true, name, theme, "pannello", 'pannello "Dati verificati" non trovato');
+            } else {
+              if (panel.left < -1 || panel.right > panel.viewport + 1) {
+                record(
+                  true,
+                  name,
+                  theme,
+                  "pannello",
+                  `pannello fuori dal viewport (${panel.left}-${panel.right} su ${panel.viewport} px)`
+                );
+              }
+              if (panel.scrollWidth > panel.clientWidth + 1) {
+                record(
+                  true,
+                  name,
+                  theme,
+                  "pannello",
+                  `contenuto del pannello tagliato (${panel.scrollWidth}px in ${panel.clientWidth}px)`
+                );
+              }
+            }
           }
 
           for (const issue of consoleIssues) {
@@ -273,13 +369,29 @@ try {
     }
   }
 } finally {
+  if (createdLeadId && prepPage) {
+    try {
+      const status = await prepPage.evaluate(async (id) => {
+        const res = await fetch("/api/leads/" + id, { method: "DELETE" });
+        return res.status;
+      }, createdLeadId);
+      if (status === 200) {
+        console.log(`🧹 lead temporaneo ${createdLeadId} cancellato`);
+      } else {
+        record(true, "scheda-lead", "-", "pulizia", `lead temporaneo non cancellato (HTTP ${status})`);
+      }
+    } catch (error) {
+      record(true, "scheda-lead", "-", "pulizia", `lead temporaneo non cancellato: ${error.message}`);
+    }
+  }
+  await prep.close();
   await browser.close();
 }
 
 const blocking = findings.filter((f) => f.blocking);
 const warnings = findings.filter((f) => !f.blocking);
 console.log(
-  `\nPagine controllate: ${PAGES.length} x ${themes.length} temi x ${withMobile ? 2 : 1} viewport. ` +
+  `\nPagine controllate: ${pages.length} x ${themes.length} temi x ${withMobile ? 2 : 1} viewport. ` +
     `${blocking.length} problemi, ${warnings.length} avvisi.`
 );
 if (blocking.length > 0) {

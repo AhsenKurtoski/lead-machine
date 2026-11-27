@@ -14,13 +14,13 @@ import {
 
 const OVERALL_COLORS: Record<string, string> = {
   verificato: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  da_verificare: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  da_verificare: "bg-amber-500/15 text-amber-800 dark:text-amber-400",
   attenzione: "bg-red-500/15 text-red-600 dark:text-red-400",
 };
 
 const STATUS_COLORS: Record<string, string> = {
   verificato: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  da_verificare: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  da_verificare: "bg-amber-500/15 text-amber-800 dark:text-amber-400",
   assente: "bg-zinc-500/15 text-zinc-500",
   non_raggiungibile: "bg-red-500/15 text-red-600 dark:text-red-400",
   non_valido: "bg-red-500/15 text-red-600 dark:text-red-400",

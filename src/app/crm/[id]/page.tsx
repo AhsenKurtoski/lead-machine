@@ -389,8 +389,9 @@ export default function LeadDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Template</label>
+                <label htmlFor="lead-template" className="text-sm font-medium">Template</label>
                 <select
+                  id="lead-template"
                   className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   value={templateId}
                   onChange={(e) => setTemplateId(e.target.value)}
@@ -504,7 +505,11 @@ export default function LeadDetailPage() {
                   {tags.map((t) => (
                     <span key={t} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs">
                       {t}
-                      <button onClick={() => removeTag(t)} className="hover:text-destructive">
+                      <button
+                        onClick={() => removeTag(t)}
+                        aria-label={"Rimuovi etichetta " + t}
+                        className="hover:text-destructive"
+                      >
                         <X className="h-3 w-3" />
                       </button>
                     </span>
@@ -517,7 +522,13 @@ export default function LeadDetailPage() {
                       placeholder="Aggiungi tag"
                       className="h-8 w-32"
                     />
-                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={addTag}>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="h-8 w-8"
+                      aria-label="Aggiungi etichetta"
+                      onClick={addTag}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
