@@ -51,7 +51,10 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
         <PrintButton />
       </div>
 
-      <div className="print-sheet mx-auto max-w-[820px] bg-white shadow-lg">
+      {/* `text-zinc-900` esplicito: la ricevuta e' sempre bianca, anche in tema
+          scuro, quindi il testo non deve ereditare il colore chiaro del body
+          (era 1.04:1 su bianco). */}
+      <div className="print-sheet mx-auto max-w-[820px] bg-white text-zinc-900 shadow-lg">
         <div className="h-2 w-full rounded-t bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500" />
         <div className="p-10">
           <div className="flex items-start justify-between border-b pb-6">
@@ -86,11 +89,11 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
 
           <div className="mt-6 grid gap-6 text-sm sm:grid-cols-2">
             <div>
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Ricevuto da</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Ricevuto da</div>
               <div className="font-semibold">{brandName || issuer || "________________"}</div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Pagato da</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Pagato da</div>
               <div className="font-semibold">{lead.name}</div>
               {lead.addressFull ? <div className="text-zinc-600">{lead.addressFull}</div> : null}
               {lead.email ? <div className="text-zinc-600">{lead.email}</div> : null}
@@ -98,30 +101,30 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
           </div>
 
           <div className="mt-6">
-            <div className="text-xs uppercase tracking-wide text-zinc-400">Descrizione</div>
+            <div className="text-xs uppercase tracking-wide text-zinc-500">Descrizione</div>
             <p className="text-sm text-zinc-700">{description}</p>
           </div>
 
           <div className="mt-6 grid gap-4 rounded-lg bg-zinc-50 p-4 text-sm sm:grid-cols-3">
             <div>
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Importo pagato</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Importo pagato</div>
               <div className="text-xl font-bold text-emerald-700">
                 {formatCurrency(receipt.amount, locale, currency)}
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Metodo</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Metodo</div>
               <div className="font-semibold">{methodLabel(receipt.method)}</div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Data pagamento</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Data pagamento</div>
               <div className="font-semibold">{formatDate(receipt.paidAt)}</div>
             </div>
           </div>
 
           {receipt.notes ? (
             <div className="mt-6 text-sm">
-              <div className="text-xs uppercase tracking-wide text-zinc-400">Note</div>
+              <div className="text-xs uppercase tracking-wide text-zinc-500">Note</div>
               <p className="text-zinc-700">{receipt.notes}</p>
             </div>
           ) : null}
@@ -129,19 +132,19 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
           <div className="mt-10 grid gap-8 text-sm sm:grid-cols-2">
             <div>
               <div className="mb-10 text-zinc-500">Luogo e data</div>
-              <div className="border-t border-zinc-300 pt-1 text-xs text-zinc-400">
+              <div className="border-t border-zinc-300 pt-1 text-xs text-zinc-500">
                 ____________________
               </div>
             </div>
             <div>
               <div className="mb-10 text-zinc-500">Firma di chi ha ricevuto il pagamento</div>
-              <div className="border-t border-zinc-300 pt-1 text-xs text-zinc-400">
+              <div className="border-t border-zinc-300 pt-1 text-xs text-zinc-500">
                 {issuer || brandName || "____________________"}
               </div>
             </div>
           </div>
 
-          <div className="mt-8 text-center text-xs text-zinc-400">
+          <div className="mt-8 text-center text-xs text-zinc-500">
             Documento generato da Lead Machine che attesta il pagamento ricevuto. Non e un
             documento fiscale e non sostituisce i documenti previsti dalla legge.
           </div>
