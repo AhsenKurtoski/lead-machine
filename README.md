@@ -485,7 +485,7 @@ Nothing here is simulated: the checks below talk to the real services (OpenStree
 |---|---|
 | `npm run qa` | typecheck + lint + translation parity (7 locales) + content and hygiene guard rails + D1/Prisma schema alignment + unit tests on the pure helpers in `src/lib/` |
 | `npm run check:auth` | login, session cookie, CSRF, security headers and fail-closed behaviour without `APP_PASSWORD`; starts its own production servers (requires `npm run build` and `npm run setup`) |
-| `npm run check:ui` | console errors, hydration mismatches, `401`/`5xx` API calls, horizontal overflow and WCAG A/AA violations (axe-core) across 17 pages, in light and dark theme and at 1280x800 and 390x844 with `--mobile` (Playwright, needs a running server) |
+| `npm run check:ui` | console errors, hydration mismatches, `401`/`5xx` API calls, horizontal overflow and WCAG A/AA violations (axe-core) across 18 pages (including a seeded lead's detail), in light and dark theme and at 1280x800 and 390x844 with `--mobile` (Playwright, needs a running server) |
 | `npm run check:hygiene` | empty pages, links and menu entries pointing at removed routes, unreachable pages, `layout` files without a page, empty folders, and (when the DB exists) leftovers and inconsistent verification rows |
 | `npm run smoke:api` | end-to-end API-key behaviour against a running production server: access profiles, scope enforcement, `401/403/404`, CORS preflight |
 | `npm run test:flows` | the key flows against a running server: lead data and verification, CSV import, payment receipts, bulk actions — values saved, rejections, dedupe, cascades |

@@ -12,7 +12,7 @@ Come si controlla che Lead Machine funzioni davvero.
 | `npm test` | solo i test unitari (`src/**/*.test.ts`) | no |
 | `npm run check:hygiene` | pagine vuote, link e voci di menu verso rotte rimosse, pagine non raggiungibili, `layout` senza pagina, cartelle vuote, e residui nel database (se c'e') | no |
 | `npm run check:auth` | login, cookie di sessione, CSRF, header di sicurezza e fail-closed senza `APP_PASSWORD`; avvia da solo due server di produzione | no (richiede `npm run build` e `npm run setup`) |
-| `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 17 pagine, in tema chiaro e scuro e a 390x844 (Playwright) | si' |
+| `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 18 pagine (inclusa la scheda di un lead), in tema chiaro e scuro e a 390x844 (Playwright) | si' |
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
 | `npm run test:flows` | flussi chiave sul server vero: dati del lead e verifica, import CSV, ricevute, azioni massive | si' |
 | `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma (fa parte di `npm run qa`) | no |
@@ -140,7 +140,7 @@ I byte misurati sono quelli non compressi (quello che il browser deve analizzare
 
 ## 7. Controllo dell'interfaccia (`npm run check:ui`)
 
-Apre con Chromium le 17 pagine autenticate dell'app su un server di **produzione** e, per ogni pagina, per ogni tema (chiaro e scuro) e per ogni viewport (1280x800 e, con `--mobile`, 390x844), fallisce se trova:
+Apre con Chromium le 18 pagine autenticate dell'app (17 fisse + la scheda di un lead) su un server di **produzione** e, per ogni pagina, per ogni tema (chiaro e scuro) e per ogni viewport (1280x800 e, con `--mobile`, 390x844), fallisce se trova:
 
 - un messaggio di **errore o warning in console**, compresi gli errori di idratazione di React;
 - una **risposta API `401`, `403` o `5xx`** su una pagina gia' autenticata (e' cosi' che sono stati scoperti i due `401` sulla pagina di login);
@@ -154,7 +154,7 @@ APP_PASSWORD='la-tua-password' PORT=3111 npm start
 APP_PASSWORD='la-tua-password' npm run check:ui
 ```
 
-Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844 con gli stessi controlli: anche li' l'overflow orizzontale della pagina e' bloccante), `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi) e `--no-axe` (salta l'audit di accessibilita'). Le pagine di dettaglio che richiedono un record (`/crm/{id}`, `/ricevuta/{id}`) non sono incluse: le coprono gli smoke test delle API.
+Opzioni: `--theme=light` (un solo tema), `--mobile` (aggiunge il giro a 390x844 con gli stessi controlli: anche li' l'overflow orizzontale della pagina e' bloccante), `--contrast` (stima del contrasto del testo sotto 3:1, solo avvisi) e `--no-axe` (salta l'audit di accessibilita'). La scheda di un lead (`/crm/{id}`) e' inclusa: il controllo usa il primo lead del seed e, se il database e' vuoto, ne crea uno temporaneo che cancella alla fine. `/ricevuta/{id}` resta esclusa: la coprono gli smoke test delle API.
 
 ## 8. Il motore di verifica fa controlli reali
 
@@ -198,7 +198,7 @@ Poi un giro a mano nel browser sulle pagine principali (dashboard, ricerca, CRM 
 `.github/workflows/ci.yml`, a ogni push e pull request:
 
 - **job "app"**: `npm run qa` — che al suo interno esegue anche `check:schema`, cioe' le migrazioni D1 contro lo schema Prisma — e infine `npm run build` (la parte sui dati del guard rail di igiene viene saltata: li' non c'e' un database);
-- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` e `npm run test:flows` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui -- --mobile`: 17 pagine in tema chiaro e scuro, a 1280x800 e a 390x844, console e layout;
+- **job "smoke-api"**: costruisce il **build di produzione**, prepara database e seed, avvia `next start`, lancia `npm run smoke:api` e `npm run test:flows` contro quel server e poi `node --import tsx scripts/check-hygiene.mjs --require-db`, che qui **pretende** il database e verifica che gli smoke non abbiano lasciato residui (lead, chiavi, verifiche orfane o doppie). Sullo stesso server installa Chromium e lancia `npm run check:ui -- --mobile`: 18 pagine (inclusa la scheda di un lead) in tema chiaro e scuro, a 1280x800 e a 390x844, console e layout;
 - **job "docker"**: costruisce l'immagine dal `Dockerfile`, la avvia con un volume nuovo, attende `/api/health` e verifica che `/login` risponda `200` e che il database sia stato creato in `/data`. Serve a non scoprire a release fatta che il percorso Docker si e' rotto;
 - **job "live"** (solo schedulato o con `workflow_dispatch`): costruisce il server di produzione, prepara database e seed, avvia `next start` e lancia `npm run smoke:geo` e `npm run perf:check`. Non e' un job richiesto dalle pull request: dipende da Overpass/Nominatim e da una macchina con il server acceso, quindi un loro disservizio non deve bloccare una modifica. I budget di performance sono calibrati su `npm start`, non sul server di sviluppo. Su un database senza lead i controlli che parlano dei dati vengono saltati con una riga `SKIP`, non falliti.
 - **job "audit"** (solo settimanale): `npm audit` sulle dipendenze.
