@@ -271,7 +271,27 @@ Fetch one lead with its `tags` and its complete `activities` history (the same s
 Update one lead. Body is a partial Lead object (same fields as `POST /api/leads`). Fields are validated: unknown statuses, malformed emails and invalid URLs are rejected. There is no implicit `lastContactAt` timestamp; record contact through activities and follow-ups.
 
 ### `DELETE /api/leads/[id]`
-Hard-delete one lead. Its activities, follow-ups, appointments, notifications, verifications and receipts are removed with it through Prisma `onDelete: Cascade`.
+Hard-delete one lead. Activities, follow-ups, receipts and verifications are removed with it through Prisma `onDelete: Cascade`. **Appointments and email logs are not deleted**: their relation is `SetNull`, so they would remain with `leadId: null` (and their name/email/body intact). For a real erasure use `POST /api/leads/[id]/erase`, which removes them explicitly.
+
+### `GET /api/leads/[id]/export`
+Exports the personal data of one lead as JSON (GDPR portability): every field of the lead plus locations, tags, activities, follow-ups, appointments, generated messages, receipts, verifications, the verification retry queue and email logs. Response is `application/json`, `Cache-Control: no-store`, `Content-Disposition: attachment; filename="lead-<id>-export.json"` and has this shape:
+
+```json
+{ "ok": true, "format": "lead-machine-gdpr-export-v1", "exportedAt": "2026-11-28T12:00:00.000Z", "lead": { "...": "..." } }
+```
+
+Rate limit: 10/min. `404` when the lead does not exist.
+
+### `POST /api/leads/[id]/erase`
+Erases the lead and all its personal data (GDPR erasure). The body must repeat the **exact lead name**, so a stray request or a boolean cannot destroy a record:
+
+```json
+{ "confirm": "Mario Rossi" }
+```
+
+Response `{ ok: true, deleted: { lead: 1, activities: 3, appointments: 1, emailLogs: 1, receipts: 1, ... } }`, with the number of rows removed per table (including `Appointment` and `EmailLog`, the two `SetNull` relations) and `screenshot` when a local screenshot file was removed. A wrong/missing/boolean confirmation returns `400` and changes nothing; rate limit: 10/min.
+
+Receipts are deleted too: they are payment records, not fiscal documents. If your country requires you to retain them, export the lead first (`GET /api/leads/[id]/export`) and archive the receipt data before erasing.
 
 ---
 
