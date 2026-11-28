@@ -83,7 +83,8 @@
     "setup": "prisma db push && tsx prisma/seed.ts",
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
     "screenshots": "node scripts/screenshot.mjs",
-    "demo": "node scripts/demo-gif.mjs"
+    "demo": "node scripts/demo-gif.mjs",
+    "check:email:worker": "node scripts/check-email-worker.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

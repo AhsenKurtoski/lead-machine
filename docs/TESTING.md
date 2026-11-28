@@ -15,6 +15,7 @@ Come si controlla che Lead Machine funzioni davvero.
 | `npm run check:ui` | console pulita, nessun errore di idratazione, nessun 401/5xx e nessun overflow orizzontale su 19 pagine (incluse la scheda di un lead e una ricevuta), in tema chiaro e scuro e a 390x844 (Playwright) | si' |
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
 | `npm run test:flows` | flussi chiave sul server vero: dati del lead e verifica, import CSV, ricevute, azioni massive | si' |
+| `npm run check:email:worker` | invio email dentro workerd: socket SMTP reale verso un server locale, AUTH, messaggio ricevuto, `EmailLog` INVIATO e lead passato a CONTATTATO; richiede il Worker gia' avviato (`WORKER_URL`, `APP_PASSWORD`) | si' |
 | `npm run check:ui:flows` | mutazioni dal browser: cambio stato persistito dopo il ricaricamento, dialogo di eliminazione accessibile (nome, focus, axe, Escape), download del PDF di una ricevuta (`application/pdf`, nome file, `no-store`) e pulizia dei dati di prova | si' |
 | `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma (fa parte di `npm run qa`) | no |
 | `npm run check:backup` | esporta un D1 locale, lo cifra (AES-256-GCM), verifica che passphrase errata e file manomesso siano rifiutati, lo ripristina con lo script vero in un database vuoto e confronta dati e schema | no |
