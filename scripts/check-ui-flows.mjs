@@ -11,9 +11,12 @@
 //   2. apre il dialogo di eliminazione, verifica che abbia un nome
 //      accessibile, che il focus sia dentro, che axe non trovi violazioni
 //      gravi e che Escape lo chiuda senza cancellare il lead;
-//   3. rimette lo stato originale (anche in caso di errore).
+//   3. rimette lo stato originale e cancella il lead temporaneo (anche in
+//      caso di errore).
 //
-// Non crea dati finti: usa un lead del seed e ripristina cio' che tocca.
+// Le API si chiamano dalla pagina autenticata (`fetch` nel browser), non dal
+// client HTTP di Playwright: cosi' il cookie di sessione e' quello vero e le
+// mutazioni restano same-origin, come nell'app.
 //
 // Uso: APP_PASSWORD=... BASE_URL=http://127.0.0.1:3111 node scripts/check-ui-flows.mjs
 // ============================================================
@@ -57,17 +60,44 @@ async function login(page) {
 const browser = await chromium.launch({ args: ["--no-sandbox"] });
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 const page = await context.newPage();
+
+// Stesso cookie e stessa origine del browser vero.
+const api = async (pathname, init) =>
+  page.evaluate(async (args) => {
+    const response = await fetch(args.pathname, args.init);
+    return { status: response.status, body: await response.json().catch(() => ({})) };
+  }, { pathname, init });
+
 let leadId = null;
 let originalStatus = null;
+let createdLeadId = null;
 
 try {
   console.log(`\nMutazioni dell'interfaccia su ${BASE_URL}\n`);
   await login(page);
 
-  const listResponse = await page.request.get(`${BASE_URL}/api/leads`);
-  const list = await listResponse.json();
-  const lead = Array.isArray(list.leads) ? list.leads[0] : null;
-  if (!lead) throw new Error("Nessun lead nel database: esegui `npm run setup` prima del controllo.");
+  const list = await api("/api/leads");
+  if (list.status !== 200) throw new Error(`GET /api/leads: HTTP ${list.status}`);
+  let lead = Array.isArray(list.body.leads) ? list.body.leads[0] : null;
+
+  if (!lead) {
+    // In CI il database puo' essere vuoto: come check:ui, si crea un lead
+    // temporaneo e lo si cancella alla fine. Non si usa un dato finto al
+    // posto di uno reale: e' un record vero, creato dall'API e rimosso.
+    const name = "Smoke Test check:ui:flows " + Date.now();
+    const created = await api("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ candidates: [{ name, city: "Belluno", source: "check-ui-flows" }] }),
+    });
+    if (created.status !== 200) throw new Error(`POST /api/leads: HTTP ${created.status}`);
+    const after = await api("/api/leads");
+    lead = Array.isArray(after.body.leads) ? after.body.leads.find((item) => item.name === name) : null;
+    if (!lead) throw new Error("lead temporaneo creato ma non rileggibile");
+    createdLeadId = lead.id;
+    console.log(`  CREATO  lead temporaneo ${lead.id} (database vuoto)`);
+  }
+
   leadId = lead.id;
   originalStatus = lead.status;
   const target = STATUSES.find((status) => status !== originalStatus);
@@ -84,18 +114,25 @@ try {
   );
   await page.click(`[data-testid="status-${target}"]`);
   const patchResponse = await patched;
-  record(`cambio stato "${originalStatus}" -> "${target}": PATCH 200`, patchResponse.status() === 200, `HTTP ${patchResponse.status()}`);
+  record(
+    `cambio stato "${originalStatus}" -> "${target}": PATCH 200`,
+    patchResponse.status() === 200,
+    `HTTP ${patchResponse.status()}`
+  );
 
-  const afterPatch = await (await page.request.get(`${BASE_URL}/api/leads/${leadId}`)).json();
-  record("lo stato è stato salvato davvero", afterPatch.lead?.status === target, `API: ${afterPatch.lead?.status}`);
+  const afterPatch = await api(`/api/leads/${leadId}`);
+  record("lo stato è stato salvato davvero", afterPatch.body.lead?.status === target, `API: ${afterPatch.body.lead?.status}`);
 
   // Ricarica: il controllo deve vedere il dato persistito, non lo stato React.
   await page.reload({ waitUntil: "domcontentloaded" });
-  const activeClass = await page
-    .locator(`[data-testid="status-${target}"]`)
-    .waitFor({ state: "visible" })
-    .then(() => page.locator(`[data-testid="status-${target}"]`).getAttribute("class"));
-  record("dopo il ricaricamento la scheda mostra lo stato salvato", (activeClass || "").includes("border-primary"), activeClass || "classe assente");
+  const targetButton = page.locator(`[data-testid="status-${target}"]`);
+  await targetButton.waitFor({ state: "visible" });
+  const activeClass = await targetButton.getAttribute("class");
+  record(
+    "dopo il ricaricamento la scheda mostra lo stato salvato",
+    (activeClass || "").includes("border-primary"),
+    activeClass || "classe assente"
+  );
 
   // --- Dialogo di eliminazione -------------------------------------------
   await page.locator('[data-testid="delete-lead"]').click();
@@ -110,7 +147,11 @@ try {
     (id) => (id ? document.getElementById(id)?.textContent ?? "" : ""),
     dialogName
   );
-  record("il dialogo ha un nome accessibile", Boolean(dialogName && labelText?.trim()), `aria-labelledby=${dialogName || "assente"}`);
+  record(
+    "il dialogo ha un nome accessibile",
+    Boolean(dialogName && labelText.trim()),
+    `aria-labelledby=${dialogName || "assente"}`
+  );
 
   const focusInside = await page.evaluate(() => {
     const node = document.querySelector('[role="dialog"]');
@@ -122,10 +163,12 @@ try {
     await page.addScriptTag({ content: axeSource });
     const violations = await page.evaluate(async () => {
       const node = document.querySelector('[role="dialog"]');
-      const result = await window.axe.run(node, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] } });
+      const result = await window.axe.run(node, {
+        runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
+      });
       return result.violations
-        .filter((v) => ["serious", "critical"].includes(v.impact))
-        .map((v) => `${v.id} (${v.impact})`);
+        .filter((violation) => ["serious", "critical"].includes(violation.impact))
+        .map((violation) => `${violation.id} (${violation.impact})`);
     });
     record("axe: nessuna violazione grave nel dialogo", violations.length === 0, violations.join(", "));
   }
@@ -134,8 +177,8 @@ try {
   await dialog.waitFor({ state: "hidden", timeout: 5000 });
   record("Escape chiude il dialogo", (await dialog.count()) === 0 || !(await dialog.isVisible()));
 
-  const stillThere = await page.request.get(`${BASE_URL}/api/leads/${leadId}`);
-  record("il lead non è stato cancellato", stillThere.status() === 200, `HTTP ${stillThere.status()}`);
+  const stillThere = await api(`/api/leads/${leadId}`);
+  record("il lead non è stato cancellato", stillThere.status === 200, `HTTP ${stillThere.status}`);
 } catch (error) {
   failures += 1;
   console.error(`\nERRORE: ${error instanceof Error ? error.message : String(error)}\n`);
@@ -143,16 +186,39 @@ try {
   // Ripristina lo stato originale anche se qualcosa e' andato storto.
   if (leadId && originalStatus) {
     try {
-      const response = await page.request.patch(`${BASE_URL}/api/leads/${leadId}`, {
-        data: { status: originalStatus },
+      const restored = await api(`/api/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: originalStatus }),
       });
-      if (response.status() === 200) console.log(`  RIPRISTINO  stato "${originalStatus}" ripristinato sul lead usato per la prova`);
-      else console.error(`  RIPRISTINO FALLITO  HTTP ${response.status()}: controlla lo stato del lead ${leadId}`);
+      if (restored.status === 200) {
+        console.log(`  RIPRISTINO  stato "${originalStatus}" ripristinato sul lead usato per la prova`);
+      } else {
+        failures += 1;
+        console.error(`  RIPRISTINO FALLITO  HTTP ${restored.status}: controlla lo stato del lead ${leadId}`);
+      }
     } catch (error) {
       failures += 1;
       console.error(`  RIPRISTINO FALLITO: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+
+  // Il lead temporaneo non deve restare (in CI il controllo di igiene gira
+  // subito dopo questo script).
+  if (createdLeadId) {
+    try {
+      const deleted = await api(`/api/leads/${createdLeadId}`, { method: "DELETE" });
+      if (deleted.status === 200) console.log(`  PULIZIA  lead temporaneo ${createdLeadId} cancellato`);
+      else {
+        failures += 1;
+        console.error(`  PULIZIA FALLITA  HTTP ${deleted.status} sul lead temporaneo ${createdLeadId}`);
+      }
+    } catch (error) {
+      failures += 1;
+      console.error(`  PULIZIA FALLITA: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
   await browser.close();
 }
 
