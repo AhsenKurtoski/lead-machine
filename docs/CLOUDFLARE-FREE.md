@@ -149,6 +149,16 @@ Conserva il file fuori dal repository e verifica che contenga i dati attesi. Il 
 
 Il progetto include `npm run backup:d1`: crea un export nella cartella **`%USERPROFILE%\Lead-Machine-Backups`** (fuori dal repository), verifica che il file non sia vuoto e scrive l’esito in `backup.log`. Non elimina i backup precedenti.
 
+Imposta **`LEAD_MACHINE_BACKUP_PASSPHRASE`** (almeno 12 caratteri) e il dump viene cifrato con AES-256-GCM (scrypt per la chiave): il file `.sql` in chiaro viene rimosso e resta solo `.sql.enc`, con permessi `0600`. Se la cifratura fallisce il dump viene cancellato: meglio nessun backup che un backup in chiaro creduto cifrato.
+
+Per ripristinare (su un database **vuoto**):
+
+```bash
+LEAD_MACHINE_BACKUP_PASSPHRASE='...' npm run restore:d1 -- --file lead-machine-....sql.enc --remote --yes
+```
+
+Senza `--remote` il ripristino è locale; `--yes` è obbligatorio per il remoto perché l'import è distruttivo. Il backup contiene schema, dati e tabella `d1_migrations`, quindi non è un merge: va importato su un database vuoto.
+
 Per eseguirlo manualmente:
 
 ```bash

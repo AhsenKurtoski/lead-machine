@@ -599,7 +599,7 @@ deploy override.
 
 - `POST /api/leads/import` → body `{ "rows": [{ "name", "category", "city", "phone", "email", "website", … }] }`. Rows without a name, and duplicates with the same name + city, are skipped; the rest are created. Response `{ ok: true, created, skipped }`. Rate limit: 20/min.
 - `GET /api/leads/export` → downloads every lead as CSV (`text/csv`, UTF-8 with BOM so Excel reads accents correctly, filename `lead-export-YYYY-MM-DD.csv`).
-- `GET /api/backup` → downloads a versioned JSON export of leads, locations, tags, activities, follow-ups, appointments, templates, generated messages, notifications, settings, receipts, verifications, the verification retry queue, email logs and API-key metadata. Settings whose key ends in `_api_key` or `_pass` are masked, and API-key hashes/secrets are not included. There is no automated restore: keep the JSON and the SQLite file, and restore manually. Rate limit: 10/min.
+- `GET /api/backup` → downloads a versioned JSON export of leads, locations, tags, activities, follow-ups, appointments, templates, generated messages, notifications, settings, receipts, verifications, the verification retry queue, email logs and API-key metadata. Settings whose key ends in `_api_key` or `_pass` are masked, and API-key hashes/secrets are not included. The JSON export is a data snapshot, not a database dump: for a real restore use the D1/SQLite backup (`npm run backup:d1` and `npm run restore:d1`, documented in `docs/CLOUDFLARE-FREE.md`). Rate limit: 10/min.
 
 Every write goes through the same validation helpers as the rest of the API (length bounds, HTML stripped, numbers bounded).
 
@@ -656,7 +656,7 @@ Common status codes:
 | Settings write | 60 req/min |
 | Everything else | 300 req/min (very permissive, mainly to stop accidental loops) |
 
-The rate limiter is **in-memory** (per Node.js process). If you scale horizontally or use serverless, replace `src/lib/security.ts#checkRateLimit` with a Redis/Upstash-backed implementation — the function signature is kept small so you can swap it without touching each route.
+The rate limiter stores its counters in the application database (`RateLimit` table, migration `0002_rate_limit.sql`), used by both the per-client and the per-API-key limiters. Counters are therefore shared by every instance and every Cloudflare isolate, and survive restarts and cold starts. If the database is unreachable the limiter falls back to an in-process counter for 30 seconds: requests keep working, but the limit is weaker during that window. Behind Cloudflare the client IP comes from `CF-Connecting-IP`, which the runtime overwrites on every request; `X-Forwarded-For` is ignored unless `TRUST_PROXY=1`.
 
 ---
 

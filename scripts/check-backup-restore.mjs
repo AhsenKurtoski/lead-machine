@@ -16,8 +16,12 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { decryptBuffer, encryptBuffer, isEncrypted } from "./backup-crypto.mjs";
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const WRANGLER = path.join(ROOT, "node_modules", "wrangler", "bin", "wrangler.js");
+const RESTORE = path.join(ROOT, "scripts", "restore-d1-backup.mjs");
+const PASSPHRASE = "check-backup-passphrase-2026";
 const MIGRATIONS = path.join(ROOT, "migrations");
 const DB_NAME = "lead-machine-backup-check";
 
@@ -126,17 +130,65 @@ try {
   ]);
   record("export locale produce un dump non vuoto", fs.existsSync(dump) && fs.statSync(dump).size > 0, dump);
 
+  // --- Cifratura e ripristino del file cifrato ---------------------------
+  const plain = fs.readFileSync(dump);
+  const encrypted = encryptBuffer(plain, PASSPHRASE);
+  const encryptedPath = `${dump}.enc`;
+  fs.writeFileSync(encryptedPath, encrypted);
+  record(
+    "il backup cifrato non contiene il dump in chiaro",
+    isEncrypted(encrypted) &&
+      !encrypted.includes(Buffer.from("backup-check")) &&
+      !encrypted.includes(Buffer.from("CREATE TABLE")),
+    `${plain.length} byte in chiaro -> ${encrypted.length} byte cifrati`
+  );
+  record("la decifratura restituisce il dump identico", decryptBuffer(encrypted, PASSPHRASE).equals(plain));
+
+  let wrongPassphraseRejected = false;
+  try {
+    decryptBuffer(encrypted, "passphrase-completamente-sbagliata");
+  } catch {
+    wrongPassphraseRejected = true;
+  }
+  record("una passphrase errata viene rifiutata", wrongPassphraseRejected);
+
+  const tampered = Buffer.from(encrypted);
+  tampered[tampered.length - 1] ^= 0xff;
+  let tamperedRejected = false;
+  try {
+    decryptBuffer(tampered, PASSPHRASE);
+  } catch {
+    tamperedRejected = true;
+  }
+  record("un file manomesso viene rifiutato (GCM)", tamperedRejected);
+
   // Il ripristino reale avviene su un database vuoto: il dump contiene sia lo
   // schema sia i dati (e la tabella `d1_migrations`). Importarlo sopra un
-  // database gia' migrato fallirebbe, ed e' giusto che fallisca.
-  wrangler("restore", [
-    "d1",
-    "execute",
-    DB_NAME,
-    "--local",
-    "--file",
-    dump,
-  ]);
+  // database gia' migrato fallirebbe, ed e' giusto che fallisca. Qui passa
+  // dallo script vero, quindi si prova anche la decifratura e il CLI.
+  const restoreRun = spawnSync(
+    process.execPath,
+    [
+      RESTORE,
+      "--file",
+      encryptedPath,
+      "--local",
+      "--database",
+      DB_NAME,
+      "--config",
+      path.join(tmp, "restore", "wrangler.jsonc"),
+    ],
+    {
+      cwd: ROOT,
+      encoding: "utf8",
+      env: { ...process.env, LEAD_MACHINE_BACKUP_PASSPHRASE: PASSPHRASE, CI: "1" },
+    }
+  );
+  record(
+    "lo script di ripristino importa il backup cifrato",
+    restoreRun.status === 0,
+    (restoreRun.stderr || restoreRun.stdout || "").trim().slice(-300)
+  );
 
   const restored = query("restore", "SELECT value FROM \"Setting\" WHERE key = 'backup-check';");
   record(

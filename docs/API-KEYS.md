@@ -117,7 +117,7 @@ Gli scope sono applicati davvero su ogni endpoint. Una chiave con solo `read` no
 
 Se crei una chiave senza indicare `permissions`, il default è **`read`**: è il minimo privilegio, non un permesso completo implicito.
 
-**Limiti per chiave** (in memoria, si azzerano al riavvio del processo):
+**Limiti per chiave** (contatori nella tabella `RateLimit` del database: valgono per tutte le istanze e sopravvivono ai riavvii; se il database non risponde si ripiega per 30 secondi su un contatore in memoria):
 
 | Operazione | Limite |
 |---|---|
@@ -126,7 +126,7 @@ Se crei una chiave senza indicare `permissions`, il default è **`read`**: è il
 | Ricerca geografica | 30 richieste/minuto |
 | Generazione sito AI | 15 richieste/minuto |
 
-I limiti sono separati per chiave: due integrazioni diverse non si bloccano a vicenda. Se esegui più processi o più repliche, ogni processo ha il proprio contatore: per un limite condiviso serve un limiter esterno.
+I limiti sono separati per chiave: due integrazioni diverse non si bloccano a vicenda. Il contatore è condiviso da tutti i processi e da tutti gli isolate di Cloudflare, quindi il limite vale anche con più repliche.
 
 ---
 

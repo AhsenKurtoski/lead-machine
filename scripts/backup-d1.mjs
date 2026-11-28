@@ -2,10 +2,12 @@
 // Backup giornaliero del database D1 di Lead Machine.
 // Il file viene creato fuori dal repository, in ~/Lead-Machine-Backups.
 import { spawn } from "node:child_process";
-import { appendFile, mkdir, stat } from "node:fs/promises";
+import { appendFile, mkdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { encryptBuffer } from "./backup-crypto.mjs";
 
 const projectDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const backupDir = path.resolve(
@@ -64,8 +66,29 @@ try {
     await log(`FALLITO: file vuoto o troppo piccolo (${info.size} byte)`);
     process.exit(1);
   }
-  await log(`OK: ${output} (${info.size} byte)`);
-  console.log(`Backup D1 completato: ${output} (${info.size} byte)`);
+
+  // Il dump contiene dati personali: con la passphrase impostata il file in
+  // chiaro non resta su disco. Se la cifratura fallisce, il dump viene
+  // rimosso: meglio nessun backup che un backup in chiaro creduto cifrato.
+  const passphrase = (process.env.LEAD_MACHINE_BACKUP_PASSPHRASE || "").trim();
+  if (passphrase) {
+    let encrypted;
+    try {
+      encrypted = encryptBuffer(await readFile(output), passphrase);
+    } catch (error) {
+      await unlink(output).catch(() => undefined);
+      throw error;
+    }
+    const encryptedPath = `${output}.enc`;
+    await writeFile(encryptedPath, encrypted, { mode: 0o600 });
+    await unlink(output);
+    const encInfo = await stat(encryptedPath);
+    await log(`OK (cifrato): ${encryptedPath} (${encInfo.size} byte)`);
+    console.log(`Backup D1 cifrato: ${encryptedPath} (${encInfo.size} byte)`);
+  } else {
+    await log(`OK: ${output} (${info.size} byte)`);
+    console.log(`Backup D1 completato: ${output} (${info.size} byte)`);
+  }
 } catch (error) {
   await log(`FALLITO: file non creato (${error instanceof Error ? error.message : String(error)})`);
   process.exit(1);
