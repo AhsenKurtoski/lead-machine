@@ -169,7 +169,7 @@ Errors are machine-readable: `401` invalid key, `403` with `requiredScope` + `cu
 
 ### 🧾 Payment receipts (not a fiscal document)
 - Register what a client actually paid: **number** (`RICEVUTA-2026-001`), **amount**, **method** (cash / bank transfer / card / other), **date** and notes.
-- Printable receipt (`/ricevuta`, `/ricevuta/{id}`) and the full list of payments per client, with amounts formatted in your locale's currency.
+- Printable receipt (`/ricevuta`, `/ricevuta/{id}`), a downloadable **PDF** (`GET /api/receipts/{id}/pdf`, generated server-side) and the full list of payments per client, with amounts formatted in your locale's currency.
 - Explicitly **no VAT, no tax rates, no invoices**: the app tracks the payment, not the paperwork.
 
 ### 📈 Opportunities, Portfolio & Reports

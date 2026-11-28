@@ -71,6 +71,7 @@ const api = async (pathname, init) =>
 let leadId = null;
 let originalStatus = null;
 let createdLeadId = null;
+let createdReceiptId = null;
 
 try {
   console.log(`\nMutazioni dell'interfaccia su ${BASE_URL}\n`);
@@ -177,6 +178,50 @@ try {
   await dialog.waitFor({ state: "hidden", timeout: 5000 });
   record("Escape chiude il dialogo", (await dialog.count()) === 0 || !(await dialog.isVisible()));
 
+  // --- Ricevuta in PDF ----------------------------------------------------
+  const createdReceipt = await api("/api/receipts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      leadId,
+      amount: 1.23,
+      description: "Smoke Test PDF",
+      method: "contanti",
+    }),
+  });
+  createdReceiptId = createdReceipt.body?.receipt?.id ?? null;
+  record(
+    "ricevuta di prova creata per il PDF",
+    createdReceipt.status === 201 && Boolean(createdReceiptId),
+    `HTTP ${createdReceipt.status}`
+  );
+
+  if (createdReceiptId) {
+    const pdf = await page.evaluate(async (id) => {
+      const response = await fetch(`/api/receipts/${id}/pdf`);
+      const buffer = new Uint8Array(await response.arrayBuffer());
+      return {
+        status: response.status,
+        type: response.headers.get("content-type") || "",
+        disposition: response.headers.get("content-disposition") || "",
+        cache: response.headers.get("cache-control") || "",
+        magic: String.fromCharCode(...buffer.slice(0, 5)),
+        size: buffer.length,
+      };
+    }, createdReceiptId);
+    record(
+      "il PDF si scarica come application/pdf",
+      pdf.status === 200 && pdf.type.includes("application/pdf") && pdf.magic === "%PDF-" && pdf.size > 500,
+      `HTTP ${pdf.status}, ${pdf.type || "tipo assente"}, ${pdf.size} byte`
+    );
+    record(
+      "il PDF ha un nome file .pdf",
+      /attachment; filename="ricevuta-.+\.pdf"/.test(pdf.disposition),
+      pdf.disposition || "disposition assente"
+    );
+    record("il PDF non è cacheabile", /no-store/.test(pdf.cache), pdf.cache || "cache-control assente");
+  }
+
   const stillThere = await api(`/api/leads/${leadId}`);
   record("il lead non è stato cancellato", stillThere.status === 200, `HTTP ${stillThere.status}`);
 } catch (error) {
@@ -200,6 +245,21 @@ try {
     } catch (error) {
       failures += 1;
       console.error(`  RIPRISTINO FALLITO: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  // La ricevuta di prova non deve restare nemmeno quando il lead è del seed.
+  if (createdReceiptId) {
+    try {
+      const deleted = await api(`/api/receipts/${createdReceiptId}`, { method: "DELETE" });
+      if (deleted.status === 200) console.log(`  PULIZIA  ricevuta temporanea ${createdReceiptId} cancellata`);
+      else {
+        failures += 1;
+        console.error(`  PULIZIA FALLITA  HTTP ${deleted.status} sulla ricevuta ${createdReceiptId}`);
+      }
+    } catch (error) {
+      failures += 1;
+      console.error(`  PULIZIA FALLITA (ricevuta): ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

@@ -460,6 +460,12 @@ Register a payment. Rate limit: 40/min.
 ### `GET /api/receipts/{id}`
 Single receipt with its lead (`{ ok: true, receipt }`; `404` when unknown).
 
+### `GET /api/receipts/{id}/pdf`
+Downloads the receipt as an A4 PDF (`application/pdf`, `Content-Disposition: attachment`,
+`Cache-Control: no-store`). Generated server-side with `pdf-lib`, so it works on Cloudflare
+Workers too. The PDF says explicitly that it is not a fiscal document. Rate limit: 30/min.
+`404` when the receipt is unknown.
+
 ### `PATCH /api/receipts/{id}`
 Fix `description`, `notes`, `amount`, `method` or `paidAt` — only the fields you send
 are changed. Rate limit: 60/min.
