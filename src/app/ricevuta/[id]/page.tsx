@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
 import { formatCurrency, methodLabel } from "@/lib/receipts";
@@ -48,7 +48,16 @@ export default async function RicevutaPage(props: { params: Promise<{ id: string
         >
           <ArrowLeft className="h-4 w-4" /> Torna alle ricevute
         </Link>
-        <PrintButton />
+        <div className="flex items-center gap-2">
+          <a
+            href={`/api/receipts/${receipt.id}/pdf`}
+            download
+            className="inline-flex items-center gap-2 rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+          >
+            <Download className="h-4 w-4" /> Scarica PDF
+          </a>
+          <PrintButton />
+        </div>
       </div>
 
       {/* `text-zinc-900` esplicito: la ricevuta e' sempre bianca, anche in tema
