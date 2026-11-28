@@ -200,6 +200,15 @@ jobs:
           SMOKE_BASE: http://localhost:3111
           SMOKE_PASSWORD: smoke-ci-password-2026
         run: npm run test:flows
+
+      - name: GDPR — export e cancellazione di un lead vero
+        # Crea due lead, aggiunge appuntamento, ricevuta, EmailLog e verifica,
+        # esporta, prova conferme sbagliate, cancella e controlla che non resti
+        # nessuna riga (Appointment ed EmailLog sono SetNull nello schema).
+        env:
+          SMOKE_BASE: http://localhost:3111
+          APP_PASSWORD: smoke-ci-password-2026
+        run: npm run check:gdpr
       - name: Installa Chromium per il controllo dell'interfaccia
         run: npx playwright install --with-deps chromium
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { removeLeadScreenshot } from "@/lib/lead-files";
 import { STATUS_LABELS } from "@/lib/utils";
 import {
   rateLimitedResponse,
@@ -239,17 +240,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
   await prisma.lead.delete({ where: { id } });
 
   // Rimuove lo screenshot locale, se presente e dentro la cartella prevista.
-  if (existing.websiteScreenshot?.startsWith("/screenshots/")) {
-    try {
-      const { unlink } = await import("node:fs/promises");
-      const path = await import("node:path");
-      const file = path.join(process.cwd(), "public", existing.websiteScreenshot);
-      const root = path.join(process.cwd(), "public", "screenshots");
-      if (file.startsWith(root + path.sep)) await unlink(file);
-    } catch {
-      // File gia assente o non rimovibile: non blocca la cancellazione del lead.
-    }
-  }
+  await removeLeadScreenshot(existing.websiteScreenshot);
 
   return NextResponse.json({ ok: true });
 }

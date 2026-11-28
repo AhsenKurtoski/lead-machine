@@ -84,7 +84,8 @@
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
     "screenshots": "node scripts/screenshot.mjs",
     "demo": "node scripts/demo-gif.mjs",
-    "check:email:worker": "node scripts/check-email-worker.mjs"
+    "check:email:worker": "node scripts/check-email-worker.mjs",
+    "check:gdpr": "node scripts/check-gdpr.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
