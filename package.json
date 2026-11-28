@@ -77,6 +77,7 @@
     "check:hygiene": "node --import tsx scripts/check-hygiene.mjs",
     "check:pages": "node scripts/check-pages.mjs",
     "check:ui": "node scripts/check-ui.mjs",
+    "check:ui:flows": "node scripts/check-ui-flows.mjs",
     "qa": "npm run typecheck && npm run lint && npm run i18n:check && npm run check:content && npm run check:hygiene && npm run check:schema && npm test",
     "setup": "prisma db push && tsx prisma/seed.ts",
     "setup:screenshot": "npm install -D playwright && npx playwright install chromium",
