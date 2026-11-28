@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { hitSharedRateLimitSafely } from "@/lib/rate-limit-store";
 
 export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -186,8 +187,9 @@ export async function validateApiKey(req: Request): Promise<AuthResult> {
 
 // ============================================================
 // Rate limiting per API key.
-// Diversamente dal limiter per IP (src/lib/security.ts), questo
-// funziona anche quando la chiave viene usata da server/IP diversi.
+// Il contatore vive nel database come quello per client, quindi vale anche
+// quando la stessa chiave viene usata da server/IP diversi e su piu' isolate.
+// Se il database non risponde si usa un contatore in memoria del processo.
 // ============================================================
 
 type KeyBucket = { count: number; resetAt: number };
@@ -207,18 +209,33 @@ export async function rateLimitApiKey(
   max: number,
   windowMs: number
 ): Promise<Response | null> {
-  cleanupKeyBuckets();
-  const key = apiKeyId + "|" + scope;
-  const now = Date.now();
-  let bucket = keyBuckets.get(key);
-  if (!bucket || bucket.resetAt < now) {
-    bucket = { count: 0, resetAt: now + windowMs };
-    keyBuckets.set(key, bucket);
-  }
-  bucket.count += 1;
-  if (bucket.count <= max) return null;
+  const shared = await hitSharedRateLimitSafely(
+    `apikey:${apiKeyId}:${scope}`,
+    max,
+    windowMs
+  );
 
-  const seconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+  let blocked: boolean;
+  let resetAtMs: number;
+  if (shared) {
+    blocked = shared.blocked;
+    resetAtMs = Date.now() + shared.resetAfterMs;
+  } else {
+    cleanupKeyBuckets();
+    const key = apiKeyId + "|" + scope;
+    const now = Date.now();
+    let bucket = keyBuckets.get(key);
+    if (!bucket || bucket.resetAt < now) {
+      bucket = { count: 0, resetAt: now + windowMs };
+      keyBuckets.set(key, bucket);
+    }
+    bucket.count += 1;
+    blocked = bucket.count > max;
+    resetAtMs = bucket.resetAt;
+  }
+  if (!blocked) return null;
+
+  const seconds = Math.max(1, Math.ceil((resetAtMs - Date.now()) / 1000));
   return new NextResponse(
     JSON.stringify({
       ok: false,
@@ -232,7 +249,7 @@ export async function rateLimitApiKey(
         "Retry-After": String(seconds),
         "X-RateLimit-Limit": String(max),
         "X-RateLimit-Remaining": "0",
-        "X-RateLimit-Reset": String(Math.ceil(bucket.resetAt / 1000)),
+        "X-RateLimit-Reset": String(Math.ceil(resetAtMs / 1000)),
       },
     }
   );

@@ -82,6 +82,12 @@ jobs:
           npm run cf:migrate:local
           npm run cf:seed:local
 
+      - name: Backup esportato e ripristinato (D1 locale)
+        # `backup:d1` produce il dump, ma un backup mai ripristinato non e' un
+        # backup: qui il dump viene reimportato in un database vuoto e i dati
+        # vengono confrontati. Stesso comando di Wrangler usato in produzione.
+        run: npm run check:backup
+
       - name: Smoke del Worker con binding D1
         env:
           # Password solo per il server effimero del job.
@@ -113,6 +119,25 @@ jobs:
             cat /tmp/worker.log
             exit 1
           fi
+          # Rate limit condiviso su D1, nel percorso vero di produzione
+          # (workerd + binding D1), non sul server Node degli altri job.
+          fail=0
+          for i in $(seq 1 10); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+              -H 'content-type: application/json' -A 'lm-rate-limit-probe' \
+              -d '{"password":"sbagliata"}' http://127.0.0.1:8799/api/auth/login)
+            if [ "$code" != "401" ]; then echo "tentativo $i: HTTP $code (atteso 401)"; fail=1; fi
+          done
+          [ "$fail" = "0" ] || { cat /tmp/worker.log; exit 1; }
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' -A 'lm-rate-limit-probe' \
+            -d '{"password":"sbagliata"}' http://127.0.0.1:8799/api/auth/login)
+          if [ "$code" != "429" ]; then
+            echo "11° tentativo: HTTP $code (atteso 429)"
+            cat /tmp/worker.log
+            exit 1
+          fi
+          echo "rate limit su D1: 429 dopo 10 tentativi"
 
       - name: Log del Worker in caso di errore
         if: failure()

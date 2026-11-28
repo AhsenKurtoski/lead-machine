@@ -33,6 +33,7 @@ let passes = 0;
 let failures = 0;
 let withPassword = null;
 let withoutPassword = null;
+let ratePeer = null;
 
 function record(name, passed, detail = "") {
   if (passed) {
@@ -123,6 +124,38 @@ function rawGet(port, pathname, host) {
     request.on("error", reject);
     request.end();
   });
+}
+
+// Stesso algoritmo di `clientFingerprint` in src/lib/security.ts, così la
+// pulizia tocca solo la riga del probe e non i contatori veri.
+function fingerprintFor(ip, ua, suffix) {
+  const s = `${ip}|${ua}|${suffix}`;
+  let h = 0;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return "rl:" + (h >>> 0).toString(36);
+}
+
+async function clearRateLimitRows() {
+  try {
+    const { PrismaClient } = await import("@prisma/client");
+    const client = new PrismaClient({ log: [] });
+    try {
+      // "local" senza TRUST_PROXY, "unknown" dietro proxy fidato senza header.
+      // Due user-agent: il probe dedicato e quello di default di `fetch`
+      // ("node"), usato dai login veri di questo script.
+      const keys = [];
+      for (const ip of ["local", "unknown"]) {
+        for (const ua of ["lm-rate-limit-probe", "node"]) {
+          keys.push(fingerprintFor(ip, ua, "auth:login"));
+        }
+      }
+      await client.rateLimit.deleteMany({ where: { key: { in: keys } } });
+    } finally {
+      await client.$disconnect();
+    }
+  } catch {
+    // Tabella assente o database non raggiungibile: non c'è nulla da pulire.
+  }
 }
 
 function cookieFrom(response) {
@@ -222,6 +255,55 @@ async function run() {
     record(`header ${label}`, Boolean(loginPage.headers.get(header)), loginPage.headers.get(header) ? "" : "assente");
   }
 
+  // --- Rate limit condiviso -------------------------------------------------
+  // User-agent dedicato: i tentativi del probe non consumano il bucket del
+  // login vero fatto sopra (il fingerprint include lo user-agent).
+  const probeHeaders = { "content-type": "application/json", "user-agent": "lm-rate-limit-probe" };
+  const attemptStatuses = [];
+  for (let i = 0; i < 10; i += 1) {
+    const attempt = await fetch(`${base}/api/auth/login`, {
+      method: "POST",
+      headers: probeHeaders,
+      body: JSON.stringify({ password: `password-sbagliata-${i}` }),
+    });
+    attemptStatuses.push(attempt.status);
+  }
+  record(
+    "10 tentativi di login errati dalla stessa sorgente -> 401",
+    attemptStatuses.every((status) => status === 401),
+    attemptStatuses.join(",")
+  );
+
+  const limited = await fetch(`${base}/api/auth/login`, {
+    method: "POST",
+    headers: probeHeaders,
+    body: JSON.stringify({ password: "password-sbagliata-oltre" }),
+  });
+  record("l'11° tentativo dalla stessa sorgente -> 429", limited.status === 429, `HTTP ${limited.status}`);
+  record(
+    "429 espone Retry-After",
+    Number(limited.headers.get("retry-after")) > 0,
+    `Retry-After ${limited.headers.get("retry-after") || "assente"}`
+  );
+
+  // Seconda istanza con lo stesso database: se il contatore fosse in memoria
+  // del processo questa richiesta tornerebbe 401, perché il suo bucket
+  // sarebbe vuoto.
+  const peerPort = PORT + 2;
+  ratePeer = startServer(peerPort, PASSWORD);
+  await waitForServer(ratePeer, peerPort);
+  const peerLimited = await fetch(`http://127.0.0.1:${peerPort}/api/auth/login`, {
+    method: "POST",
+    headers: probeHeaders,
+    body: JSON.stringify({ password: "password-sbagliata-peer" }),
+  });
+  record(
+    "il limite è condiviso con una seconda istanza -> 429",
+    peerLimited.status === 429,
+    `HTTP ${peerLimited.status}`
+  );
+  await clearRateLimitRows();
+
   console.log(`\nFail-closed senza APP_PASSWORD su http://127.0.0.1:${NO_PASSWORD_PORT}\n`);
   withoutPassword = startServer(NO_PASSWORD_PORT, "");
   await waitForServer(withoutPassword, NO_PASSWORD_PORT);
@@ -251,6 +333,7 @@ try {
   failures += 1;
   console.error(`\nERRORE: ${error instanceof Error ? error.message : String(error)}\n`);
 } finally {
+  await stopServer(ratePeer);
   await stopServer(withoutPassword);
   await stopServer(withPassword);
 }

@@ -16,6 +16,7 @@ Come si controlla che Lead Machine funzioni davvero.
 | `npm run smoke:api` | chiavi API, profili di permesso, scope applicati, `401/403/404`, preflight CORS | si' |
 | `npm run test:flows` | flussi chiave sul server vero: dati del lead e verifica, import CSV, ricevute, azioni massive | si' |
 | `npm run check:schema` | le migrazioni D1 applicate a un database vuoto danno esattamente lo schema Prisma (fa parte di `npm run qa`) | no |
+| `npm run check:backup` | esporta un D1 locale, lo reimporta in un database vuoto e verifica dati e schema ripristinati | no |
 | `npm run smoke:geo` | sorgenti geografiche reali, geocoding reale senza coordinate e API pubblica di ricerca | si' |
 | `npm run perf:check` | tempi di risposta reali e peso in byte delle pagine e delle API chiave | si' |
 | `node scripts/probe-mirrors.mjs` | quali mirror Overpass sono ancora vivi, con quale copertura e in quanto tempo | no (va in rete) |
@@ -113,6 +114,12 @@ Il controllo applica tutte le migrazioni, in ordine, a un database SQLite tempor
 Quando il controllo fallisce, la correzione e' una **nuova** migrazione (es. `migrations/0002_....sql`) con l'SQL stampato: `0001_init.sql` e' gia' stata applicata sui database esistenti e non va modificata.
 
 Il controllo fa parte di `npm run qa`: una divergenza si vede sul computer di chi scrive il codice, alla prima esecuzione del gate, e non al primo deploy. In CI non c'e' un passo separato, lo esegue `qa`.
+
+## 4d. Backup e ripristino D1 (`npm run check:backup`)
+
+`npm run backup:d1` esporta il database di produzione, ma un backup che non e' mai stato ripristinato non dimostra nulla: il file potrebbe essere vuoto, incompleto o non reimportabile. Questo controllo fa il giro completo su un D1 **locale** (workerd/SQLite, nessun account Cloudflare): applica le migrazioni, inserisce una riga nota, esegue `wrangler d1 export`, importa il dump in un database vuoto e confronta la riga, il numero di righe di `Setting` e `Lead` e la presenza della tabella `RateLimit` nello schema.
+
+Il ripristino avviene su un database vuoto di proposito: il dump contiene schema, dati e tabella `d1_migrations`, quindi importarlo sopra un database gia' migrato deve fallire (ed e' cosi' che si accorge di un ripristino fatto nel modo sbagliato). Lo stato locale vive in una cartella temporanea e viene cancellato a fine corsa: `wrangler dev` e il tuo D1 locale non vengono toccati.
 
 ## 5. Smoke test geografici (`npm run smoke:geo`)
 

@@ -1,11 +1,13 @@
 // ============================================================
-// Rate limiter semplice in-memory per proteggere le route
-// da burst di richieste (es. invio email, AI, ricerca).
+// Rate limiter per client, usato dalle route interne.
 //
-// Nota: essendo in-memory, NON scala su più istanze serverless
-// (es. Vercel con più regioni): in quel caso va sostituito
-// con Redis/Upstash. Per uso locale / singola istanza va bene.
+// Il contatore vive nel database applicativo (src/lib/rate-limit-store.ts),
+// quindi vale per tutte le istanze e per tutti gli isolate di Cloudflare.
+// Se il database non risponde si ripiega per 30 secondi su un contatore in
+// memoria: meglio di un 500 sul login, ma più debole, quindi non va
+// considerato una difesa contro un attacco distribuito.
 // ============================================================
+import { hitSharedRateLimitSafely } from "@/lib/rate-limit-store";
 
 type Bucket = {
   count: number;
@@ -55,12 +57,20 @@ export function clientFingerprint(req: Request, suffix = ""): string {
   // reverse proxy fidato che lo sovrascrive. In locale tutti condividono un
   // bucket, che per un'app single-user va benissimo.
   const trustProxy = (process.env.TRUST_PROXY || "").trim() === "1";
-  const ip = trustProxy
-    ? headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      headers.get("x-real-ip") ||
-      headers.get("cf-connecting-ip") ||
-      "unknown"
-    : "local";
+  // Su Workers il runtime e' Cloudflare: CF-Connecting-IP viene sovrascritto
+  // ad ogni richiesta, quindi il client non puo' falsificarlo. Senza questo
+  // tutti gli utenti condividerebbero il bucket "local" e un singolo
+  // attaccante bloccherebbe il proprietario.
+  const onCloudflare =
+    process.env.CLOUDFLARE_WORKERS === "1" || process.env.DATABASE_PROVIDER === "d1";
+  const cfIp = onCloudflare ? headers.get("cf-connecting-ip")?.trim() || "" : "";
+  const ip = cfIp
+    ? cfIp
+    : trustProxy
+      ? headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        headers.get("x-real-ip") ||
+        "unknown"
+      : "local";
   const ua = headers.get("user-agent") || "";
   let h = 0;
   const s = ip + "|" + ua + "|" + suffix;
@@ -75,7 +85,8 @@ export async function rateLimitedResponse(
   windowMs: number
 ): Promise<Response | null> {
   const fp = clientFingerprint(req, scope);
-  const r = checkRateLimit(fp, max, windowMs);
+  const r =
+    (await hitSharedRateLimitSafely(fp, max, windowMs)) ?? checkRateLimit(fp, max, windowMs);
   if (!r.blocked) return null;
   const seconds = Math.ceil(r.resetAfterMs / 1000);
   return new Response(

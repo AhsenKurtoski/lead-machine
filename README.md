@@ -219,7 +219,7 @@ The interface is translated into **7 languages**, with per-country formatting:
 - **Security headers**: CSP, HSTS in production, `X-Frame-Options`, `nosniff`, Referrer-Policy and Permissions-Policy are set in `next.config.mjs`; remote `next/image` hosts are disabled.
 - **SSRF guard**: user-supplied website URLs are resolved and private, loopback and link-local targets are rejected before HTTP checks, screenshots or Playwright navigation.
 - **Sandboxed demo previews**: generated demo HTML runs in an iframe without scripts and without a referrer.
-- **Rate limiting** (in-memory) on login, writes, emails, verification and AI endpoints. Set `TRUST_PROXY=1` only behind a proxy you control; otherwise forwarded headers are ignored.
+- **Rate limiting** shared through the app database on login, writes, emails, verification and AI endpoints, so it holds across instances and Cloudflare isolates (in-memory only as a 30-second fallback if the database is unreachable). Behind Cloudflare the client IP comes from `CF-Connecting-IP`; set `TRUST_PROXY=1` only behind a proxy you control, otherwise forwarded headers are ignored.
 - **Input sanitization** + typed coercion: `asString / asNumber / asBoolean / asArray`, HTML escaping, URL normalization and email validation.
 - **Settings whitelist** and **secret redaction**: only known keys can be written; `*_api_key` and `*_pass` values are returned masked and masked values are refused on write.
 - **Prisma parameterized queries and transactions**: atomic writes on imports, receipts and bulk operations.
