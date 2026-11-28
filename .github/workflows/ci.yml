@@ -139,6 +139,16 @@ jobs:
           fi
           echo "rate limit su D1: 429 dopo 10 tentativi"
 
+      - name: Invio email reale su workerd (SMTP locale)
+        # `nodemailer` usa node:net e node:tls: con nodejs_compat funzionano,
+        # ma un bump di Wrangler/workerd potrebbe romperli senza che il build
+        # se ne accorga. Qui il Worker apre davvero un socket SMTP, si
+        # autentica, consegna il messaggio e verifichiamo EmailLog e stato lead.
+        env:
+          APP_PASSWORD: ci-worker-password-2026
+          WORKER_URL: http://127.0.0.1:8799
+        run: node scripts/check-email-worker.mjs
+
       - name: Log del Worker in caso di errore
         if: failure()
         run: |

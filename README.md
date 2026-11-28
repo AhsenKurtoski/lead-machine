@@ -263,7 +263,7 @@ Lead Machine uses AI to generate outreach scripts and score leads. You can use G
 4. Paste it in your `.env` file as `GROQ_API_KEY=gsk_...`
 
 Other optional prerequisites:
-- **SMTP server** (Gmail with app password, SendGrid, Brevo…). Without SMTP the app writes `.eml` files to `./tmp/emails` so you can still inspect them locally.
+- **SMTP server** (Gmail with app password, SendGrid, Brevo…). Without SMTP the app writes `.eml` files to `./tmp/emails` so you can still inspect them locally. Sending works on Cloudflare Workers too (`nodejs_compat` provides the TCP/TLS sockets `nodemailer` needs) and `npm run check:email:worker` verifies it by delivering a real message to a local SMTP server inside workerd.
 - **Playwright / Chromium** (for homepage screenshots) — install via `npm run setup:screenshot`.
 
 ### 2. Install & run
