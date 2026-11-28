@@ -300,3 +300,13 @@ model ApiKey {
   @@index([enabled])
 }
 
+
+// --- Rate limit condiviso ---
+// Un contatore per chiave (IP+user-agent oppure chiave API+scope). Vive nel
+// database, non nella memoria del processo: su Workers gli isolate sono tanti
+// e muoiono spesso, quindi un contatore locale non fermerebbe nulla.
+model RateLimit {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+}

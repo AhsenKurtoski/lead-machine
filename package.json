@@ -68,6 +68,7 @@
     "smoke:api": "node scripts/smoke-api.mjs",
     "test:flows": "node scripts/test-flows.mjs",
     "check:schema": "node scripts/check-schema.mjs",
+    "check:backup": "node scripts/check-backup-restore.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "smoke:geo": "node scripts/smoke-geo.mjs",
     "perf:check": "node scripts/perf-check.mjs",
