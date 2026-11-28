@@ -305,7 +305,12 @@ export default function LeadDetailPage() {
         <Link href="/crm" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Torna al CRM
         </Link>
-        <Button variant="destructive" size="sm" onClick={() => setDeleteDialogOpen(true)}>
+        <Button
+          variant="destructive"
+          size="sm"
+          data-testid="delete-lead"
+          onClick={() => setDeleteDialogOpen(true)}
+        >
           <Trash2 className="h-4 w-4" /> Elimina
         </Button>
       </div>
@@ -368,6 +373,7 @@ export default function LeadDetailPage() {
               {STATUSES.map((s) => (
                 <button
                   key={s}
+                  data-testid={`status-${s}`}
                   onClick={() => changeStatus(s)}
                   className={cn(
                     "rounded-full border px-3 py-1.5 text-sm transition-colors",
